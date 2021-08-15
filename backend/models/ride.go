@@ -1,13 +1,17 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 type Ride struct {
-	ID   uint32    `json:"id"`
-	Type string    `json:"type"`
-	Date time.Time `json:"date"`
-	From string    `json:"from"`
-	To   string    `json:"to"`
+	ID   primitive.ObjectID `bson:"_id,omitempty" json:"id"`
+	Type string             `bson:"type" json:"type"`
+	Date time.Time          `bson:"date" json:"date"`
+	From string             `bson:"from" json:"from"`
+	To   string             `bson:"to" json:"to"`
 }
 
 type RideDTO struct {
@@ -16,11 +20,3 @@ type RideDTO struct {
 	From string `json:"from"`
 	To   string `json:"to"`
 }
-
-var Rides = []Ride{
-	{ID: 1, Type: "taxi", Date: time.Now(), From: "Campus", To: "Sabiha Gokcen Airport"},
-	{ID: 2, Type: "offer", Date: time.Now(), From: "Campus", To: "Kadikoy"},
-	{ID: 3, Type: "request", Date: time.Now(), From: "Taksim", To: "Kampus"},
-}
-
-var RidesId uint32 = 3

@@ -11,13 +11,13 @@ import (
 
 func main() {
 	godotenv.Load()
-	db_uri := os.Getenv("DB_CONNECTION")
 
-	var env common.Env
-	{ // Prepare dependencies
-		client, close := common.InitilizeDb(db_uri)
-		env.Db = client
-		defer close()
+	db_uri := os.Getenv("DB_CONNECTION")
+	db, close := common.InitilizeDb(db_uri)
+	defer close()
+
+	env := common.Env{
+		Db: db,
 	}
 
 	router := gin.Default()
