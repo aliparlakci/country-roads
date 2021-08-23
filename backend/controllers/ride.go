@@ -29,18 +29,13 @@ func getRide(env *common.Env) gin.HandlerFunc {
 			return
 		}
 
-		ctx.JSON(http.StatusOK, models.RideDTO{
-			Type: ride.Type,
-			From: ride.From,
-			To:   ride.To,
-			Date: ride.Date.Unix(),
-		})
+		ctx.JSON(http.StatusOK, ride)
 	}
 }
 
 func getAllRides(env *common.Env) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		results := make([]models.RideDTO, 0)
+		results := make([]models.Ride, 0)
 
 		collection := env.Db.Database("country-roads").Collection("rides")
 
@@ -57,12 +52,7 @@ func getAllRides(env *common.Env) gin.HandlerFunc {
 				return
 			}
 
-			results = append(results, models.RideDTO{
-				Type: ride.Type,
-				From: ride.From,
-				To:   ride.To,
-				Date: ride.Date.Unix(),
-			})
+			results = append(results, ride)
 		}
 
 		ctx.JSON(http.StatusOK, results)
@@ -73,20 +63,19 @@ func postRides(env *common.Env) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var ride models.RideDTO
 
-		if err := ctx.BindJSON(&ride); err != nil {
+		if err := ctx.Bind(&ride); err != nil {
 			ctx.JSON(http.StatusBadRequest, fmt.Sprintf("Ride format was incorrect: %v", err))
 			return
 		}
 
-		newRide := models.Ride{
-			Type: ride.Type,
-			Date: time.Unix(ride.Date, 0),
-			From: ride.From,
-			To:   ride.To,
-		}
-
 		collection := env.Db.Database("country-roads").Collection("rides")
-		result, err := collection.InsertOne(ctx, newRide)
+		result, err := collection.InsertOne(ctx, models.Ride{
+			Type:        ride.Type,
+			Date:        ride.Date,
+			Destination: ride.Destination,
+			Direction:   ride.Direction,
+			CreatedAt:   time.Now(),
+		})
 
 		if err != nil {
 			ctx.String(http.StatusInternalServerError, fmt.Sprintf("Ride couldn't get created: %v", err))
