@@ -17,11 +17,11 @@ func main() {
 
 	var env *common.Env
 	{
-		db_uri := os.Getenv("DB_CONNECTION")
+		db_uri := os.Getenv("MDB_URI")
 		db, close := common.InitilizeDb(db_uri)
 		defer close()
 
-		rdb_uri := os.Getenv("REDIS_ADDR")
+		rdb_uri := os.Getenv("RDB_URI")
 		rdb := common.InitilizeRedis(rdb_uri, "", 0)
 
 		env = &common.Env{
@@ -44,6 +44,7 @@ func main() {
 
 	api := router.Group("api")
 	controllers.RegisterRideController(api, env)
+	controllers.RegisterLocationController(api, env)
 
 	router.Run(":8080")
 }
