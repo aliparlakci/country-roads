@@ -5,8 +5,6 @@ import App from "./App";
 import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
 import reportWebVitals from "./reportWebVitals";
 
-process.env.BACKEND_URI = process.env.BACKEND_URI || "http://localhost:8080";
-
 ReactDOM.render(
   <React.StrictMode>
     <App />

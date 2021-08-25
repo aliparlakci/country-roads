@@ -1,8 +1,20 @@
 import React from "react";
-import NewRideForm from "./components/NewRideForm";
 import styled from "styled-components";
 
+import NewRideForm from "./components/NewRideForm";
+import RideList from "./components/RideList";
+
 import "./App.css";
+
+export default function App() {
+  return (
+    <StyledContainer>
+      <h1>CountryRoads</h1>
+      <NewRideForm />
+      <RideList />
+    </StyledContainer>
+  );
+}
 
 const StyledContainer = styled.div`
   display: flex;
@@ -12,19 +24,4 @@ const StyledContainer = styled.div`
 
   height: 100%;
   width: 100%;
-`
-
-const StyledHeading = styled.h1`
-
-`
-
-function App() {
-  return (
-    <StyledContainer>
-      <StyledHeading>CountryRoads</StyledHeading>
-      <NewRideForm />
-    </StyledContainer>
-  );
-}
-
-export default App;
+`;

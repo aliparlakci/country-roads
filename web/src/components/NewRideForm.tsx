@@ -9,7 +9,7 @@ export default function NewRideForm() {
     event.preventDefault();
     setDisabled(true);
 
-    const URI = process.env.BACKEND_URI;
+    const URI = process.env.BACKEND_URI || "http://localhost:8080";
 
     const formData = new FormData(event.currentTarget);
     const date = formData.get("date")?.toString();
