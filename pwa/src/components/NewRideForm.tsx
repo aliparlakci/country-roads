@@ -1,8 +1,15 @@
 import React, { useState } from "react";
 import styled from "styled-components";
+import { mutate } from "swr";
 import CONSTANTS from "../constants";
+import useLocations from "../hooks/useLocations";
 
-export default function NewRideForm() {
+export interface INewRideForm {
+  onSend: CallableFunction;
+}
+
+export default function NewRideForm({ onSend }: INewRideForm) {
+  const locations = useLocations();
   const [disabled, setDisabled] = useState(false);
 
   const handleSubmit = async (event: any) => {
@@ -24,6 +31,8 @@ export default function NewRideForm() {
     } catch (e) {
       console.error(e);
     }
+
+    mutate(`${URI}/${CONSTANTS.API.RIDES}`)
 
     event.target.reset();
     setDisabled(false);
@@ -103,10 +112,13 @@ export default function NewRideForm() {
           required
           disabled={disabled}
         >
-          <option value="kadikoy">Kadıköy</option>
-          <option value="levent4">4th Levent</option>
-          <option value="istanbul_europe">İstanbul (Europe)</option>
-          <option value="istanbul_asia">İstanbul (Asia)</option>
+          {locations &&
+            locations.map((location) => (
+              <option key={location.id} value={location.id}>
+                {location.display}
+              </option>
+            ))}
+          {!locations && <option>Loading...</option>}
         </select>
       </FormItem>
 
