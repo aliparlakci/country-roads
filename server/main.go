@@ -15,12 +15,19 @@ import (
 func main() {
 	godotenv.Load()
 
-	db_uri := os.Getenv("DB_CONNECTION")
-	db, close := common.InitilizeDb(db_uri)
-	defer close()
+	var env *common.Env
+	{
+		db_uri := os.Getenv("DB_CONNECTION")
+		db, close := common.InitilizeDb(db_uri)
+		defer close()
 
-	env := common.Env{
-		Db: db,
+		rdb_uri := os.Getenv("REDIS_ADDR")
+		rdb := common.InitilizeRedis(rdb_uri, "", 0)
+
+		env = &common.Env{
+			Db:  db,
+			Rdb: rdb,
+		}
 	}
 
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
@@ -36,8 +43,7 @@ func main() {
 	}))
 
 	api := router.Group("api")
-
-	controllers.RegisterRideController(api, &env)
+	controllers.RegisterRideController(api, env)
 
 	router.Run(":8080")
 }

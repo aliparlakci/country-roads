@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/go-redis/redis"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -25,4 +26,12 @@ func InitilizeDb(uri string) (client *mongo.Client, close func()) {
 	}
 
 	return
+}
+
+func InitilizeRedis(uri, password string, db int) *redis.Client {
+	return redis.NewClient(&redis.Options{
+		Addr:     uri,
+		Password: password,
+		DB:       db,
+	})
 }
