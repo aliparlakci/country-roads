@@ -16,7 +16,6 @@ export default function NewRideForm({ onSend }: INewRideForm) {
     event.preventDefault();
     setDisabled(true);
 
-    const URI = process.env.BACKEND_URI || "http://localhost:8080";
 
     const formData = new FormData(event.currentTarget);
     const date = formData.get("date")?.toString();
@@ -24,7 +23,7 @@ export default function NewRideForm({ onSend }: INewRideForm) {
       formData.set("date", (new Date(date).getTime() / 1000).toString());
 
     try {
-      await fetch(`${URI}/${CONSTANTS.API.RIDES}`, {
+      await fetch(CONSTANTS.API().RIDES, {
         method: "POST",
         body: formData,
       });
@@ -32,7 +31,7 @@ export default function NewRideForm({ onSend }: INewRideForm) {
       console.error(e);
     }
 
-    mutate(`${URI}/${CONSTANTS.API.RIDES}`)
+    mutate(CONSTANTS.API().RIDES)
 
     event.target.reset();
     setDisabled(false);

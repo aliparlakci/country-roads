@@ -10,9 +10,7 @@ export interface IRideListProps {
 }
 
 export default function RideList(props: IRideListProps) {
-  const URI = process.env.BACKEND_URI || "http://localhost:8080";
-
-  const { data, error } = useSWR<IRide[]>(`${URI}/${CONSTANTS.API.RIDES}`);
+  const { data, error } = useSWR<IRide[]>(CONSTANTS.API().RIDES);
 
   if (!data) return <div>Loading...</div>;
   if (error) return <div>Error</div>;
