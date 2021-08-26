@@ -6,6 +6,6 @@ import (
 )
 
 type Env struct {
-	Db  *mongo.Client
+	Db  *mongo.Database
 	Rdb *redis.Client
 }

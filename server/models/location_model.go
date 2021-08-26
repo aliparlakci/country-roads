@@ -18,8 +18,8 @@ type Location struct {
 }
 
 type LocationDTO struct {
-	Display  string `bson:"display" json:"display"`
-	ParentID string `bson:"parentId,omitempty" json:"parentId,omitempty"`
+	Display  string `bson:"display" json:"display" form:"display"`
+	ParentID string `bson:"parentId,omitempty" json:"parentId,omitempty" form:"parentId,omitempty"`
 }
 
 func GetSingleLocation(ctx context.Context, database *mongo.Database, objID primitive.ObjectID) (Location, error) {
@@ -50,23 +50,28 @@ func GetLocations(ctx context.Context, database *mongo.Database) ([]Location, er
 }
 
 func RegisterLocation(ctx context.Context, database *mongo.Database, location LocationDTO) (interface{}, error) {
-	var newLocation schemas.LocationSchema
-	newLocation.Display = location.Display
-
+	var newSchema schemas.LocationSchema
 	if location.ParentID != "" {
 		parentId, err := primitive.ObjectIDFromHex(location.ParentID)
 		if err != nil {
 			return nil, err
 		}
 
-		newLocation.ParentID = parentId
-
 		if _, err := GetSingleLocation(ctx, database, parentId); err != nil {
 			return nil, fmt.Errorf("Location with id %v does not exist", parentId.Hex())
 		}
+
+		newSchema = schemas.LocationSchema{
+			Display:  location.Display,
+			ParentID: parentId,
+		}
+	} else {
+		newSchema = schemas.LocationSchema{
+			Display: location.Display,
+		}
 	}
 
-	result, err := database.Collection("locations").InsertOne(ctx, newLocation)
+	result, err := database.Collection("locations").InsertOne(ctx, newSchema)
 	if err != nil {
 		return nil, err
 	}

@@ -16,7 +16,8 @@ func main() {
 	var env *common.Env
 	{
 		db_uri := os.Getenv("MDB_URI")
-		db, close := common.InitilizeDb(db_uri)
+		db_name := "country-roads"
+		db, close := common.InitilizeDb(db_uri, db_name)
 		defer close()
 
 		rdb_uri := os.Getenv("RDB_URI")

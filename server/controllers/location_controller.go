@@ -1,11 +1,11 @@
 package controllers
 
 import (
+	"example.com/country-roads/interfaces"
 	"fmt"
 	"net/http"
 
 	"example.com/country-roads/common"
-	"example.com/country-roads/interfaces"
 	"example.com/country-roads/models"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -13,7 +13,7 @@ import (
 
 func getAllLocations(env *common.Env) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		results, err := models.GetLocations(ctx, env.Db.Database("country-roads"))
+		results, err := models.GetLocations(ctx, env.Db)
 		if err != nil {
 			ctx.String(http.StatusInternalServerError, err.Error())
 			return
@@ -43,12 +43,12 @@ func postLocation(env *common.Env) gin.HandlerFunc {
 				ctx.JSON(http.StatusBadRequest, fmt.Sprintf("Location format was invalid: %v", err))
 			}
 
-			if _, err := models.GetSingleLocation(ctx, env.Db.Database("country-roads"), objID); err != nil {
+			if _, err := models.GetSingleLocation(ctx, env.Db, objID); err != nil {
 				ctx.JSON(http.StatusBadRequest, "Location format was invalid")
 			}
 		}
 
-		id, err := models.RegisterLocation(ctx, env.Db.Database("country-roads"), locationDto)
+		id, err := models.RegisterLocation(ctx, env.Db, locationDto)
 		if err != nil {
 			ctx.String(http.StatusInternalServerError, fmt.Sprintf("Location couldn't get created: %v", err))
 			return

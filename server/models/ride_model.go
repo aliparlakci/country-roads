@@ -2,6 +2,7 @@ package models
 
 import (
 	"context"
+	"example.com/country-roads/aggregations"
 	"fmt"
 	"time"
 
@@ -28,28 +29,6 @@ type RideDTO struct {
 	Destination string    `bson:"destination" json:"destination" form:"destination" binding:"required"`
 }
 
-var rideAggregationPipeline = mongo.Pipeline{
-	bson.D{
-		primitive.E{
-			Key: "$lookup",
-			Value: bson.D{
-				primitive.E{Key: "from", Value: "locations"},
-				primitive.E{Key: "localField", Value: "destination"},
-				primitive.E{Key: "foreignField", Value: "_id"}, primitive.E{Key: "as", Value: "destination"},
-			},
-		},
-	},
-	bson.D{
-		primitive.E{
-			Key: "$unwind",
-			Value: bson.D{
-				primitive.E{Key: "path", Value: "$destination"},
-				primitive.E{Key: "preserveNullAndEmptyArrays", Value: false},
-			},
-		},
-	},
-}
-
 func GetSingleRide(ctx context.Context, database *mongo.Database, objID primitive.ObjectID) (Ride, error) {
 	var ride Ride
 	result := database.Collection("rides").FindOne(ctx, bson.M{"_id": objID})
@@ -63,10 +42,8 @@ func GetSingleRide(ctx context.Context, database *mongo.Database, objID primitiv
 func GetRides(ctx context.Context, database *mongo.Database) ([]Ride, error) {
 	results := make([]Ride, 0)
 
-	pipeline := rideAggregationPipeline
-
 	collection := database.Collection("rides")
-	cursor, err := collection.Aggregate(ctx, pipeline)
+	cursor, err := collection.Aggregate(ctx, aggregations.RideWithDestination)
 	if err != nil {
 		return nil, err
 	}

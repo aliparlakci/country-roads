@@ -1,24 +1,26 @@
 import React from "react";
-import useSWR from "swr";
 
 import RideItem from "./RideItem";
-import CONSTANTS from "../constants";
-import IRide from "../models/ride";
 import styled from "styled-components";
+import RideType from "../types/rideType";
+import RideDirection from "../types/rideDirection";
+import useRides from "../hooks/useRides";
 
 export interface IRideListProps {
-  refresh: number;
+  type?: RideType
+  direction?: RideDirection
+  destination?: Location
 }
 
 export default function RideList(props: IRideListProps) {
-  const { data, error } = useSWR<IRide[]>(CONSTANTS.API().RIDES);
+  const { data, error } = useRides();
 
   if (!data) return <i>Nothing to see here...</i>;
   if (error) return <div>Error</div>;
 
   return (
     <RideListContainer>
-      {data.map((ride, i) => (
+      {data && data.map((ride, i) => (
         <RideItem key={i} ride={ride} />
       ))}
     </RideListContainer>

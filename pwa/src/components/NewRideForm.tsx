@@ -1,21 +1,21 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { mutate } from "swr";
+
 import CONSTANTS from "../constants";
 import useLocations from "../hooks/useLocations";
+import mutateWithQueries from "../utils/mutateWithQueries";
 
-export interface INewRideForm {
-  onSend: CallableFunction;
-}
+export interface INewRideFormProps {}
 
-export default function NewRideForm({ onSend }: INewRideForm) {
-  const locations = useLocations();
+export default function NewRideForm(props: INewRideFormProps) {
+  const { data: locations } = useLocations();
   const [disabled, setDisabled] = useState(false);
+
+  useEffect(() => setDisabled(!locations), [locations]);
 
   const handleSubmit = async (event: any) => {
     event.preventDefault();
     setDisabled(true);
-
 
     const formData = new FormData(event.currentTarget);
     const date = formData.get("date")?.toString();
@@ -31,7 +31,7 @@ export default function NewRideForm({ onSend }: INewRideForm) {
       console.error(e);
     }
 
-    mutate(CONSTANTS.API().RIDES)
+    mutateWithQueries(CONSTANTS.API().RIDES)
 
     event.target.reset();
     setDisabled(false);

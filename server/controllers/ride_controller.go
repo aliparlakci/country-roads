@@ -8,13 +8,12 @@ import (
 	"example.com/country-roads/interfaces"
 	"example.com/country-roads/models"
 	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func getRide(env *common.Env) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		database := env.Db.Database("country-roads")
+		database := env.Db
 
 		objID, err := primitive.ObjectIDFromHex(ctx.Param("id"))
 		if err != nil {
@@ -36,7 +35,7 @@ func getAllRides(env *common.Env) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var results []map[string]interface{}
 
-		if rides, err := models.GetRides(ctx, env.Db.Database("country-roads")); err != nil {
+		if rides, err := models.GetRides(ctx, env.Db); err != nil {
 			ctx.String(http.StatusInternalServerError, err.Error())
 			return
 		} else {
@@ -63,11 +62,11 @@ func postRides(env *common.Env) gin.HandlerFunc {
 			ctx.JSON(http.StatusBadRequest, fmt.Sprintf("Ride format was invalid: %v", err))
 		}
 
-		if !rideDto.ValidateDestination(ctx, env.Db.Database("country-roads")) {
+		if !rideDto.ValidateDestination(ctx, env.Db) {
 			ctx.JSON(http.StatusBadRequest, "Ride format was invalid")
 		}
 
-		id, err := models.CreateRide(ctx, env.Db.Database("country-roads"), rideDto)
+		id, err := models.CreateRide(ctx, env.Db, rideDto)
 		if err != nil {
 			ctx.String(http.StatusInternalServerError, fmt.Sprintf("Ride couldn't get created: %v", err))
 			return
@@ -79,21 +78,19 @@ func postRides(env *common.Env) gin.HandlerFunc {
 
 func deleteRides(env *common.Env) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		collection := env.Db.Database("country-roads").Collection("rides")
-
 		objID, err := primitive.ObjectIDFromHex(ctx.Param("id"))
 		if err != nil {
 			ctx.String(http.StatusInternalServerError, err.Error())
 			return
 		}
 
-		result, err := collection.DeleteOne(ctx, bson.M{"_id": objID})
+		deletedCount, err := models.DeleteRide(ctx, env.Db, objID)
 		if err != nil {
 			ctx.String(http.StatusInternalServerError, err.Error())
 			return
 		}
 
-		if result.DeletedCount == 0 {
+		if deletedCount == 0 {
 			ctx.JSON(http.StatusNotFound, fmt.Sprintf("Ride with ID %v does not exist", objID))
 		}
 

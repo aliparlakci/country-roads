@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { mutate } from "swr";
 import CONSTANTS from "../constants";
-import IRide from "../models/ride";
+import IRide from "../types/ride";
 import capitalize from "../utils/capitalize";
 
 export interface IRideItemProps {

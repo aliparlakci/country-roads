@@ -9,15 +9,16 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func InitilizeDb(uri string) (client *mongo.Client, close func()) {
+func InitilizeDb(uri, name string) (database *mongo.Database, close func()) {
 	c, cancel := context.WithTimeout(context.TODO(), 10*time.Second)
 	defer cancel()
 
-	var err error
-	client, err = mongo.Connect(c, options.Client().ApplyURI(uri))
+	client, err := mongo.Connect(c, options.Client().ApplyURI(uri))
 	if err != nil {
 		panic(err)
 	}
+
+	database = client.Database(name)
 
 	close = func() {
 		if err := client.Disconnect(context.TODO()); err != nil {
