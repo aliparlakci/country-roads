@@ -162,13 +162,13 @@ func (dto RideDTO) Validate() (bool, error) {
 	return true, nil
 }
 
-func (r Ride) JSONify() map[string]interface{} {
+func (r Ride) Jsonify() map[string]interface{} {
 	return map[string]interface{}{
 		"id":          r.ID.Hex(),
 		"type":        r.Type,
 		"date":        fmt.Sprint(r.Date.Unix()),
 		"direction":   r.Direction,
-		"destination": r.Destination.JSONify(),
+		"destination": r.Destination.Jsonify(),
 		"createdAt":   fmt.Sprint(r.CreatedAt.Unix()),
 	}
 }

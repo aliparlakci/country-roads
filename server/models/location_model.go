@@ -87,10 +87,10 @@ func (lDto LocationDTO) Validate() (bool, error) {
 	return true, nil
 }
 
-func (location Location) JSONify() map[string]interface{} {
+func (location Location) Jsonify() map[string]interface{} {
 	var parent map[string]interface{}
 	if location.Parent != nil {
-		parent = location.Parent.JSONify()
+		parent = location.Parent.Jsonify()
 	} else {
 		parent = nil
 	}

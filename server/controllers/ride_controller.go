@@ -27,7 +27,7 @@ func getRide(env *common.Env) gin.HandlerFunc {
 			return
 		}
 
-		ctx.JSON(http.StatusOK, ride.JSONify())
+		ctx.JSON(http.StatusOK, ride.Jsonify())
 	}
 }
 
@@ -40,7 +40,7 @@ func getAllRides(env *common.Env) gin.HandlerFunc {
 			return
 		} else {
 			for _, ride := range rides {
-				results = append(results, ride.JSONify())
+				results = append(results, ride.Jsonify())
 			}
 		}
 

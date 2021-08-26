@@ -4,6 +4,6 @@ type Validator interface {
 	Validate() (bool, error)
 }
 
-type JSONifier interface {
-	JSONify() map[string]interface{}
+type Jsonifier interface {
+	Jsonify() map[string]interface{}
 }
