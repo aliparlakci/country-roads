@@ -1,8 +1,9 @@
 package controllers
 
 import (
-	"example.com/country-roads/interfaces"
+	"example.com/country-roads/schemas"
 	"fmt"
+	"go.mongodb.org/mongo-driver/bson"
 	"net/http"
 
 	"example.com/country-roads/common"
@@ -13,7 +14,8 @@ import (
 
 func getAllLocations(env *common.Env) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		results, err := models.GetLocations(ctx, env.Db)
+		var finder models.LocationFinder = env.Collections.LocationCollection
+		results, err := finder.FindMany(ctx, bson.D{})
 		if err != nil {
 			ctx.String(http.StatusInternalServerError, err.Error())
 			return
@@ -32,23 +34,31 @@ func postLocation(env *common.Env) gin.HandlerFunc {
 			return
 		}
 
-		var validator interfaces.Validator = locationDto
-		if isValid, err := validator.Validate(); !isValid || err != nil {
+		validator := env.Validators.LocationValidator()
+		validator.SetDto(locationDto)
+		if isValid, err := validator.Validate(ctx); !isValid || err != nil {
 			ctx.JSON(http.StatusBadRequest, fmt.Sprintf("Location format was invalid: %v", err))
 		}
 
+		var schema schemas.LocationSchema
 		if locationDto.ParentID != "" {
-			objID, err := primitive.ObjectIDFromHex(locationDto.ParentID)
+			parentId, err := primitive.ObjectIDFromHex(locationDto.ParentID)
 			if err != nil {
 				ctx.JSON(http.StatusBadRequest, fmt.Sprintf("Location format was invalid: %v", err))
 			}
 
-			if _, err := models.GetSingleLocation(ctx, env.Db, objID); err != nil {
+			var finder models.LocationFinder = env.Collections.LocationCollection
+			if _, err := finder.FindOne(ctx, bson.M{"_id": parentId}); err != nil {
 				ctx.JSON(http.StatusBadRequest, "Location format was invalid")
 			}
+
+			schema = schemas.LocationSchema{Display: locationDto.Display, ParentID: parentId}
+		} else {
+			schema = schemas.LocationSchema{Display: locationDto.Display}
 		}
 
-		id, err := models.RegisterLocation(ctx, env.Db, locationDto)
+		var inserter models.LocationInserter = env.Collections.LocationCollection
+		id, err := inserter.InsertOne(ctx, schema)
 		if err != nil {
 			ctx.String(http.StatusInternalServerError, fmt.Sprintf("Location couldn't get created: %v", err))
 			return

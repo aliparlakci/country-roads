@@ -2,12 +2,10 @@ package models
 
 import (
 	"context"
-	"example.com/country-roads/aggregations"
 	"fmt"
 	"time"
 
 	"example.com/country-roads/schemas"
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -29,21 +27,43 @@ type RideDTO struct {
 	Destination string    `bson:"destination" json:"destination" form:"destination" binding:"required"`
 }
 
-func GetSingleRide(ctx context.Context, database *mongo.Database, objID primitive.ObjectID) (Ride, error) {
+type RideCollection struct {
+	Collection *mongo.Collection
+}
+
+type RideFinder interface {
+	FindOne(ctx context.Context, filter interface{}) (Ride, error)
+	FindMany(ctx context.Context, pipeline interface{}) ([]Ride, error)
+}
+
+type RideInserter interface {
+	InsertOne(ctx context.Context, candidate schemas.RideSchema) (interface{}, error)
+}
+
+type RideDeleter interface {
+	DeleteOne(ctx context.Context, filter interface{}) (int64, error)
+}
+
+type RideRepository interface {
+	RideFinder
+	RideInserter
+	RideDeleter
+}
+
+func (r *RideCollection) FindOne(ctx context.Context, filter interface{}) (Ride, error) {
 	var ride Ride
-	result := database.Collection("rides").FindOne(ctx, bson.M{"_id": objID})
+	result := r.Collection.FindOne(ctx, filter)
 	if err := result.Err(); err != nil {
-		return Ride{}, err
+		return ride, err
 	}
 	err := result.Decode(&ride)
 	return ride, err
 }
 
-func GetRides(ctx context.Context, database *mongo.Database) ([]Ride, error) {
+func (r *RideCollection) FindMany(ctx context.Context, pipeline interface{}) ([]Ride, error) {
 	results := make([]Ride, 0)
 
-	collection := database.Collection("rides")
-	cursor, err := collection.Aggregate(ctx, aggregations.RideWithDestination)
+	cursor, err := r.Collection.Aggregate(ctx, pipeline)
 	if err != nil {
 		return nil, err
 	}
@@ -60,23 +80,8 @@ func GetRides(ctx context.Context, database *mongo.Database) ([]Ride, error) {
 	return results, nil
 }
 
-func CreateRide(ctx context.Context, database *mongo.Database, newRide RideDTO) (interface{}, error) {
-	destination_id, err := primitive.ObjectIDFromHex(newRide.Destination)
-	if err != nil {
-		return nil, err
-	}
-
-	if _, err := GetSingleLocation(ctx, database, destination_id); err != nil {
-		return nil, fmt.Errorf("Location with id %v does not exist", destination_id.Hex())
-	}
-
-	result, err := database.Collection("rides").InsertOne(ctx, schemas.RideSchema{
-		Type:        newRide.Type,
-		Date:        newRide.Date,
-		Destination: destination_id,
-		Direction:   newRide.Direction,
-		CreatedAt:   time.Now(),
-	})
+func (r *RideCollection) InsertOne(ctx context.Context, candidate schemas.RideSchema) (interface{}, error) {
+	result, err := r.Collection.InsertOne(ctx, candidate)
 	if err != nil {
 		return nil, err
 	}
@@ -84,82 +89,13 @@ func CreateRide(ctx context.Context, database *mongo.Database, newRide RideDTO) 
 	return result.InsertedID, nil
 }
 
-func DeleteRide(ctx context.Context, database *mongo.Database, objID primitive.ObjectID) (int64, error) {
-	collection := database.Collection("rides")
-	result, err := collection.DeleteOne(ctx, bson.M{"_id": objID})
+func (r *RideCollection) DeleteOne(ctx context.Context, filter interface{}) (int64, error) {
+	result, err := r.Collection.DeleteOne(ctx, filter)
 	if err != nil {
 		return 0, err
 	}
 
 	return result.DeletedCount, nil
-}
-
-func (dto RideDTO) ValidateDate() bool {
-	date := dto.Date
-	today := time.Now()
-	if today.Year() < date.Year() {
-		return true
-	} else if today.Year() == date.Year() {
-		if today.Month() < date.Month() {
-			return true
-		} else if today.Month() == date.Month() {
-			if today.Day() <= date.Day() {
-				return true
-			}
-		}
-	}
-	return false
-}
-
-func (dto RideDTO) ValidateType() bool {
-	switch dto.Type {
-	case "offer":
-		return true
-	case "request":
-		return true
-	case "taxi":
-		return true
-	default:
-		return false
-	}
-}
-
-func (dto RideDTO) ValidateDirection() bool {
-	switch dto.Direction {
-	case "to_campus":
-		return true
-	case "from_campus":
-		return true
-	default:
-		return false
-	}
-}
-
-func (dto RideDTO) ValidateDestination(ctx context.Context, database *mongo.Database) bool {
-	destination_id, err := primitive.ObjectIDFromHex(dto.Destination)
-	if err != nil {
-		return false
-	}
-
-	if _, err := GetSingleLocation(ctx, database, destination_id); err != nil {
-		return false
-	}
-
-	return true
-}
-
-func (dto RideDTO) Validate() (bool, error) {
-	if !dto.ValidateDate() {
-		return false, fmt.Errorf("date is not valid")
-	}
-	if !dto.ValidateDirection() {
-		return false, fmt.Errorf("direction is not valid")
-	}
-	if !dto.ValidateType() {
-		return false, fmt.Errorf("ride type is not valid")
-	}
-
-	return true, nil
 }
 
 func (r Ride) Jsonify() map[string]interface{} {

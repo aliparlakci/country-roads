@@ -1,11 +1,14 @@
 package controllers
 
 import (
+	"example.com/country-roads/aggregations"
+	"example.com/country-roads/schemas"
 	"fmt"
+	"go.mongodb.org/mongo-driver/bson"
 	"net/http"
+	"time"
 
 	"example.com/country-roads/common"
-	"example.com/country-roads/interfaces"
 	"example.com/country-roads/models"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -13,15 +16,15 @@ import (
 
 func getRide(env *common.Env) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		database := env.Db
-
 		objID, err := primitive.ObjectIDFromHex(ctx.Param("id"))
 		if err != nil {
 			ctx.String(http.StatusInternalServerError, err.Error())
 			return
 		}
 
-		ride, err := models.GetSingleRide(ctx, database, objID)
+		var finder models.RideFinder = env.Collections.RideCollection
+
+		ride, err := finder.FindOne(ctx, bson.M{"_id": objID})
 		if err != nil {
 			ctx.String(http.StatusInternalServerError, err.Error())
 			return
@@ -35,7 +38,8 @@ func getAllRides(env *common.Env) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var results []map[string]interface{}
 
-		if rides, err := models.GetRides(ctx, env.Db); err != nil {
+		var finder models.RideFinder = env.Collections.RideCollection
+		if rides, err := finder.FindMany(ctx, aggregations.RideWithDestination); err != nil {
 			ctx.String(http.StatusInternalServerError, err.Error())
 			return
 		} else {
@@ -57,16 +61,26 @@ func postRides(env *common.Env) gin.HandlerFunc {
 			return
 		}
 
-		var validator interfaces.Validator = rideDto
-		if isValid, err := validator.Validate(); !isValid || err != nil {
+		destinationId, err := primitive.ObjectIDFromHex(rideDto.Destination)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, fmt.Sprintf("Ride format was incorrect: %v", err))
+			return
+		}
+
+		validator := env.Validators.RideValidator()
+		validator.SetDto(rideDto)
+		if isValid, err := validator.Validate(ctx); !isValid || err != nil {
 			ctx.JSON(http.StatusBadRequest, fmt.Sprintf("Ride format was invalid: %v", err))
 		}
 
-		if !rideDto.ValidateDestination(ctx, env.Db) {
-			ctx.JSON(http.StatusBadRequest, "Ride format was invalid")
-		}
-
-		id, err := models.CreateRide(ctx, env.Db, rideDto)
+		var inserter models.RideInserter = env.Collections.RideCollection
+		id, err := inserter.InsertOne(ctx, schemas.RideSchema{
+			Type:        rideDto.Type,
+			Date:        rideDto.Date,
+			Destination: destinationId,
+			Direction:   rideDto.Direction,
+			CreatedAt:   time.Now(),
+		})
 		if err != nil {
 			ctx.String(http.StatusInternalServerError, fmt.Sprintf("Ride couldn't get created: %v", err))
 			return
@@ -84,7 +98,8 @@ func deleteRides(env *common.Env) gin.HandlerFunc {
 			return
 		}
 
-		deletedCount, err := models.DeleteRide(ctx, env.Db, objID)
+		var deleter models.RideDeleter = env.Collections.RideCollection
+		deletedCount, err := deleter.DeleteOne(ctx, bson.M{"_id": objID})
 		if err != nil {
 			ctx.String(http.StatusInternalServerError, err.Error())
 			return

@@ -18,7 +18,7 @@ export default function NewLocationForm(props: INewLocationFormProps) {
     setDisabled(true);
 
     const formData = new FormData(event.currentTarget);
-    if (formData.get("parentId")?.valueOf() === -1) formData.delete("parentId");
+    if (formData.get("parentId")?.valueOf() === "-1") formData.delete("parentId");
 
     try {
       await fetch(CONSTANTS.API().LOCATIONS, {

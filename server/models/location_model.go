@@ -2,10 +2,7 @@ package models
 
 import (
 	"context"
-	"fmt"
-
 	"example.com/country-roads/schemas"
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -22,17 +19,34 @@ type LocationDTO struct {
 	ParentID string `bson:"parentId,omitempty" json:"parentId,omitempty" form:"parentId,omitempty"`
 }
 
-func GetSingleLocation(ctx context.Context, database *mongo.Database, objID primitive.ObjectID) (Location, error) {
+type LocationCollection struct {
+	Collection *mongo.Collection
+}
+
+type LocationFinder interface {
+	FindOne(ctx context.Context, filter interface{}) (Location, error)
+	FindMany(ctx context.Context, pipeline interface{}) ([]Location, error)
+}
+
+type LocationInserter interface {
+	InsertOne(ctx context.Context, candidate schemas.LocationSchema) (interface{}, error)
+}
+
+type LocationRepository interface {
+	LocationFinder
+	LocationInserter
+}
+
+func (l *LocationCollection) FindOne(ctx context.Context, filter interface{}) (Location, error) {
 	var location Location
-	err := database.Collection("locations").FindOne(ctx, bson.M{"_id": objID}).Decode(&location)
+	err := l.Collection.FindOne(ctx, filter).Decode(&location)
 	return location, err
 }
 
-func GetLocations(ctx context.Context, database *mongo.Database) ([]Location, error) {
+func (l *LocationCollection) FindMany(ctx context.Context, pipeline interface{}) ([]Location, error) {
 	results := make([]Location, 0)
 
-	collection := database.Collection("locations")
-	cursor, err := collection.Find(ctx, bson.M{})
+	cursor, err := l.Collection.Aggregate(ctx, pipeline)
 	if err != nil {
 		return nil, err
 	}
@@ -49,29 +63,8 @@ func GetLocations(ctx context.Context, database *mongo.Database) ([]Location, er
 	return results, nil
 }
 
-func RegisterLocation(ctx context.Context, database *mongo.Database, location LocationDTO) (interface{}, error) {
-	var newSchema schemas.LocationSchema
-	if location.ParentID != "" {
-		parentId, err := primitive.ObjectIDFromHex(location.ParentID)
-		if err != nil {
-			return nil, err
-		}
-
-		if _, err := GetSingleLocation(ctx, database, parentId); err != nil {
-			return nil, fmt.Errorf("Location with id %v does not exist", parentId.Hex())
-		}
-
-		newSchema = schemas.LocationSchema{
-			Display:  location.Display,
-			ParentID: parentId,
-		}
-	} else {
-		newSchema = schemas.LocationSchema{
-			Display: location.Display,
-		}
-	}
-
-	result, err := database.Collection("locations").InsertOne(ctx, newSchema)
+func (l *LocationCollection) InsertOne(ctx context.Context, candidate schemas.LocationSchema) (interface{}, error) {
+	result, err := l.Collection.InsertOne(ctx, candidate)
 	if err != nil {
 		return nil, err
 	}
@@ -83,22 +76,18 @@ func (l Location) String() string {
 	return l.Display
 }
 
-func (lDto LocationDTO) Validate() (bool, error) {
-	return true, nil
-}
-
-func (location Location) Jsonify() map[string]interface{} {
+func (l Location) Jsonify() map[string]interface{} {
 	var parent map[string]interface{}
-	if location.Parent != nil {
-		parent = location.Parent.Jsonify()
+	if l.Parent != nil {
+		parent = l.Parent.Jsonify()
 	} else {
 		parent = nil
 	}
 
 	return map[string]interface{}{
-		"id":       location.ID.Hex(),
-		"display":  location.Display,
-		"parentId": location.Parent,
+		"id":       l.ID.Hex(),
+		"display":  l.Display,
+		"parentId": l.Parent,
 		"parent":   parent,
 	}
 }
