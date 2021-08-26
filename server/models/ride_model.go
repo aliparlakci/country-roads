@@ -22,9 +22,9 @@ type Ride struct {
 }
 
 type RideDTO struct {
-	Type        string    `bson:"type" json:"type" form:"type" binding:"required,validridetype"`
-	Date        time.Time `bson:"date" json:"date" form:"date" time_format:"unix" binding:"required,futuredate"`
-	Direction   string    `bson:"direction" json:"direction" form:"direction" binding:"required,validdirection"`
+	Type        string    `bson:"type" json:"type" form:"type" binding:"required"`
+	Date        time.Time `bson:"date" json:"date" form:"date" time_format:"unix" binding:"required"`
+	Direction   string    `bson:"direction" json:"direction" form:"direction" binding:"required"`
 	Destination string    `bson:"destination" json:"destination" form:"destination" binding:"required"`
 }
 
@@ -117,13 +117,81 @@ func DeleteRide(ctx context.Context, database *mongo.Database, objID primitive.O
 	return result.DeletedCount, nil
 }
 
-func (r Ride) JSON() map[string]interface{} {
+func (dto RideDTO) ValidateDate() bool {
+	date := dto.Date
+	today := time.Now()
+	if today.Year() < date.Year() {
+		return true
+	} else if today.Year() == date.Year() {
+		if today.Month() < date.Month() {
+			return true
+		} else if today.Month() == date.Month() {
+			if today.Day() <= date.Day() {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func (dto RideDTO) ValidateType() bool {
+	switch dto.Type {
+	case "offer":
+		return true
+	case "request":
+		return true
+	case "taxi":
+		return true
+	default:
+		return false
+	}
+}
+
+func (dto RideDTO) ValidateDirection() bool {
+	switch dto.Direction {
+	case "to_campus":
+		return true
+	case "from_campus":
+		return true
+	default:
+		return false
+	}
+}
+
+func (dto RideDTO) ValidateDestination(ctx context.Context, database *mongo.Database) bool {
+	destination_id, err := primitive.ObjectIDFromHex(dto.Destination)
+	if err != nil {
+		return false
+	}
+
+	if _, err := GetSingleLocation(ctx, database, destination_id); err != nil {
+		return false
+	}
+
+	return true
+}
+
+func (dto RideDTO) Validate() (bool, error) {
+	if !dto.ValidateDate() {
+		return false, fmt.Errorf("date is not valid")
+	}
+	if !dto.ValidateDirection() {
+		return false, fmt.Errorf("direction is not valid")
+	}
+	if !dto.ValidateType() {
+		return false, fmt.Errorf("ride type is not valid")
+	}
+
+	return true, nil
+}
+
+func (r Ride) JSONify() map[string]interface{} {
 	return map[string]interface{}{
 		"id":          r.ID.Hex(),
 		"type":        r.Type,
 		"date":        fmt.Sprint(r.Date.Unix()),
 		"direction":   r.Direction,
-		"destination": r.Destination.JSON(),
+		"destination": r.Destination.JSONify(),
 		"createdAt":   fmt.Sprint(r.CreatedAt.Unix()),
 	}
 }

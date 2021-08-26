@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"example.com/country-roads/common"
+	"example.com/country-roads/interfaces"
 	"example.com/country-roads/models"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
@@ -27,7 +28,7 @@ func getRide(env *common.Env) gin.HandlerFunc {
 			return
 		}
 
-		ctx.JSON(http.StatusOK, ride.JSON())
+		ctx.JSON(http.StatusOK, ride.JSONify())
 	}
 }
 
@@ -40,7 +41,7 @@ func getAllRides(env *common.Env) gin.HandlerFunc {
 			return
 		} else {
 			for _, ride := range rides {
-				results = append(results, ride.JSON())
+				results = append(results, ride.JSONify())
 			}
 		}
 
@@ -50,14 +51,23 @@ func getAllRides(env *common.Env) gin.HandlerFunc {
 
 func postRides(env *common.Env) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var ride models.RideDTO
+		var rideDto models.RideDTO
 
-		if err := ctx.Bind(&ride); err != nil {
+		if err := ctx.Bind(&rideDto); err != nil {
 			ctx.JSON(http.StatusBadRequest, fmt.Sprintf("Ride format was incorrect: %v", err))
 			return
 		}
 
-		id, err := models.CreateRide(ctx, env.Db.Database("country-roads"), ride)
+		var validator interfaces.Validator = rideDto
+		if isValid, err := validator.Validate(); !isValid || err != nil {
+			ctx.JSON(http.StatusBadRequest, fmt.Sprintf("Ride format was invalid: %v", err))
+		}
+
+		if !rideDto.ValidateDestination(ctx, env.Db.Database("country-roads")) {
+			ctx.JSON(http.StatusBadRequest, "Ride format was invalid")
+		}
+
+		id, err := models.CreateRide(ctx, env.Db.Database("country-roads"), rideDto)
 		if err != nil {
 			ctx.String(http.StatusInternalServerError, fmt.Sprintf("Ride couldn't get created: %v", err))
 			return

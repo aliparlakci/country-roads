@@ -10,5 +10,6 @@ require (
 	github.com/go-redis/redis/v8 v8.11.3 // indirect
 	github.com/joho/godotenv v1.3.0
 	go.mongodb.org/mongo-driver v1.7.1
+	gopkg.in/go-playground/validator.v8 v8.18.2
 	honnef.co/go/tools v0.2.1
 )
