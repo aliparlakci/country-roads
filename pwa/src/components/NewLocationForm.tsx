@@ -8,17 +8,18 @@ import useLocations from "../hooks/useLocations";
 export interface INewLocationFormProps {}
 
 export default function NewLocationForm(props: INewLocationFormProps) {
-  const { data: locations } = useLocations();
+  const { data: locationResponse } = useLocations();
   const [disabled, setDisabled] = useState(false);
 
-  useEffect(() => setDisabled(!locations), [locations]);
+  useEffect(() => setDisabled(!locationResponse), [locationResponse]);
 
   const handleSubmit = async (event: any) => {
     event.preventDefault();
     setDisabled(true);
 
     const formData = new FormData(event.currentTarget);
-    if (formData.get("parentId")?.valueOf() === "-1") formData.delete("parentId");
+    if (formData.get("parentId")?.valueOf() === "-1")
+      formData.delete("parentId");
 
     try {
       await fetch(CONSTANTS.API().LOCATIONS, {
@@ -52,13 +53,13 @@ export default function NewLocationForm(props: INewLocationFormProps) {
         <label htmlFor="destination">Parent:</label>
         <select id="parentId" name="parentId" required disabled={disabled}>
           <option value={-1}>None</option>
-          {locations &&
-            locations.map((location) => (
+          {locationResponse &&
+            locationResponse.results.map((location) => (
               <option key={location.id} value={location.id}>
                 {location.display}
               </option>
             ))}
-          {!locations && <option>Loading...</option>}
+          {!locationResponse && <option>Loading...</option>}
         </select>
       </FormItem>
 

@@ -7,9 +7,9 @@ import RideDirection from "../types/rideDirection";
 import useRides from "../hooks/useRides";
 
 export interface IRideListProps {
-  type?: RideType
-  direction?: RideDirection
-  destination?: Location
+  type?: RideType;
+  direction?: RideDirection;
+  destination?: Location;
 }
 
 export default function RideList(props: IRideListProps) {
@@ -20,9 +20,7 @@ export default function RideList(props: IRideListProps) {
 
   return (
     <RideListContainer>
-      {data && data.map((ride, i) => (
-        <RideItem key={i} ride={ride} />
-      ))}
+      {data && data.results.map((ride, i) => <RideItem key={i} ride={ride} />)}
     </RideListContainer>
   );
 }

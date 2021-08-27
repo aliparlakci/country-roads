@@ -8,10 +8,10 @@ import mutateWithQueries from "../utils/mutateWithQueries";
 export interface INewRideFormProps {}
 
 export default function NewRideForm(props: INewRideFormProps) {
-  const { data: locations } = useLocations();
+  const { data: locationResponse } = useLocations();
   const [disabled, setDisabled] = useState(false);
 
-  useEffect(() => setDisabled(!locations), [locations]);
+  useEffect(() => setDisabled(!locationResponse), [locationResponse]);
 
   const handleSubmit = async (event: any) => {
     event.preventDefault();
@@ -111,13 +111,13 @@ export default function NewRideForm(props: INewRideFormProps) {
           required
           disabled={disabled}
         >
-          {locations &&
-            locations.map((location) => (
+          {locationResponse &&
+            locationResponse.results.map((location) => (
               <option key={location.id} value={location.id}>
                 {location.display}
               </option>
             ))}
-          {!locations && <option>Loading...</option>}
+          {!locationResponse && <option>Loading...</option>}
         </select>
       </FormItem>
 
