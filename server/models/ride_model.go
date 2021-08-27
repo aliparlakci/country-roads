@@ -1,6 +1,6 @@
 package models
 
-//go:generate mockgen -destination=../mocks/mock_ride_model.go -package=mocks example.com/country-roads/models RideRepository
+//go:generate mockgen -destination=../mocks/mock_ride_model.go -package=mocks example.com/country-roads/models RideRepository,RideFinder,RideInserter,RideDeleter
 
 import (
 	"context"

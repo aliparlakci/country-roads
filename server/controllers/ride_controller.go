@@ -16,20 +16,18 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func GetRide(env *common.Env) gin.HandlerFunc {
+func GetRides(finder models.RideFinder) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		rawId := c.Param("id")
 		objID, err := primitive.ObjectIDFromHex(rawId)
 		if err != nil {
-			c.String(http.StatusBadRequest, err.Error())
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ride id"})
 			return
 		}
 
-		var repo models.RideRepository = env.Collections.RideCollection
-
-		ride, err := repo.FindOne(c, bson.M{"_id": objID})
+		ride, err := finder.FindOne(c, bson.M{"_id": objID})
 		if err != nil {
-			c.String(http.StatusInternalServerError, err.Error())
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 			return
 		}
 
@@ -37,13 +35,12 @@ func GetRide(env *common.Env) gin.HandlerFunc {
 	}
 }
 
-func GetAllRides(env *common.Env) gin.HandlerFunc {
+func GetAllRides(finder models.RideFinder) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var results []map[string]interface{}
 
-		var finder models.RideFinder = env.Collections.RideCollection
 		if rides, err := finder.FindMany(c, aggregations.RideWithDestination); err != nil {
-			c.String(http.StatusInternalServerError, err.Error())
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		} else {
 			for _, ride := range rides {
@@ -51,32 +48,36 @@ func GetAllRides(env *common.Env) gin.HandlerFunc {
 			}
 		}
 
-		c.JSON(http.StatusOK, results)
+		if len(results) == 0 {
+			c.JSON(http.StatusNotFound, gin.H{"error": "No matching ride was found"})
+		}
+
+		c.JSON(http.StatusOK, gin.H{"payload": results})
 	}
 }
 
-func PostRides(env *common.Env) gin.HandlerFunc {
+func PostRides(inserter models.RideInserter, getValidator func() validators.Validator) gin.HandlerFunc {
+	validator := getValidator()
 	return func(c *gin.Context) {
 		var rideDto models.RideDTO
 
 		if err := c.Bind(&rideDto); err != nil {
-			c.JSON(http.StatusBadRequest, fmt.Sprintf("Ride format was incorrect: %v", err))
+			c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Ride format was incorrect: %v", err)})
 			return
 		}
 
 		destinationId, err := primitive.ObjectIDFromHex(rideDto.Destination)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, fmt.Sprintf("Ride format was incorrect: %v", err))
+			c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Ride format was incorrect: %v", err)})
 			return
 		}
 
-		var validator validators.Validator = env.Validators.RideValidator()
 		validator.SetDto(rideDto)
 		if isValid, err := validator.Validate(c); !isValid || err != nil {
-			c.JSON(http.StatusBadRequest, fmt.Sprintf("Ride format was invalid: %v", err))
+			c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Ride format was incorrect: %v", err)})
+			return
 		}
 
-		var inserter models.RideInserter = env.Collections.RideCollection
 		id, err := inserter.InsertOne(c, schemas.RideSchema{
 			Type:        rideDto.Type,
 			Date:        rideDto.Date,
@@ -85,40 +86,41 @@ func PostRides(env *common.Env) gin.HandlerFunc {
 			CreatedAt:   time.Now(),
 		})
 		if err != nil {
-			c.String(http.StatusInternalServerError, fmt.Sprintf("Ride couldn't get created: %v", err))
+			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Ride couldn't get created: %v", err)})
 			return
 		}
 
-		c.JSON(http.StatusCreated, id)
+		c.JSON(http.StatusCreated, gin.H{"id": id})
 	}
 }
 
-func DeleteRides(env *common.Env) gin.HandlerFunc {
+func DeleteRides(deleter models.RideDeleter) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		objID, err := primitive.ObjectIDFromHex(c.Param("id"))
 		if err != nil {
-			c.String(http.StatusInternalServerError, err.Error())
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
 
-		var deleter models.RideDeleter = env.Collections.RideCollection
 		deletedCount, err := deleter.DeleteOne(c, bson.M{"_id": objID})
 		if err != nil {
-			c.String(http.StatusInternalServerError, err.Error())
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
 
 		if deletedCount == 0 {
-			c.JSON(http.StatusNotFound, fmt.Sprintf("Ride with ID %v does not exist", objID))
+			c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("Ride with ID %v does not exist", objID)})
 		}
 
-		c.JSON(http.StatusOK, "")
+		c.JSON(http.StatusOK, gin.H{})
 	}
 }
 
 func RegisterRideController(router *gin.RouterGroup, env *common.Env) {
-	router.GET("/rides/:id", GetRide(env))
-	router.GET("/rides", GetAllRides(env))
-	router.POST("/rides", PostRides(env))
-	router.DELETE("/rides/:id", DeleteRides(env))
+	router.GET("/rides", GetRides(env.Collections.RideCollection))
+	router.POST("/rides", PostRides(
+		env.Collections.RideCollection,
+		env.Validators.RideValidator,
+	))
+	router.DELETE("/rides/:id", DeleteRides(env.Collections.RideCollection))
 }
