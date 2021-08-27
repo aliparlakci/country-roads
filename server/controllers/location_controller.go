@@ -1,10 +1,12 @@
 package controllers
 
 import (
-	"example.com/country-roads/schemas"
 	"fmt"
-	"go.mongodb.org/mongo-driver/bson"
 	"net/http"
+
+	"example.com/country-roads/schemas"
+	"example.com/country-roads/validators"
+	"go.mongodb.org/mongo-driver/bson"
 
 	"example.com/country-roads/common"
 	"example.com/country-roads/models"
@@ -34,7 +36,7 @@ func postLocation(env *common.Env) gin.HandlerFunc {
 			return
 		}
 
-		validator := env.Validators.LocationValidator()
+		var validator validators.Validator = env.Validators.LocationValidator()
 		validator.SetDto(locationDto)
 		if isValid, err := validator.Validate(ctx); !isValid || err != nil {
 			ctx.JSON(http.StatusBadRequest, fmt.Sprintf("Location format was invalid: %v", err))

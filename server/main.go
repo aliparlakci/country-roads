@@ -1,10 +1,10 @@
 package main
 
 import (
-	"example.com/country-roads/interfaces"
+	"os"
+
 	"example.com/country-roads/models"
 	"example.com/country-roads/validators"
-	"os"
 
 	"example.com/country-roads/common"
 	"example.com/country-roads/controllers"
@@ -32,10 +32,10 @@ func main() {
 				LocationCollection: &models.LocationCollection{Collection: db.Collection("locations")},
 			},
 			Validators: common.ValidatorContainer{
-				RideValidator:     func() interfaces.Validator {
+				RideValidator: func() validators.Validator {
 					return &validators.RideValidator{LocationFinder: env.Collections.LocationCollection}
 				},
-				LocationValidator: func() interfaces.Validator {
+				LocationValidator: func() validators.Validator {
 					return &validators.LocationValidator{}
 				},
 			},

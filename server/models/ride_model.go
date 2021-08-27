@@ -1,5 +1,7 @@
 package models
 
+//go:generate mockgen -destination=../mocks/mock_ride_model.go -package=mocks example.com/country-roads/models RideRepository
+
 import (
 	"context"
 	"fmt"
