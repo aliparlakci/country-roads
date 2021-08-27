@@ -36,7 +36,7 @@ func main() {
 					return &validators.RideValidator{LocationFinder: env.Collections.LocationCollection}
 				},
 				LocationValidator: func() validators.Validator {
-					return &validators.LocationValidator{}
+					return &validators.LocationValidator{LocationFinder: env.Collections.LocationCollection}
 				},
 			},
 			Rdb: rdb,

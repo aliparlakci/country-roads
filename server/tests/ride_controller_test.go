@@ -9,7 +9,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -43,7 +42,7 @@ func TestGetRidesInvalidID(t *testing.T) {
 	}
 }
 
-func TestGetRidesFound(t *testing.T) {
+func TestGetRidesSuccess(t *testing.T) {
 	param := gin.Param{Key: "id", Value: "551137c2f9e1fac808a5f572"}
 	id, err := primitive.ObjectIDFromHex(param.Value)
 	if err != nil {
@@ -67,20 +66,13 @@ func TestGetRidesFound(t *testing.T) {
 
 		result := w.Result()
 
-		rawBody := make([]byte, 0)
-		chunk := make([]byte, 8)
-		for {
-			n, err := result.Body.Read(chunk)
-			if err == io.EOF {
-				break
-			} else if err != nil {
-				t.Fatal(err)
-			}
-			rawBody = append(rawBody, chunk[:n]...)
+		rawBody, err := BodyReader(result.Body)
+		if err != nil {
+			t.Fatal(err)
 		}
 
 		var resultBody gin.H
-		err := json.Unmarshal(rawBody, &resultBody)
+		err = json.Unmarshal(rawBody, &resultBody)
 		if err != nil {
 			t.Fatal(err)
 		}

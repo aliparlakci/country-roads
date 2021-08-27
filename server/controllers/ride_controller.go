@@ -37,7 +37,7 @@ func GetRides(finder models.RideFinder) gin.HandlerFunc {
 
 func GetAllRides(finder models.RideFinder) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var results []map[string]interface{}
+		results := make([]map[string]interface{}, 0)
 
 		if rides, err := finder.FindMany(c, aggregations.RideWithDestination); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -49,10 +49,11 @@ func GetAllRides(finder models.RideFinder) gin.HandlerFunc {
 		}
 
 		if len(results) == 0 {
-			c.JSON(http.StatusNotFound, gin.H{"error": "No matching ride was found"})
+			c.JSON(http.StatusNotFound, gin.H{"results": results, "error": "No matching ride was found"})
+			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{"payload": results})
+		c.JSON(http.StatusOK, gin.H{"results": results, "error": nil})
 	}
 }
 
@@ -117,7 +118,7 @@ func DeleteRides(deleter models.RideDeleter) gin.HandlerFunc {
 }
 
 func RegisterRideController(router *gin.RouterGroup, env *common.Env) {
-	router.GET("/rides", GetRides(env.Collections.RideCollection))
+	router.GET("/rides", GetAllRides(env.Collections.RideCollection))
 	router.POST("/rides", PostRides(
 		env.Collections.RideCollection,
 		env.Validators.RideValidator,

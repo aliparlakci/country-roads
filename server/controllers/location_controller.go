@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"net/http"
 
 	"example.com/country-roads/schemas"
@@ -11,23 +12,27 @@ import (
 	"example.com/country-roads/common"
 	"example.com/country-roads/models"
 	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func getAllLocations(env *common.Env) gin.HandlerFunc {
+func GetAllLocations(finder models.LocationFinder) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var finder models.LocationFinder = env.Collections.LocationCollection
 		results, err := finder.FindMany(ctx, bson.D{})
 		if err != nil {
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
 
-		ctx.JSON(http.StatusOK, results)
+		if len(results) == 0 {
+			ctx.JSON(http.StatusNotFound, gin.H{})
+			return
+		}
+
+		ctx.JSON(http.StatusOK, gin.H{"results": results})
 	}
 }
 
-func postLocation(env *common.Env) gin.HandlerFunc {
+func PostLocation(inserter models.LocationInserter, getValidator func() validators.Validator) gin.HandlerFunc {
+	validator := getValidator()
 	return func(ctx *gin.Context) {
 		var locationDto models.LocationDTO
 
@@ -36,7 +41,6 @@ func postLocation(env *common.Env) gin.HandlerFunc {
 			return
 		}
 
-		var validator validators.Validator = env.Validators.LocationValidator()
 		validator.SetDto(locationDto)
 		if isValid, err := validator.Validate(ctx); !isValid || err != nil {
 			ctx.JSON(http.StatusBadRequest, fmt.Sprintf("Location format was invalid: %v", err))
@@ -44,22 +48,12 @@ func postLocation(env *common.Env) gin.HandlerFunc {
 
 		var schema schemas.LocationSchema
 		if locationDto.ParentID != "" {
-			parentId, err := primitive.ObjectIDFromHex(locationDto.ParentID)
-			if err != nil {
-				ctx.JSON(http.StatusBadRequest, fmt.Sprintf("Location format was invalid: %v", err))
-			}
-
-			var finder models.LocationFinder = env.Collections.LocationCollection
-			if _, err := finder.FindOne(ctx, bson.M{"_id": parentId}); err != nil {
-				ctx.JSON(http.StatusBadRequest, "Location format was invalid")
-			}
-
+			parentId, _ := primitive.ObjectIDFromHex(locationDto.ParentID)
 			schema = schemas.LocationSchema{Display: locationDto.Display, ParentID: parentId}
 		} else {
 			schema = schemas.LocationSchema{Display: locationDto.Display}
 		}
 
-		var inserter models.LocationInserter = env.Collections.LocationCollection
 		id, err := inserter.InsertOne(ctx, schema)
 		if err != nil {
 			ctx.String(http.StatusInternalServerError, fmt.Sprintf("Location couldn't get created: %v", err))
@@ -71,6 +65,9 @@ func postLocation(env *common.Env) gin.HandlerFunc {
 }
 
 func RegisterLocationController(router *gin.RouterGroup, env *common.Env) {
-	router.GET("/locations", getAllLocations(env))
-	router.POST("/locations", postLocation(env))
+	router.GET("/locations", GetAllLocations(env.Collections.LocationCollection))
+	router.POST("/locations", PostLocation(
+		env.Collections.LocationCollection,
+		env.Validators.LocationValidator,
+	))
 }

@@ -1,5 +1,7 @@
 package models
 
+//go:generate mockgen -destination=../mocks/mock_location_model.go -package=mocks example.com/country-roads/models LocationFinder,LocationInserter,LocationRepository
+
 import (
 	"context"
 	"example.com/country-roads/schemas"
@@ -14,6 +16,8 @@ type Location struct {
 	Parent   *Location          `bson:"parent,omitempty" json:"parent,omitempty"`
 }
 
+type Locations []Location
+
 type LocationDTO struct {
 	Display  string `bson:"display" json:"display" form:"display"`
 	ParentID string `bson:"parentId,omitempty" json:"parentId,omitempty" form:"parentId,omitempty"`
@@ -25,7 +29,7 @@ type LocationCollection struct {
 
 type LocationFinder interface {
 	FindOne(ctx context.Context, filter interface{}) (Location, error)
-	FindMany(ctx context.Context, pipeline interface{}) ([]Location, error)
+	FindMany(ctx context.Context, pipeline interface{}) (Locations, error)
 }
 
 type LocationInserter interface {
@@ -43,7 +47,7 @@ func (l *LocationCollection) FindOne(ctx context.Context, filter interface{}) (L
 	return location, err
 }
 
-func (l *LocationCollection) FindMany(ctx context.Context, pipeline interface{}) ([]Location, error) {
+func (l *LocationCollection) FindMany(ctx context.Context, pipeline interface{}) (Locations, error) {
 	results := make([]Location, 0)
 
 	cursor, err := l.Collection.Aggregate(ctx, pipeline)
@@ -77,17 +81,28 @@ func (l Location) String() string {
 }
 
 func (l Location) Jsonify() map[string]interface{} {
-	var parent map[string]interface{}
 	if l.Parent != nil {
-		parent = l.Parent.Jsonify()
+		return map[string]interface{}{
+			"id":       l.ID.Hex(),
+			"display":  l.Display,
+			"parentId": l.ParentID.Hex(),
+			"parent":   l.Parent.Jsonify(),
+		}
 	} else {
-		parent = nil
+		return map[string]interface{}{
+			"id":       l.ID.Hex(),
+			"display":  l.Display,
+			"parentId": l.ParentID.Hex(),
+		}
+	}
+}
+
+func (l Locations) Jsonify() []map[string]interface{} {
+	result := make([]map[string]interface{}, 0)
+
+	for _, location := range l {
+		result = append(result, location.Jsonify())
 	}
 
-	return map[string]interface{}{
-		"id":       l.ID.Hex(),
-		"display":  l.Display,
-		"parentId": l.Parent,
-		"parent":   parent,
-	}
+	return result
 }
