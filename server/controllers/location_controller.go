@@ -2,8 +2,9 @@ package controllers
 
 import (
 	"fmt"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"net/http"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"example.com/country-roads/schemas"
 	"example.com/country-roads/validators"
@@ -31,8 +32,11 @@ func GetAllLocations(finder models.LocationFinder) gin.HandlerFunc {
 	}
 }
 
-func PostLocation(inserter models.LocationInserter, getValidator func() validators.Validator) gin.HandlerFunc {
-	validator := getValidator()
+func PostLocation(inserter models.LocationInserter, validators validators.IValidatorFactory) gin.HandlerFunc {
+	validator, err := validators.GetValidator("locations")
+	if err != nil {
+		panic(err)
+	}
 	return func(ctx *gin.Context) {
 		var locationDto models.LocationDTO
 
@@ -68,6 +72,6 @@ func RegisterLocationController(router *gin.RouterGroup, env *common.Env) {
 	router.GET("/locations", GetAllLocations(env.Collections.LocationCollection))
 	router.POST("/locations", PostLocation(
 		env.Collections.LocationCollection,
-		env.Validators.LocationValidator,
+		env.Validators,
 	))
 }

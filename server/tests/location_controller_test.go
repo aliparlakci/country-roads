@@ -11,7 +11,6 @@ import (
 	"example.com/country-roads/controllers"
 	"example.com/country-roads/mocks"
 	"example.com/country-roads/models"
-	"example.com/country-roads/validators"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -129,7 +128,10 @@ func TestPostLocation(t *testing.T) {
 	mockLocationValidator.EXPECT().Validate(gomock.Any()).Return(true, nil).AnyTimes()
 	mockLocationValidator.EXPECT().SetDto(gomock.Any()).Return().AnyTimes()
 
-	controller := controllers.PostLocation(mockLocationInserter, func() validators.Validator { return mockLocationValidator })
+	mockedValidatorFactory := mocks.NewMockIValidatorFactory(mockCtrl)
+	mockedValidatorFactory.EXPECT().GetValidator("locations").Return(mockLocationValidator, nil)
+
+	controller := controllers.PostLocation(mockLocationInserter, mockedValidatorFactory)
 
 	for _, tt := range tests {
 		testId := tt.Form

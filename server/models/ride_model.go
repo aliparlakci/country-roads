@@ -22,6 +22,8 @@ type Ride struct {
 	// Author      User               `bson:"author" json:"author"`
 }
 
+type Rides []Ride
+
 type RideDTO struct {
 	Type        string    `bson:"type" json:"type" form:"type" binding:"required"`
 	Date        time.Time `bson:"date" json:"date" form:"date" time_format:"unix" binding:"required"`
@@ -35,7 +37,7 @@ type RideCollection struct {
 
 type RideFinder interface {
 	FindOne(ctx context.Context, filter interface{}) (Ride, error)
-	FindMany(ctx context.Context, pipeline interface{}) ([]Ride, error)
+	FindMany(ctx context.Context, pipeline interface{}) (Rides, error)
 }
 
 type RideInserter interface {
@@ -62,7 +64,7 @@ func (r *RideCollection) FindOne(ctx context.Context, filter interface{}) (Ride,
 	return ride, err
 }
 
-func (r *RideCollection) FindMany(ctx context.Context, pipeline interface{}) ([]Ride, error) {
+func (r *RideCollection) FindMany(ctx context.Context, pipeline interface{}) (Rides, error) {
 	results := make([]Ride, 0)
 
 	cursor, err := r.Collection.Aggregate(ctx, pipeline)
@@ -109,4 +111,12 @@ func (r Ride) Jsonify() map[string]interface{} {
 		"destination": r.Destination.Jsonify(),
 		"createdAt":   fmt.Sprint(r.CreatedAt.Unix()),
 	}
+}
+
+func (r Rides) Jsonify() []map[string]interface{} {
+	result := make([]map[string]interface{}, 0)
+	for _, location := range r {
+		result = append(result, location.Jsonify())
+	}
+	return result
 }

@@ -15,7 +15,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func TestGetRidesInvalidID(t *testing.T) {
+func TestGetRideInvalidID(t *testing.T) {
 	tests := []struct {
 		Params gin.Params
 		Want   int
@@ -24,7 +24,7 @@ func TestGetRidesInvalidID(t *testing.T) {
 		{Params: gin.Params{}, Want: http.StatusBadRequest},
 	}
 
-	controller := controllers.GetRides(nil)
+	controller := controllers.GetRide(nil)
 
 	for _, tt := range tests {
 		testId, _ := tt.Params.Get("id")
@@ -43,19 +43,19 @@ func TestGetRidesInvalidID(t *testing.T) {
 	}
 }
 
-func TestGetRidesSuccess(t *testing.T) {
+func TestGetRideSuccess(t *testing.T) {
 	param := gin.Param{Key: "id", Value: "551137c2f9e1fac808a5f572"}
 	id, err := primitive.ObjectIDFromHex(param.Value)
 	if err != nil {
 		t.Fatal(err)
 	}
-	want := models.Ride{ID: id}
+	want := models.Rides{models.Ride{ID: id}}
 
 	mockCtrl := gomock.NewController(t)
 	mockedRideFinder := mocks.NewMockRideFinder(mockCtrl)
-	mockedRideFinder.EXPECT().FindOne(gomock.Any(), gomock.Any()).Return(want, nil)
+	mockedRideFinder.EXPECT().FindMany(gomock.Any(), gomock.Any()).Return(want, nil)
 
-	controller := controllers.GetRides(mockedRideFinder)
+	controller := controllers.GetRide(mockedRideFinder)
 
 	testname := fmt.Sprint(param.Value)
 	t.Run(testname, func(t *testing.T) {
@@ -83,7 +83,7 @@ func TestGetRidesSuccess(t *testing.T) {
 		}
 
 		jsonResultBody, _ := json.Marshal(resultBody)
-		jsonWantBody, _ := json.Marshal(want.Jsonify())
+		jsonWantBody, _ := json.Marshal(want[0].Jsonify())
 
 		if string(jsonResultBody) != string(jsonWantBody) {
 			t.Errorf("got %v, want %v", w.Result().StatusCode, want)
@@ -91,15 +91,15 @@ func TestGetRidesSuccess(t *testing.T) {
 	})
 }
 
-func TestGetRidesNotFound(t *testing.T) {
+func TestGetRideNotFound(t *testing.T) {
 	param := gin.Param{Key: "id", Value: "551137c2f9e1fac808a5f572"}
 	want := http.StatusNotFound
 
 	mockCtrl := gomock.NewController(t)
 	mockedRideFinder := mocks.NewMockRideFinder(mockCtrl)
-	mockedRideFinder.EXPECT().FindOne(gomock.Any(), gomock.Any()).Return(models.Ride{}, fmt.Errorf(""))
+	mockedRideFinder.EXPECT().FindMany(gomock.Any(), gomock.Any()).Return(models.Rides{}, fmt.Errorf(""))
 
-	controller := controllers.GetRides(mockedRideFinder)
+	controller := controllers.GetRide(mockedRideFinder)
 
 	testname := fmt.Sprint(param.Value)
 	t.Run(testname, func(t *testing.T) {

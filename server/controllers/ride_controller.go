@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"go.mongodb.org/mongo-driver/mongo"
 	"net/http"
 	"time"
 
@@ -16,7 +17,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func GetRides(finder models.RideFinder) gin.HandlerFunc {
+func GetRide(finder models.RideFinder) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		rawId := c.Param("id")
 		objID, err := primitive.ObjectIDFromHex(rawId)
@@ -25,17 +26,20 @@ func GetRides(finder models.RideFinder) gin.HandlerFunc {
 			return
 		}
 
-		ride, err := finder.FindOne(c, bson.M{"_id": objID})
-		if err != nil {
+		filter := bson.D{primitive.E{Key: "$match", Value: bson.M{"_id": objID}}}
+		pipeline := append(mongo.Pipeline{filter}, aggregations.RideWithDestination...)
+
+		rides, err := finder.FindMany(c, pipeline)
+		if err != nil || len(rides) < 1 {
 			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 			return
 		}
 
-		c.JSON(http.StatusOK, ride.Jsonify())
+		c.JSON(http.StatusOK, gin.H{"results": rides[0].Jsonify()})
 	}
 }
 
-func GetAllRides(finder models.RideFinder) gin.HandlerFunc {
+func SearchRides(finder models.RideFinder) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		results := make([]map[string]interface{}, 0)
 
@@ -53,12 +57,15 @@ func GetAllRides(finder models.RideFinder) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{"results": results, "error": nil})
+		c.JSON(http.StatusOK, gin.H{"results": results})
 	}
 }
 
-func PostRides(inserter models.RideInserter, getValidator func() validators.Validator) gin.HandlerFunc {
-	validator := getValidator()
+func PostRides(inserter models.RideInserter, validators validators.IValidatorFactory) gin.HandlerFunc {
+	validator, err := validators.GetValidator("rides")
+	if err != nil {
+		panic(err)
+	}
 	return func(c *gin.Context) {
 		var rideDto models.RideDTO
 
@@ -118,10 +125,11 @@ func DeleteRides(deleter models.RideDeleter) gin.HandlerFunc {
 }
 
 func RegisterRideController(router *gin.RouterGroup, env *common.Env) {
-	router.GET("/rides", GetAllRides(env.Collections.RideCollection))
+	router.GET("/rides/:id", GetRide(env.Collections.RideCollection))
+	router.GET("/rides", SearchRides(env.Collections.RideCollection))
 	router.POST("/rides", PostRides(
 		env.Collections.RideCollection,
-		env.Validators.RideValidator,
+		env.Validators,
 	))
 	router.DELETE("/rides/:id", DeleteRides(env.Collections.RideCollection))
 }
