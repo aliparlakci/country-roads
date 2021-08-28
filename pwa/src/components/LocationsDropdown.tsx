@@ -17,7 +17,7 @@ export default function LocationsDropdown(props: ILocationsDropdownProps) {
 
   return (
     <select {...props}>
-      <option value={-1}>None</option>
+      <option value={-1}></option>
       {locationResponse && locationResponse.results && (
         <>
           {locationResponse?.results?.map((location) => (

@@ -6,18 +6,29 @@ import RideList from "./components/RideList";
 
 import "./App.css";
 import NewLocationForm from "./components/NewLocationForm";
-import { BrowserRouter } from "react-router-dom";
+import useQuery from "./hooks/useQuery";
+import {IRideQuery} from "./hooks/useRides";
+import RideFilter from "./components/RideFilter";
 
 export default function App() {
+  const params = useQuery()
+  const query: IRideQuery = {
+    type: params.get("type"),
+    direction: params.get("direction"),
+    startDate: params.get("start_date"),
+    endDate: params.get("end_date")
+  }
+
   return (
-    <BrowserRouter>
-      <StyledContainer>
-        <h1>CountryRoads</h1>
+    <StyledContainer>
+      <h1>CountryRoads</h1>
+      <ColumnView>
         <NewRideForm/>
+        <RideFilter />
         <NewLocationForm/>
-        <RideList/>
-      </StyledContainer>
-    </BrowserRouter>
+      </ColumnView>
+      <RideList {...query}/>
+    </StyledContainer>
 
   );
 }
@@ -32,3 +43,9 @@ const StyledContainer = styled.div`
   height: 100%;
   width: 100%;
 `;
+
+const ColumnView = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+`

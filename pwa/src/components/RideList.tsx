@@ -2,18 +2,12 @@ import React from "react";
 
 import RideItem from "./RideItem";
 import styled from "styled-components";
-import RideType from "../types/rideType";
-import RideDirection from "../types/rideDirection";
-import useRides from "../hooks/useRides";
+import useRides, {IRideQuery} from "../hooks/useRides";
 
-export interface IRideListProps {
-  type?: RideType;
-  direction?: RideDirection;
-  destination?: Location;
-}
+export interface IRideListProps extends IRideQuery {}
 
 export default function RideList(props: IRideListProps) {
-  const { data, error } = useRides({});
+  const { data, error } = useRides(props);
 
   if (!data) return <i>Nothing to see here...</i>;
   if (error) return <div>Error</div>;

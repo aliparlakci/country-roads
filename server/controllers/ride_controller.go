@@ -57,11 +57,6 @@ func SearchRides(finder models.RideFinder) gin.HandlerFunc {
 			}
 		}
 
-		if len(results) == 0 {
-			c.JSON(http.StatusNotFound, gin.H{"results": results, "error": "No matching ride was found"})
-			return
-		}
-
 		c.JSON(http.StatusOK, gin.H{"results": results})
 	}
 }

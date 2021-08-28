@@ -93,7 +93,7 @@ func (v RideValidator) Validate(ctx context.Context) (bool, error) {
 		return false, fmt.Errorf("ride type is not valid")
 	}
 	if !v.ValidateDestination(ctx) {
-		return false, fmt.Errorf("ride type is not valid")
+		return false, fmt.Errorf("ride destination is not valid")
 	}
 
 	return true, nil
