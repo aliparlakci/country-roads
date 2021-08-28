@@ -2,16 +2,17 @@ package tests
 
 import (
 	"encoding/json"
-	"example.com/country-roads/controllers"
-	"example.com/country-roads/mocks"
-	"example.com/country-roads/models"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/golang/mock/gomock"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"example.com/country-roads/controllers"
+	"example.com/country-roads/mocks"
+	"example.com/country-roads/models"
+	"github.com/gin-gonic/gin"
+	"github.com/golang/mock/gomock"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func TestGetRidesInvalidID(t *testing.T) {

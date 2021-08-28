@@ -1,17 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { mutate } from "swr";
 
 import CONSTANTS from "../constants";
-import useLocations from "../hooks/useLocations";
+import LocationsDropdown from "./LocationsDropdown";
 
 export interface INewLocationFormProps {}
 
 export default function NewLocationForm(props: INewLocationFormProps) {
-  const { data: locationResponse } = useLocations();
-  const [disabled, setDisabled] = useState(false);
-
-  useEffect(() => setDisabled(!locationResponse), [locationResponse]);
+  const [disabled, setDisabled] = useState(true);
 
   const handleSubmit = async (event: any) => {
     event.preventDefault();
@@ -51,16 +48,13 @@ export default function NewLocationForm(props: INewLocationFormProps) {
 
       <FormItem>
         <label htmlFor="destination">Parent:</label>
-        <select id="parentId" name="parentId" required disabled={disabled}>
-          <option value={-1}>None</option>
-          {locationResponse &&
-            locationResponse.results.map((location) => (
-              <option key={location.id} value={location.id}>
-                {location.display}
-              </option>
-            ))}
-          {!locationResponse && <option>Loading...</option>}
-        </select>
+        <LocationsDropdown
+          id="parentId"
+          name="parentId"
+          required
+          disabled={disabled}
+          onData={() => setDisabled(false)}
+        />
       </FormItem>
 
       <input type="submit" value="Post" disabled={disabled} />

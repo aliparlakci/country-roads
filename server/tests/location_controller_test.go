@@ -2,18 +2,19 @@ package tests
 
 import (
 	"encoding/json"
-	"example.com/country-roads/controllers"
-	"example.com/country-roads/mocks"
-	"example.com/country-roads/models"
-	"example.com/country-roads/validators"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/golang/mock/gomock"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"example.com/country-roads/controllers"
+	"example.com/country-roads/mocks"
+	"example.com/country-roads/models"
+	"example.com/country-roads/validators"
+	"github.com/gin-gonic/gin"
+	"github.com/golang/mock/gomock"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func TestGetLocationsSuccess(t *testing.T) {
@@ -116,7 +117,6 @@ func TestPostLocation(t *testing.T) {
 		Form multipart.Form
 		Want int
 	}{
-		{Form: multipart.Form{Value: map[string][]string{"bad": {"request"}}}, Want: http.StatusBadRequest},
 		{Form: multipart.Form{Value: map[string][]string{"display": {"Ankara"}}}, Want: http.StatusCreated},
 		{Form: multipart.Form{Value: map[string][]string{"display": {"Ankara"}, "parentId": {"612620d35d526dc43e342e30"}}}, Want: http.StatusCreated},
 	}

@@ -17,10 +17,13 @@ export default function RideList(props: IRideListProps) {
 
   if (!data) return <i>Nothing to see here...</i>;
   if (error) return <div>Error</div>;
+  if (data && data.error) return <div>Error</div>;
 
   return (
     <RideListContainer>
-      {data && data.results.map((ride, i) => <RideItem key={i} ride={ride} />)}
+      {data &&
+        data.results &&
+        data.results.map((ride, i) => <RideItem key={i} ride={ride} />)}
     </RideListContainer>
   );
 }

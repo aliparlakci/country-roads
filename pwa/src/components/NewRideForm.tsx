@@ -1,17 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 
 import CONSTANTS from "../constants";
-import useLocations from "../hooks/useLocations";
 import mutateWithQueries from "../utils/mutateWithQueries";
+import LocationsDropdown from "./LocationsDropdown";
 
 export interface INewRideFormProps {}
 
 export default function NewRideForm(props: INewRideFormProps) {
-  const { data: locationResponse } = useLocations();
-  const [disabled, setDisabled] = useState(false);
-
-  useEffect(() => setDisabled(!locationResponse), [locationResponse]);
+  const [disabled, setDisabled] = useState(true);
 
   const handleSubmit = async (event: any) => {
     event.preventDefault();
@@ -105,20 +102,13 @@ export default function NewRideForm(props: INewRideFormProps) {
 
       <FormItem>
         <label htmlFor="destination">Destination:</label>
-        <select
+        <LocationsDropdown
           id="destination"
           name="destination"
           required
           disabled={disabled}
-        >
-          {locationResponse &&
-            locationResponse.results.map((location) => (
-              <option key={location.id} value={location.id}>
-                {location.display}
-              </option>
-            ))}
-          {!locationResponse && <option>Loading...</option>}
-        </select>
+          onData={() => setDisabled(false)}
+        />
       </FormItem>
 
       <FormItem>

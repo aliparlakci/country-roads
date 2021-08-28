@@ -9,7 +9,7 @@ import (
 )
 
 type LocationValidator struct {
-	Dto models.LocationDTO
+	Dto            models.LocationDTO
 	LocationFinder models.LocationFinder
 }
 
@@ -21,23 +21,33 @@ func (v *LocationValidator) SetDto(dto interface{}) {
 	}
 }
 
-func (l LocationValidator) ValidateParent(ctx context.Context) bool {
+func (l LocationValidator) ValidateDisplay() bool {
+	return l.Dto.Display != ""
+}
+
+func (l LocationValidator) ValidateParent(ctx context.Context) (bool, error) {
 	if l.Dto.ParentID == "" {
-		return true
+		return true, nil
 	}
 
 	parentId, err := primitive.ObjectIDFromHex(l.Dto.ParentID)
 	if err != nil {
-		return false
+		return false, err
 	}
 
 	if _, err := l.LocationFinder.FindOne(ctx, bson.M{"_id": parentId}); err != nil {
-		return false
+		return false, err
 	}
 
-	return true
+	return true, nil
 }
 
 func (l LocationValidator) Validate(ctx context.Context) (bool, error) {
+	if parent, err := l.ValidateParent(ctx); !parent && err != nil {
+		return parent, err
+	}
+	if display := l.ValidateDisplay(); !display {
+		return display, nil
+	}
 	return true, nil
 }
