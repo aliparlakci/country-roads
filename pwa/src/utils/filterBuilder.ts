@@ -7,6 +7,8 @@ export default function filterBuilder(query: IRideQuery): string {
     result.set("type", query.type)
   if (query.direction)
     result.set("direction", query.direction)
+  if (query.destination)
+    result.set("destination", query.destination)
   if (query.startDate)
     result.set("start_date", query.startDate)
   if (query.endDate)

@@ -12,6 +12,7 @@ export interface IRideResponse {
 export interface IRideQuery {
   type: string | null;
   direction: string | null;
+  destination: string | null;
   startDate: string | null;
   endDate: string | null;
 }

@@ -15,6 +15,7 @@ export default function App() {
   const query: IRideQuery = {
     type: params.get("type"),
     direction: params.get("direction"),
+    destination: params.get("destination"),
     startDate: params.get("start_date"),
     endDate: params.get("end_date")
   }
