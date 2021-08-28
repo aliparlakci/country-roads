@@ -1,0 +1,32 @@
+name: NodeJS
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: 16.x
+
+    - name: Install dependencies
+      working-directory: ./pwa
+      run: yarn
+
+    - name: Build
+      working-directory: ./pwa
+      run: yarn build
+
+    - name: Test
+      working-directory: ./pwa
+      run: yarn test --passWithNoTests
+      env:
+        CI: true
