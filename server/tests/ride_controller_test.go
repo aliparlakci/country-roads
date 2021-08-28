@@ -82,11 +82,12 @@ func TestGetRideSuccess(t *testing.T) {
 			t.Errorf("got %v, want %v", w.Result().StatusCode, want)
 		}
 
+		wantedResponse := gin.H{"results": want[0].Jsonify()}
 		jsonResultBody, _ := json.Marshal(resultBody)
-		jsonWantBody, _ := json.Marshal(want[0].Jsonify())
+		jsonWantBody, _ := json.Marshal(wantedResponse)
 
 		if string(jsonResultBody) != string(jsonWantBody) {
-			t.Errorf("got %v, want %v", w.Result().StatusCode, want)
+			t.Errorf("got %v, want %v", resultBody, wantedResponse)
 		}
 	})
 }
