@@ -2,7 +2,7 @@ import React from "react";
 
 import RideItem from "./RideItem";
 import styled from "styled-components";
-import useRides, {IRideQuery} from "../hooks/useRides";
+import useRides, { IRideQuery } from "../hooks/useRides";
 
 export interface IRideListProps extends IRideQuery {}
 

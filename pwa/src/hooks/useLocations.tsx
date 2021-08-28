@@ -5,7 +5,7 @@ import CONSTANTS from "../constants";
 
 export interface ILocationResponse {
   results?: ILocation[];
-  error?: string
+  error?: string;
 }
 
 export default function useLocations() {

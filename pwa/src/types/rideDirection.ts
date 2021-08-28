@@ -3,4 +3,4 @@ enum RideDirection {
   FROM_CAMPUS = "from_campus",
 }
 
-export default RideDirection
+export default RideDirection;

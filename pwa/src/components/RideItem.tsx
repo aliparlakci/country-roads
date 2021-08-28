@@ -12,18 +12,20 @@ export interface IRideItemProps {
 export default function RideItem({ ride }: IRideItemProps) {
   const doDelete = async () => {
     try {
-      await fetch(CONSTANTS.API().RIDE(ride.id), { method: "delete" })
-      mutate(CONSTANTS.API().RIDES)
+      await fetch(CONSTANTS.API().RIDE(ride.id), { method: "delete" });
+      mutate(CONSTANTS.API().RIDES);
     } catch (err) {
-      console.error(err)
+      console.error(err);
     }
-  }
+  };
 
   return (
     <RideItemContainer>
       <TitleArea>
         <b>{capitalize(ride.type)}</b>
-        <CloseButton onClick={doDelete}><b>X</b></CloseButton>
+        <CloseButton onClick={doDelete}>
+          <b>X</b>
+        </CloseButton>
       </TitleArea>
       <span>
         From{" "}
@@ -58,7 +60,7 @@ const TitleArea = styled.div`
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-`
+`;
 
 const CloseButton = styled.button`
   border: none;
@@ -70,4 +72,4 @@ const CloseButton = styled.button`
     transform: translateX(-0.1rem) translateY(-0.1rem);
     transition: 100ms;
   }
-`
+`;

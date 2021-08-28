@@ -38,11 +38,11 @@ export default function NewLocationForm(props: INewLocationFormProps) {
       <FormItem>
         <label htmlFor="locationKey">Key:</label>
         <input
-            type="text"
-            placeholder="Type a key..."
-            id="locationKey"
-            name="key"
-            disabled={disabled}
+          type="text"
+          placeholder="Type a key..."
+          id="locationKey"
+          name="key"
+          disabled={disabled}
         />
       </FormItem>
 

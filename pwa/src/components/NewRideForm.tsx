@@ -28,7 +28,7 @@ export default function NewRideForm(props: INewRideFormProps) {
       console.error(e);
     }
 
-    mutateWithQueries(CONSTANTS.API().RIDES)
+    mutateWithQueries(CONSTANTS.API().RIDES);
 
     event.target.reset();
     setDisabled(false);

@@ -7,30 +7,29 @@ import RideList from "./components/RideList";
 import "./App.css";
 import NewLocationForm from "./components/NewLocationForm";
 import useQuery from "./hooks/useQuery";
-import {IRideQuery} from "./hooks/useRides";
+import { IRideQuery } from "./hooks/useRides";
 import RideFilter from "./components/RideFilter";
 
 export default function App() {
-  const params = useQuery()
+  const params = useQuery();
   const query: IRideQuery = {
     type: params.get("type"),
     direction: params.get("direction"),
     destination: params.get("destination"),
     startDate: params.get("start_date"),
-    endDate: params.get("end_date")
-  }
+    endDate: params.get("end_date"),
+  };
 
   return (
     <StyledContainer>
       <h1>CountryRoads</h1>
       <ColumnView>
-        <NewRideForm/>
+        <NewRideForm />
         <RideFilter />
-        <NewLocationForm/>
+        <NewLocationForm />
       </ColumnView>
-      <RideList {...query}/>
+      <RideList {...query} />
     </StyledContainer>
-
   );
 }
 
@@ -49,4 +48,4 @@ const ColumnView = styled.div`
   display: flex;
   flex-direction: row;
   gap: 2rem;
-`
+`;
