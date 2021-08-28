@@ -1,0 +1,27 @@
+name: Go
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.17
+        
+    - name: Build
+      working-directory: ./server
+      run: go build -v ./...
+
+    - name: Test
+      working-directory: ./server
+      run: go test -v example.com/country-roads/tests
