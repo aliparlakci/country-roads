@@ -4,9 +4,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"go.mongodb.org/mongo-driver/bson/primitive"
-
-	"example.com/country-roads/schemas"
 	"example.com/country-roads/validators"
 	"go.mongodb.org/mongo-driver/bson"
 
@@ -38,7 +35,7 @@ func PostLocation(inserter models.LocationInserter, validators validators.IValid
 		panic(err)
 	}
 	return func(ctx *gin.Context) {
-		var locationDto models.LocationDTO
+		var locationDto models.NewLocationFrom
 
 		if err := ctx.Bind(&locationDto); err != nil {
 			ctx.JSON(http.StatusBadRequest, fmt.Sprintf("Location format was incorrect: %v", err))
@@ -48,14 +45,14 @@ func PostLocation(inserter models.LocationInserter, validators validators.IValid
 		validator.SetDto(locationDto)
 		if isValid, err := validator.Validate(ctx); !isValid || err != nil {
 			ctx.JSON(http.StatusBadRequest, fmt.Sprintf("Location format was invalid: %v", err))
+			return
 		}
 
-		var schema schemas.LocationSchema
-		if locationDto.ParentID != "" {
-			parentId, _ := primitive.ObjectIDFromHex(locationDto.ParentID)
-			schema = schemas.LocationSchema{Display: locationDto.Display, ParentID: parentId}
+		var schema models.LocationSchema
+		if locationDto.ParentKey != "" {
+			schema = models.LocationSchema{Key: locationDto.Key, Display: locationDto.Display, ParentKey: locationDto.ParentKey}
 		} else {
-			schema = schemas.LocationSchema{Display: locationDto.Display}
+			schema = models.LocationSchema{Key: locationDto.Key, Display: locationDto.Display}
 		}
 
 		id, err := inserter.InsertOne(ctx, schema)

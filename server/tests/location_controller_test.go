@@ -21,12 +21,8 @@ func TestGetLocationsSuccess(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	parentId, err := primitive.ObjectIDFromHex("61261e7d5d526dc43e342e21")
-	if err != nil {
-		t.Fatal(err)
-	}
 	want := models.Locations{
-		models.Location{ID: id, ParentID: parentId, Display: "4. Levent"},
+		models.Location{ID: id, Key: "levent4", ParentKey: "istanbul_europe", Display: "4. Levent"},
 	}
 	wantCode := http.StatusOK
 
@@ -62,7 +58,7 @@ func TestGetLocationsSuccess(t *testing.T) {
 		jsonWantBody, _ := json.Marshal(gin.H{"results": want.Jsonify()})
 
 		if string(jsonResultBody) != string(jsonWantBody) {
-			t.Errorf("got %v, want %v", w.Result().StatusCode, want)
+			t.Errorf("got %v, want %v", w.Result().StatusCode, wantCode)
 		}
 	})
 }
@@ -117,7 +113,7 @@ func TestPostLocation(t *testing.T) {
 		Want int
 	}{
 		{Form: multipart.Form{Value: map[string][]string{"display": {"Ankara"}}}, Want: http.StatusCreated},
-		{Form: multipart.Form{Value: map[string][]string{"display": {"Ankara"}, "parentId": {"612620d35d526dc43e342e30"}}}, Want: http.StatusCreated},
+		{Form: multipart.Form{Value: map[string][]string{"display": {"Ankara"}, "parentKey": {"turkey"}}}, Want: http.StatusCreated},
 	}
 
 	mockCtrl := gomock.NewController(t)

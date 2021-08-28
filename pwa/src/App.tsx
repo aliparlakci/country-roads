@@ -6,15 +6,19 @@ import RideList from "./components/RideList";
 
 import "./App.css";
 import NewLocationForm from "./components/NewLocationForm";
+import { BrowserRouter } from "react-router-dom";
 
 export default function App() {
   return (
-    <StyledContainer>
-      <h1>CountryRoads</h1>
-      <NewRideForm />
-      <NewLocationForm />
-      <RideList />
-    </StyledContainer>
+    <BrowserRouter>
+      <StyledContainer>
+        <h1>CountryRoads</h1>
+        <NewRideForm/>
+        <NewLocationForm/>
+        <RideList/>
+      </StyledContainer>
+    </BrowserRouter>
+
   );
 }
 

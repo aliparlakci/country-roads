@@ -5,49 +5,53 @@ import (
 	"example.com/country-roads/models"
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type LocationValidator struct {
-	Dto            models.LocationDTO
+	Dto            models.NewLocationFrom
 	LocationFinder models.LocationFinder
 }
 
 func (v *LocationValidator) SetDto(dto interface{}) {
-	if d, ok := dto.(models.LocationDTO); ok {
+	if d, ok := dto.(models.NewLocationFrom); ok {
 		v.Dto = d
 	} else {
-		panic(fmt.Errorf("dto is not assignable to LocationDTO"))
+		panic(fmt.Errorf("dto is not assignable to NewLocationFrom"))
 	}
 }
 
-func (l LocationValidator) ValidateDisplay() bool {
+func (l LocationValidator) validateDisplay() bool {
 	return l.Dto.Display != ""
 }
 
-func (l LocationValidator) ValidateParent(ctx context.Context) (bool, error) {
-	if l.Dto.ParentID == "" {
+func (l LocationValidator) validateParent(ctx context.Context) (bool, error) {
+	if l.Dto.ParentKey == "" {
 		return true, nil
 	}
 
-	parentId, err := primitive.ObjectIDFromHex(l.Dto.ParentID)
-	if err != nil {
-		return false, err
-	}
-
-	if _, err := l.LocationFinder.FindOne(ctx, bson.M{"_id": parentId}); err != nil {
+	if _, err := l.LocationFinder.FindOne(ctx, bson.M{"key": l.Dto.ParentKey}); err != nil {
 		return false, err
 	}
 
 	return true, nil
 }
 
+func (l LocationValidator) validateKey(ctx context.Context) bool {
+	if _, err := l.LocationFinder.FindOne(ctx, bson.M{"key": l.Dto.Key}); err != nil {
+		return true
+	}
+	return false
+}
+
 func (l LocationValidator) Validate(ctx context.Context) (bool, error) {
-	if parent, err := l.ValidateParent(ctx); !parent && err != nil {
+	if parent, err := l.validateParent(ctx); !parent && err != nil {
 		return parent, err
 	}
-	if display := l.ValidateDisplay(); !display {
+	if display := l.validateDisplay(); !display {
 		return display, nil
+	}
+	if key := l.validateKey(ctx); !key {
+		return key, nil
 	}
 	return true, nil
 }

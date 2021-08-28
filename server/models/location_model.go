@@ -4,23 +4,31 @@ package models
 
 import (
 	"context"
-	"example.com/country-roads/schemas"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type Location struct {
-	ID       primitive.ObjectID `bson:"_id" json:"id"`
-	Display  string             `bson:"display" json:"display"`
-	ParentID primitive.ObjectID `bson:"parentId,omitempty" json:"parentId,omitempty"`
-	Parent   *Location          `bson:"parent,omitempty" json:"parent,omitempty"`
+	ID        primitive.ObjectID `bson:"_id" json:"id"`
+	Key       string             `bson:"key" json:"key"`
+	Display   string             `bson:"display" json:"display"`
+	ParentKey string             `bson:"parentKey,omitempty" json:"parentKey,omitempty"`
+	Parent    *Location          `bson:"parent,omitempty" json:"parent,omitempty"`
 }
 
 type Locations []Location
 
-type LocationDTO struct {
-	Display  string `bson:"display" json:"display" form:"display"`
-	ParentID string `bson:"parentId,omitempty" json:"parentId,omitempty" form:"parentId,omitempty"`
+type NewLocationFrom struct {
+	Key       string `bson:"key" json:"key" form:"key"`
+	Display   string `bson:"display" json:"display" form:"display"`
+	ParentKey string `bson:"parentKey,omitempty" json:"parentKey,omitempty" form:"parentKey,omitempty"`
+}
+
+type LocationSchema struct {
+	ID        primitive.ObjectID `bson:"_id,omitempty" json:"id"`
+	Key       string             `bson:"key" json:"key" form:"key"`
+	Display   string             `bson:"display" json:"display"`
+	ParentKey string             `bson:"parentKey,omitempty" json:"parentKey"`
 }
 
 type LocationCollection struct {
@@ -33,7 +41,7 @@ type LocationFinder interface {
 }
 
 type LocationInserter interface {
-	InsertOne(ctx context.Context, candidate schemas.LocationSchema) (interface{}, error)
+	InsertOne(ctx context.Context, candidate LocationSchema) (interface{}, error)
 }
 
 type LocationRepository interface {
@@ -67,7 +75,7 @@ func (l *LocationCollection) FindMany(ctx context.Context, pipeline interface{})
 	return results, nil
 }
 
-func (l *LocationCollection) InsertOne(ctx context.Context, candidate schemas.LocationSchema) (interface{}, error) {
+func (l *LocationCollection) InsertOne(ctx context.Context, candidate LocationSchema) (interface{}, error) {
 	result, err := l.Collection.InsertOne(ctx, candidate)
 	if err != nil {
 		return nil, err
@@ -83,16 +91,18 @@ func (l Location) String() string {
 func (l Location) Jsonify() map[string]interface{} {
 	if l.Parent != nil {
 		return map[string]interface{}{
-			"id":       l.ID.Hex(),
-			"display":  l.Display,
-			"parentId": l.ParentID.Hex(),
-			"parent":   l.Parent.Jsonify(),
+			"id":        l.ID.Hex(),
+			"key":       l.Key,
+			"display":   l.Display,
+			"parentKey": l.ParentKey,
+			"parent":    l.Parent.Jsonify(),
 		}
 	} else {
 		return map[string]interface{}{
-			"id":       l.ID.Hex(),
-			"display":  l.Display,
-			"parentId": l.ParentID.Hex(),
+			"id":        l.ID.Hex(),
+			"key":       l.Key,
+			"display":   l.Display,
+			"parentKey": l.ParentKey,
 		}
 	}
 }

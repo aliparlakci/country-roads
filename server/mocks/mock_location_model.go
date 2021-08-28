@@ -9,7 +9,6 @@ import (
 	reflect "reflect"
 
 	models "example.com/country-roads/models"
-	schemas "example.com/country-roads/schemas"
 	gomock "github.com/golang/mock/gomock"
 )
 
@@ -90,7 +89,7 @@ func (m *MockLocationInserter) EXPECT() *MockLocationInserterMockRecorder {
 }
 
 // InsertOne mocks base method.
-func (m *MockLocationInserter) InsertOne(arg0 context.Context, arg1 schemas.LocationSchema) (interface{}, error) {
+func (m *MockLocationInserter) InsertOne(arg0 context.Context, arg1 models.LocationSchema) (interface{}, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "InsertOne", arg0, arg1)
 	ret0, _ := ret[0].(interface{})
@@ -158,7 +157,7 @@ func (mr *MockLocationRepositoryMockRecorder) FindOne(arg0, arg1 interface{}) *g
 }
 
 // InsertOne mocks base method.
-func (m *MockLocationRepository) InsertOne(arg0 context.Context, arg1 schemas.LocationSchema) (interface{}, error) {
+func (m *MockLocationRepository) InsertOne(arg0 context.Context, arg1 models.LocationSchema) (interface{}, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "InsertOne", arg0, arg1)
 	ret0, _ := ret[0].(interface{})

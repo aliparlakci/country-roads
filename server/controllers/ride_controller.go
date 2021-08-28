@@ -2,12 +2,10 @@ package controllers
 
 import (
 	"fmt"
-	"go.mongodb.org/mongo-driver/mongo"
 	"net/http"
 	"time"
 
 	"example.com/country-roads/aggregations"
-	"example.com/country-roads/schemas"
 	"example.com/country-roads/validators"
 	"go.mongodb.org/mongo-driver/bson"
 
@@ -27,7 +25,7 @@ func GetRide(finder models.RideFinder) gin.HandlerFunc {
 		}
 
 		filter := bson.D{primitive.E{Key: "$match", Value: bson.M{"_id": objID}}}
-		pipeline := append(mongo.Pipeline{filter}, aggregations.RideWithDestination...)
+		pipeline := aggregations.BuildAggregation([]bson.D{filter})
 
 		rides, err := finder.FindMany(c, pipeline)
 		if err != nil || len(rides) < 1 {
@@ -41,9 +39,16 @@ func GetRide(finder models.RideFinder) gin.HandlerFunc {
 
 func SearchRides(finder models.RideFinder) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		results := make([]map[string]interface{}, 0)
+		// TODO: Queries should be validated before running against the database to prevent attacks
+		var queries models.SearchRideQueries
+		if err := c.BindQuery(&queries); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		}
 
-		if rides, err := finder.FindMany(c, aggregations.RideWithDestination); err != nil {
+		pipeline := aggregations.BuildAggregation(aggregations.FilterRides(queries), aggregations.RideWithDestination)
+
+		results := make([]map[string]interface{}, 0)
+		if rides, err := finder.FindMany(c, pipeline); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		} else {
@@ -67,15 +72,9 @@ func PostRides(inserter models.RideInserter, validators validators.IValidatorFac
 		panic(err)
 	}
 	return func(c *gin.Context) {
-		var rideDto models.RideDTO
+		var rideDto models.NewRideRequest
 
 		if err := c.Bind(&rideDto); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Ride format was incorrect: %v", err)})
-			return
-		}
-
-		destinationId, err := primitive.ObjectIDFromHex(rideDto.Destination)
-		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Ride format was incorrect: %v", err)})
 			return
 		}
@@ -86,10 +85,10 @@ func PostRides(inserter models.RideInserter, validators validators.IValidatorFac
 			return
 		}
 
-		id, err := inserter.InsertOne(c, schemas.RideSchema{
+		id, err := inserter.InsertOne(c, models.RideSchema{
 			Type:        rideDto.Type,
 			Date:        rideDto.Date,
-			Destination: destinationId,
+			Destination: rideDto.Destination,
 			Direction:   rideDto.Direction,
 			CreatedAt:   time.Now(),
 		})

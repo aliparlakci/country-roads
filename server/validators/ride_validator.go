@@ -5,12 +5,11 @@ import (
 	"example.com/country-roads/models"
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"time"
 )
 
 type RideValidator struct {
-	Dto            models.RideDTO
+	Dto            models.NewRideRequest
 	LocationFinder models.LocationFinder
 }
 
@@ -28,10 +27,10 @@ type DestinationValidator interface {
 
 func (v *RideValidator) SetDto(dto interface{}) {
 	switch t := dto.(type) {
-	case models.RideDTO:
-		v.Dto = dto.(models.RideDTO)
+	case models.NewRideRequest:
+		v.Dto = dto.(models.NewRideRequest)
 	default:
-		panic(fmt.Errorf("%v is not assignable to RideDTO", t))
+		panic(fmt.Errorf("%v is not assignable to NewRideRequest", t))
 	}
 }
 
@@ -77,15 +76,9 @@ func (v RideValidator) ValidateDirection() bool {
 }
 
 func (v RideValidator) ValidateDestination(ctx context.Context) bool {
-	destinationId, err := primitive.ObjectIDFromHex(v.Dto.Destination)
-	if err != nil {
+	if _, err := v.LocationFinder.FindOne(ctx, bson.M{"key": v.Dto.Destination}); err != nil {
 		return false
 	}
-
-	if _, err := v.LocationFinder.FindOne(ctx, bson.M{"_id": destinationId}); err != nil {
-		return false
-	}
-
 	return true
 }
 

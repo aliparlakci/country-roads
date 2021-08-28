@@ -15,8 +15,8 @@ export default function NewLocationForm(props: INewLocationFormProps) {
     setDisabled(true);
 
     const formData = new FormData(event.currentTarget);
-    if (formData.get("parentId")?.valueOf() === "-1")
-      formData.delete("parentId");
+    if (formData.get("parentKey")?.valueOf() === "-1")
+      formData.delete("parentKey");
 
     try {
       await fetch(CONSTANTS.API().LOCATIONS, {
@@ -36,10 +36,21 @@ export default function NewLocationForm(props: INewLocationFormProps) {
   return (
     <StyledForm onSubmit={handleSubmit}>
       <FormItem>
+        <label htmlFor="locationKey">Key:</label>
+        <input
+            type="text"
+            placeholder="Type a key..."
+            id="locationKey"
+            name="key"
+            disabled={disabled}
+        />
+      </FormItem>
+
+      <FormItem>
         <label htmlFor="displayName">Display name:</label>
         <input
           type="text"
-          placeholder="Type display name..."
+          placeholder="Type a name..."
           id="displayName"
           name="display"
           disabled={disabled}
@@ -49,8 +60,8 @@ export default function NewLocationForm(props: INewLocationFormProps) {
       <FormItem>
         <label htmlFor="destination">Parent:</label>
         <LocationsDropdown
-          id="parentId"
-          name="parentId"
+          id="parentKey"
+          name="parentKey"
           required
           disabled={disabled}
           onData={() => setDisabled(false)}

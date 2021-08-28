@@ -13,7 +13,7 @@ export interface IRideListProps {
 }
 
 export default function RideList(props: IRideListProps) {
-  const { data, error } = useRides();
+  const { data, error } = useRides({});
 
   if (!data) return <i>Nothing to see here...</i>;
   if (error) return <div>Error</div>;

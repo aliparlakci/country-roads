@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"time"
 
-	"example.com/country-roads/schemas"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -24,11 +23,28 @@ type Ride struct {
 
 type Rides []Ride
 
-type RideDTO struct {
+type NewRideRequest struct {
 	Type        string    `bson:"type" json:"type" form:"type" binding:"required"`
 	Date        time.Time `bson:"date" json:"date" form:"date" time_format:"unix" binding:"required"`
 	Direction   string    `bson:"direction" json:"direction" form:"direction" binding:"required"`
 	Destination string    `bson:"destination" json:"destination" form:"destination" binding:"required"`
+}
+
+type RideSchema struct {
+	ID          primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
+	Type        string             `bson:"type" json:"type"`
+	Date        time.Time          `bson:"date" json:"date" time_format:"unix"`
+	Direction   string             `bson:"direction" json:"direction"`
+	Destination string             `bson:"destination" json:"destination"`
+	CreatedAt   time.Time          `bson:"createdAt" json:"createdAt,omitempty" time_format:"unix"`
+}
+
+type SearchRideQueries struct {
+	Type        string    `form:"type"`
+	StartDate   time.Time `form:"start_date" time_format:"unix"`
+	EndDate     time.Time `form:"end_date" time_format:"unix"`
+	Direction   string    `form:"direction"`
+	Destination string    `form:"destination"`
 }
 
 type RideCollection struct {
@@ -41,7 +57,7 @@ type RideFinder interface {
 }
 
 type RideInserter interface {
-	InsertOne(ctx context.Context, candidate schemas.RideSchema) (interface{}, error)
+	InsertOne(ctx context.Context, candidate RideSchema) (interface{}, error)
 }
 
 type RideDeleter interface {
@@ -84,7 +100,7 @@ func (r *RideCollection) FindMany(ctx context.Context, pipeline interface{}) (Ri
 	return results, nil
 }
 
-func (r *RideCollection) InsertOne(ctx context.Context, candidate schemas.RideSchema) (interface{}, error) {
+func (r *RideCollection) InsertOne(ctx context.Context, candidate RideSchema) (interface{}, error) {
 	result, err := r.Collection.InsertOne(ctx, candidate)
 	if err != nil {
 		return nil, err

@@ -17,11 +17,11 @@ export default function LocationsDropdown(props: ILocationsDropdownProps) {
 
   return (
     <select {...props}>
+      <option value={-1}>None</option>
       {locationResponse && locationResponse.results && (
         <>
-          <option value={-1}>None</option>
           {locationResponse?.results?.map((location) => (
-            <option key={location.id} value={location.id}>
+            <option key={location.key} value={location.key}>
               {location.display}
             </option>
           ))}
