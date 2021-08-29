@@ -31,14 +31,14 @@ func TestPostRide(t *testing.T) {
 				"type": {"offer"},
 				"direction": {"to_campus"},
 				"destination": {"istanbul_asia"},
-				"date": {"1630227365"},
+				"date": {"1730227365"},
 			}},
 			Prepare: func(inserter *mocks.MockRideInserter, locationFinder *mocks.MockLocationFinder) {
 				locationFinder.EXPECT().FindOne(gomock.Any(), bson.M{"key": "istanbul_asia"}).Return(models.Location{}, nil)
 				inserter.EXPECT().InsertOne(gomock.Any(), GetRideSchemaMatcher(models.RideSchema{
 					ID: primitive.ObjectID{},
 					Type: "offer",
-					Date: time.Unix(1630227365, 0),
+					Date: time.Unix(1730227365, 0),
 					Destination: "istanbul_asia",
 					Direction: "to_campus",
 					CreatedAt: time.Now(),
@@ -52,7 +52,7 @@ func TestPostRide(t *testing.T) {
 				"type": {"incorrect_type"},
 				"direction": {"to_campus"},
 				"destination": {"istanbul_asia"},
-				"date": {"1630227365"},
+				"date": {"1730227365"},
 			}},
 			Prepare: func(inserter *mocks.MockRideInserter, locationFinder *mocks.MockLocationFinder) {
 				locationFinder.EXPECT().FindOne(gomock.Any(), bson.M{"key": "istanbul_asia"}).Return(models.Location{}, nil).MaxTimes(1)
@@ -66,7 +66,7 @@ func TestPostRide(t *testing.T) {
 				"type": {"request"},
 				"direction": {"invalid_direction"},
 				"destination": {"istanbul_asia"},
-				"date": {"1630227365"},
+				"date": {"1730227365"},
 			}},
 			Prepare: func(inserter *mocks.MockRideInserter, locationFinder *mocks.MockLocationFinder) {
 				locationFinder.EXPECT().FindOne(gomock.Any(), bson.M{"key": "istanbul_asia"}).Return(models.Location{}, nil).MaxTimes(1)
@@ -80,7 +80,7 @@ func TestPostRide(t *testing.T) {
 				"type": {"request"},
 				"direction": {"from_campus"},
 				"destination": {"this_key_does_not_exist"},
-				"date": {"1630227365"},
+				"date": {"1730227365"},
 			}},
 			Prepare: func(inserter *mocks.MockRideInserter, locationFinder *mocks.MockLocationFinder) {
 				locationFinder.EXPECT().FindOne(gomock.Any(), bson.M{"key": "this_key_does_not_exist"}).Return(models.Location{}, fmt.Errorf(""))

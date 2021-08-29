@@ -20,11 +20,11 @@ func main() {
 	{
 		dbUri := os.Getenv("MDB_URI")
 		dbName := "country-roads"
-		db, close := common.InitilizeDb(dbUri, dbName)
+		db, close := common.InitializeDb(dbUri, dbName)
 		defer close()
 
 		rdbUri := os.Getenv("RDB_URI")
-		rdb := common.InitilizeRedis(rdbUri, "", 0)
+		rdb := common.InitializeRedis(rdbUri, "", 0)
 
 		env.Rdb = rdb
 		env.Collections = &common.CollectionContainer{

@@ -9,7 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func InitilizeDb(uri, name string) (database *mongo.Database, close func()) {
+func InitializeDb(uri, name string) (database *mongo.Database, close func()) {
 	c, cancel := context.WithTimeout(context.TODO(), 10*time.Second)
 	defer cancel()
 
@@ -29,7 +29,7 @@ func InitilizeDb(uri, name string) (database *mongo.Database, close func()) {
 	return
 }
 
-func InitilizeRedis(uri, password string, db int) *redis.Client {
+func InitializeRedis(uri, password string, db int) *redis.Client {
 	return redis.NewClient(&redis.Options{
 		Addr:     uri,
 		Password: password,
