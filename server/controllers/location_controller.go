@@ -19,12 +19,6 @@ func GetAllLocations(finder models.LocationFinder) gin.HandlerFunc {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
-
-		if len(results) == 0 {
-			ctx.JSON(http.StatusNotFound, gin.H{})
-			return
-		}
-
 		ctx.JSON(http.StatusOK, gin.H{"results": results})
 	}
 }
@@ -44,7 +38,7 @@ func PostLocation(inserter models.LocationInserter, validators validators.IValid
 
 		validator.SetDto(locationDto)
 		if isValid, err := validator.Validate(ctx); !isValid || err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Location format was invalid: %v", err)})
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Location format was invalid"})
 			return
 		}
 
