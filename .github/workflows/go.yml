@@ -25,3 +25,5 @@ jobs:
     - name: Test
       working-directory: ./server
       run: go test -v example.com/country-roads/tests
+      env:
+        GIN_MODE: release
