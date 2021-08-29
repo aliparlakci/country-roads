@@ -84,10 +84,10 @@ func (v RideValidator) ValidateDestination(ctx context.Context) bool {
 
 func (v RideValidator) Validate(ctx context.Context) (bool, error) {
 	if !v.ValidateDate() {
-		return false, fmt.Errorf("date is not valid")
+		return false, fmt.Errorf("ride date is not valid")
 	}
 	if !v.ValidateDirection() {
-		return false, fmt.Errorf("direction is not valid")
+		return false, fmt.Errorf("ride direction is not valid")
 	}
 	if !v.ValidateType() {
 		return false, fmt.Errorf("ride type is not valid")

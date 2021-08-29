@@ -28,10 +28,10 @@ func TestPostRide(t *testing.T) {
 	}{
 		{
 			Body: multipart.Form{Value: map[string][]string{
-				"type": []string{"offer"},
-				"direction": []string{"to_campus"},
-				"destination": []string{"istanbul_asia"},
-				"date": []string{"1630227365"},
+				"type": {"offer"},
+				"direction": {"to_campus"},
+				"destination": {"istanbul_asia"},
+				"date": {"1630227365"},
 			}},
 			Prepare: func(inserter *mocks.MockRideInserter, locationFinder *mocks.MockLocationFinder) {
 				locationFinder.EXPECT().FindOne(gomock.Any(), bson.M{"key": "istanbul_asia"}).Return(models.Location{}, nil)
@@ -46,6 +46,76 @@ func TestPostRide(t *testing.T) {
 			},
 			ExpectedCode: http.StatusCreated,
 			ExpectedBody: gin.H{"id": "551137c2f9e1fac808a5f572"},
+		},
+		{
+			Body: multipart.Form{Value: map[string][]string{
+				"type": {"incorrect_type"},
+				"direction": {"to_campus"},
+				"destination": {"istanbul_asia"},
+				"date": {"1630227365"},
+			}},
+			Prepare: func(inserter *mocks.MockRideInserter, locationFinder *mocks.MockLocationFinder) {
+				locationFinder.EXPECT().FindOne(gomock.Any(), bson.M{"key": "istanbul_asia"}).Return(models.Location{}, nil).MaxTimes(1)
+				inserter.EXPECT().InsertOne(gomock.Any(), gomock.Any()).Times(0)
+			},
+			ExpectedCode: http.StatusBadRequest,
+			ExpectedBody: gin.H{"error": "Ride format was incorrect: ride type is not valid"},
+		},
+		{
+			Body: multipart.Form{Value: map[string][]string{
+				"type": {"request"},
+				"direction": {"invalid_direction"},
+				"destination": {"istanbul_asia"},
+				"date": {"1630227365"},
+			}},
+			Prepare: func(inserter *mocks.MockRideInserter, locationFinder *mocks.MockLocationFinder) {
+				locationFinder.EXPECT().FindOne(gomock.Any(), bson.M{"key": "istanbul_asia"}).Return(models.Location{}, nil).MaxTimes(1)
+				inserter.EXPECT().InsertOne(gomock.Any(), gomock.Any()).Times(0)
+			},
+			ExpectedCode: http.StatusBadRequest,
+			ExpectedBody: gin.H{"error": "Ride format was incorrect: ride direction is not valid"},
+		},
+		{
+			Body: multipart.Form{Value: map[string][]string{
+				"type": {"request"},
+				"direction": {"from_campus"},
+				"destination": {"this_key_does_not_exist"},
+				"date": {"1630227365"},
+			}},
+			Prepare: func(inserter *mocks.MockRideInserter, locationFinder *mocks.MockLocationFinder) {
+				locationFinder.EXPECT().FindOne(gomock.Any(), bson.M{"key": "this_key_does_not_exist"}).Return(models.Location{}, fmt.Errorf(""))
+				inserter.EXPECT().InsertOne(gomock.Any(), gomock.Any()).Times(0)
+			},
+			ExpectedCode: http.StatusBadRequest,
+			ExpectedBody: gin.H{"error": "Ride format was incorrect: ride destination is not valid"},
+		},
+		{
+			Body: multipart.Form{Value: map[string][]string{
+				"type": {"request"},
+				"direction": {"from_campus"},
+				"destination": {"istanbul_asia"},
+				"date": {"1600000000"}, // At the past
+			}},
+			Prepare: func(inserter *mocks.MockRideInserter, locationFinder *mocks.MockLocationFinder) {
+				locationFinder.EXPECT().FindOne(gomock.Any(), bson.M{"key": "istanbul_asia"}).Return(models.Location{}, nil).AnyTimes()
+				inserter.EXPECT().InsertOne(gomock.Any(), gomock.Any()).Times(0)
+			},
+			ExpectedCode: http.StatusBadRequest,
+			ExpectedBody: gin.H{"error": "Ride format was incorrect: ride date is not valid"},
+		},
+		{
+			Body: multipart.Form{Value: map[string][]string{
+				"type": {"request"},
+				"direction": {"from_campus"},
+				"destination": {"istanbul_asia"},
+				"date": {"2020-08-29"},
+			}},
+			Prepare: func(inserter *mocks.MockRideInserter, locationFinder *mocks.MockLocationFinder) {
+				locationFinder.EXPECT().FindOne(gomock.Any(), bson.M{"key": "istanbul_asia"}).Return(models.Location{}, nil).AnyTimes()
+				inserter.EXPECT().InsertOne(gomock.Any(), gomock.Any()).Times(0)
+			},
+			ExpectedCode: http.StatusBadRequest,
+			ExpectedBody: gin.H{"error": "Ride format was incorrect: strconv.ParseInt: parsing \"2020-08-29\": invalid syntax"},
 		},
 	}
 

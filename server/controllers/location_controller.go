@@ -38,13 +38,13 @@ func PostLocation(inserter models.LocationInserter, validators validators.IValid
 		var locationDto models.NewLocationFrom
 
 		if err := ctx.Bind(&locationDto); err != nil {
-			ctx.JSON(http.StatusBadRequest, fmt.Sprintf("Location format was incorrect: %v", err))
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Location format was incorrect: %v", err)})
 			return
 		}
 
 		validator.SetDto(locationDto)
 		if isValid, err := validator.Validate(ctx); !isValid || err != nil {
-			ctx.JSON(http.StatusBadRequest, fmt.Sprintf("Location format was invalid: %v", err))
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Location format was invalid: %v", err)})
 			return
 		}
 
@@ -57,11 +57,11 @@ func PostLocation(inserter models.LocationInserter, validators validators.IValid
 
 		id, err := inserter.InsertOne(ctx, schema)
 		if err != nil {
-			ctx.String(http.StatusInternalServerError, fmt.Sprintf("Location couldn't get created: %v", err))
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Location couldn't get created: %v", err)})
 			return
 		}
 
-		ctx.JSON(http.StatusCreated, id)
+		ctx.JSON(http.StatusCreated, gin.H{"id": id})
 	}
 }
 
