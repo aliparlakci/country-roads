@@ -28,8 +28,13 @@ func GetRide(finder models.RideFinder) gin.HandlerFunc {
 		pipeline := aggregations.BuildAggregation([]bson.D{filter})
 
 		rides, err := finder.FindMany(c, pipeline)
-		if err != nil || len(rides) < 1 {
-			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		if len(rides) < 1 {
+			c.JSON(http.StatusNotFound, gin.H{"results": gin.H{}})
 			return
 		}
 

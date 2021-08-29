@@ -1,6 +1,10 @@
 package tests
 
-import "io"
+import (
+	"encoding/json"
+	"github.com/gin-gonic/gin"
+	"io"
+)
 
 func BodyReader(reader io.Reader) ([]byte, error) {
 	rawBody := make([]byte, 0)
@@ -16,4 +20,24 @@ func BodyReader(reader io.Reader) ([]byte, error) {
 	}
 
 	return rawBody, nil
+}
+
+func IsBodyEqual(expected gin.H, actual io.ReadCloser) (bool, error) {
+	actualBytes, err := BodyReader(actual)
+	if err != nil {
+		return false, err
+	}
+
+	parsedExpected := expected
+
+	var parsedActual gin.H
+	err = json.Unmarshal(actualBytes, &parsedActual)
+	if err != nil {
+		return false, nil
+	}
+
+	marshalledExpected, _ := json.Marshal(parsedExpected)
+	marshalledActual, _ := json.Marshal(parsedActual)
+
+	return string(marshalledExpected) == string(marshalledActual), nil
 }

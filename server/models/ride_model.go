@@ -4,7 +4,6 @@ package models
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -122,10 +121,10 @@ func (r Ride) Jsonify() map[string]interface{} {
 	return map[string]interface{}{
 		"id":          r.ID.Hex(),
 		"type":        r.Type,
-		"date":        fmt.Sprint(r.Date.Unix()),
+		"date":        r.Date.Unix(),
 		"direction":   r.Direction,
 		"destination": r.Destination.Jsonify(),
-		"createdAt":   fmt.Sprint(r.CreatedAt.Unix()),
+		"createdAt":   r.CreatedAt.Unix(),
 	}
 }
 
