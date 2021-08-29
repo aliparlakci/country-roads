@@ -2,6 +2,7 @@ package tests
 
 import (
 	"encoding/json"
+	_ "fmt"
 	"github.com/gin-gonic/gin"
 	"io"
 )
@@ -22,7 +23,7 @@ func BodyReader(reader io.Reader) ([]byte, error) {
 	return rawBody, nil
 }
 
-func IsBodyEqual(expected gin.H, actual io.ReadCloser) (bool, error) {
+func IsBodyEqual(expected gin.H, actual io.Reader) (bool, error) {
 	actualBytes, err := BodyReader(actual)
 	if err != nil {
 		return false, err
@@ -40,4 +41,24 @@ func IsBodyEqual(expected gin.H, actual io.ReadCloser) (bool, error) {
 	marshalledActual, _ := json.Marshal(parsedActual)
 
 	return string(marshalledExpected) == string(marshalledActual), nil
+}
+
+func IsResultsSameLength(expectedLength int, actual io.Reader) (bool, error) {
+	actualBytes, err := BodyReader(actual)
+	if err != nil {
+		return false, err
+	}
+
+	var parsedActual gin.H
+	err = json.Unmarshal(actualBytes, &parsedActual)
+	if err != nil {
+		return false, nil
+	}
+
+	results, success := parsedActual["results"].([]interface{})
+	if !success {
+		return false, nil
+	}
+
+	return expectedLength == len(results), nil
 }

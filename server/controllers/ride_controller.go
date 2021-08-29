@@ -48,6 +48,7 @@ func SearchRides(finder models.RideFinder) gin.HandlerFunc {
 		var queries models.SearchRideQueries
 		if err := c.BindQuery(&queries); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
 		}
 
 		pipeline := aggregations.BuildAggregation(aggregations.FilterRides(queries), aggregations.RideWithDestination)
@@ -105,7 +106,7 @@ func DeleteRides(deleter models.RideDeleter) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		objID, err := primitive.ObjectIDFromHex(c.Param("id"))
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "ride id is not valid"})
 			return
 		}
 
@@ -117,6 +118,7 @@ func DeleteRides(deleter models.RideDeleter) gin.HandlerFunc {
 
 		if deletedCount == 0 {
 			c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("Ride with ID %v does not exist", objID)})
+			return
 		}
 
 		c.JSON(http.StatusOK, gin.H{})
