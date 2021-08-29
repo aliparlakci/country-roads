@@ -2,8 +2,11 @@ package tests
 
 import (
 	"encoding/json"
+	"example.com/country-roads/common"
+	"example.com/country-roads/models"
 	_ "fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/golang/mock/gomock"
 	"io"
 )
 
@@ -62,3 +65,33 @@ func IsResultsSameLength(expectedLength int, actual io.Reader) (bool, error) {
 
 	return expectedLength == len(results), nil
 }
+
+type RideSchemaMatcher struct {
+	Expected models.RideSchema
+}
+
+func GetRideSchemaMatcher(schema models.RideSchema) gomock.Matcher {
+	return &RideSchemaMatcher{Expected: schema}
+}
+
+func (r RideSchemaMatcher) Matches(x interface{}) bool {
+	actual, succ := x.(models.RideSchema)
+	if !succ {
+		return false
+	}
+
+	result := true
+	result = result && r.Expected.ID == actual.ID
+	result = result && r.Expected.Type == actual.Type
+	result = result && r.Expected.Date == actual.Date
+	result = result && r.Expected.Destination == actual.Destination
+	result = result && r.Expected.Direction == actual.Direction
+	result = result && r.Expected.CreatedAt.Unix() != common.MinDate
+	return result
+}
+
+func (r RideSchemaMatcher) String() string {
+	return ""
+}
+
+

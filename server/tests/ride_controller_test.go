@@ -2,8 +2,10 @@ package tests
 
 import (
 	"example.com/country-roads/aggregations"
+	"example.com/country-roads/validators"
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
+	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -16,6 +18,76 @@ import (
 	"github.com/golang/mock/gomock"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
+
+func TestPostRide(t *testing.T) {
+	tests := []struct {
+		Body         multipart.Form
+		Prepare      func(inserter *mocks.MockRideInserter, locationFinder *mocks.MockLocationFinder)
+		ExpectedCode int
+		ExpectedBody gin.H
+	}{
+		{
+			Body: multipart.Form{Value: map[string][]string{
+				"type": []string{"offer"},
+				"direction": []string{"to_campus"},
+				"destination": []string{"istanbul_asia"},
+				"date": []string{"1630227365"},
+			}},
+			Prepare: func(inserter *mocks.MockRideInserter, locationFinder *mocks.MockLocationFinder) {
+				locationFinder.EXPECT().FindOne(gomock.Any(), bson.M{"key": "istanbul_asia"}).Return(models.Location{}, nil)
+				inserter.EXPECT().InsertOne(gomock.Any(), GetRideSchemaMatcher(models.RideSchema{
+					ID: primitive.ObjectID{},
+					Type: "offer",
+					Date: time.Unix(1630227365, 0),
+					Destination: "istanbul_asia",
+					Direction: "to_campus",
+					CreatedAt: time.Now(),
+				})).Return("551137c2f9e1fac808a5f572", nil)
+			},
+			ExpectedCode: http.StatusCreated,
+			ExpectedBody: gin.H{"id": "551137c2f9e1fac808a5f572"},
+		},
+	}
+
+	for i, tt := range tests {
+		testName := fmt.Sprintf("[%v]", i)
+		t.Run(testName, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+			mockedRideInserter := mocks.NewMockRideInserter(ctrl)
+			mockedLocationFinder := mocks.NewMockLocationFinder(ctrl)
+			validator := validators.ValidatorFactory{LocationFinder: mockedLocationFinder}
+
+			if tt.Prepare != nil {
+				tt.Prepare(mockedRideInserter, mockedLocationFinder)
+			}
+
+			recorder := httptest.NewRecorder()
+			_, r := gin.CreateTestContext(recorder)
+			r.POST("/rides", controllers.PostRides(mockedRideInserter, validator))
+
+			request, err := http.NewRequest(http.MethodPost, "/rides", nil)
+			request.MultipartForm = &tt.Body
+			request.Header.Set("Content-Type", "multipart/form-data")
+
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			r.ServeHTTP(recorder, request)
+
+			if bodyAssertion, err := IsBodyEqual(tt.ExpectedBody, recorder.Result().Body); err != nil {
+				t.Fatal(err)
+			} else if !bodyAssertion {
+				t.Errorf("response bodies don't match")
+			}
+
+			if recorder.Result().StatusCode != tt.ExpectedCode {
+				t.Errorf("want %v, got %v", tt.ExpectedCode, recorder.Result().StatusCode)
+			}
+		})
+	}
+}
 
 func TestGetRide(t *testing.T) {
 	now := time.Now()
