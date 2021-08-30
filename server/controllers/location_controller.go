@@ -29,7 +29,7 @@ func PostLocation(inserter models.LocationInserter, validators validators.IValid
 		panic(err)
 	}
 	return func(ctx *gin.Context) {
-		var locationDto models.NewLocationFrom
+		var locationDto models.NewLocationForm
 
 		if err := ctx.Bind(&locationDto); err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Location format was incorrect: %v", err)})
@@ -60,9 +60,9 @@ func PostLocation(inserter models.LocationInserter, validators validators.IValid
 }
 
 func RegisterLocationController(router *gin.RouterGroup, env *common.Env) {
-	router.GET("/locations", GetAllLocations(env.Collections.LocationCollection))
+	router.GET("/locations", GetAllLocations(env.Repositories.LocationRepository))
 	router.POST("/locations", PostLocation(
-		env.Collections.LocationCollection,
-		env.Validators,
+		env.Repositories.LocationRepository,
+		env.ValidatorFactory,
 	))
 }

@@ -7,12 +7,13 @@ import (
 )
 
 type Env struct {
-	Collections *CollectionContainer
-	Validators  validators.IValidatorFactory
-	Rdb         *redis.Client
+	Repositories     *RepositoryContainer
+	ValidatorFactory validators.IValidatorFactory
+	Rdb              *redis.Client
 }
 
-type CollectionContainer struct {
-	RideCollection     models.RideRepository
-	LocationCollection models.LocationRepository
+type RepositoryContainer struct {
+	models.RideRepository
+	models.LocationRepository
+	models.UserRepository
 }

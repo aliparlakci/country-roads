@@ -10,7 +10,7 @@ import (
 //go:generate mockgen -destination=../mocks/mock_ride_validator.go -package=mocks example.com/country-roads/validators Validator,IValidatorFactory
 
 type Validator interface {
-	SetDto(dto interface{})
+	SetDto(dto interface{}) error
 	Validate(ctx context.Context) (bool, error)
 }
 
@@ -28,6 +28,8 @@ func (v ValidatorFactory) GetValidator(name string) (Validator, error) {
 		return &RideValidator{LocationFinder: v.LocationFinder}, nil
 	case "locations":
 		return &LocationValidator{LocationFinder: v.LocationFinder}, nil
+	case "users":
+		return &UserValidator{}, nil
 	default:
 		return nil, fmt.Errorf("no validator of type %v", name)
 	}

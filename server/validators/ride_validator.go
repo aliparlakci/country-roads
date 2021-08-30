@@ -9,29 +9,18 @@ import (
 )
 
 type RideValidator struct {
-	Dto            models.NewRideRequest
+	Dto            models.NewRideForm
 	LocationFinder models.LocationFinder
 }
 
-type DateValidator interface {
-	ValidateDate() bool
-}
-
-type TypeValidator interface {
-	ValidateType() bool
-}
-
-type DestinationValidator interface {
-	ValidateDestination(ctx context.Context, finder models.LocationFinder) bool
-}
-
-func (v *RideValidator) SetDto(dto interface{}) {
+func (v *RideValidator) SetDto(dto interface{}) error {
 	switch t := dto.(type) {
-	case models.NewRideRequest:
-		v.Dto = dto.(models.NewRideRequest)
+	case models.NewRideForm:
+		v.Dto = dto.(models.NewRideForm)
 	default:
-		panic(fmt.Errorf("%v is not assignable to NewRideRequest", t))
+		return fmt.Errorf("%v is not assignable to NewRideForm", t)
 	}
+	return nil
 }
 
 func (v RideValidator) ValidateDate() bool {

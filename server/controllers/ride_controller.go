@@ -73,7 +73,7 @@ func PostRides(inserter models.RideInserter, validators validators.IValidatorFac
 		panic(err)
 	}
 	return func(c *gin.Context) {
-		var rideDto models.NewRideRequest
+		var rideDto models.NewRideForm
 
 		if err := c.Bind(&rideDto); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Ride format was incorrect: %v", err)})
@@ -126,11 +126,11 @@ func DeleteRides(deleter models.RideDeleter) gin.HandlerFunc {
 }
 
 func RegisterRideController(router *gin.RouterGroup, env *common.Env) {
-	router.GET("/rides/:id", GetRide(env.Collections.RideCollection))
-	router.GET("/rides", SearchRides(env.Collections.RideCollection))
+	router.GET("/rides/:id", GetRide(env.Repositories.RideRepository))
+	router.GET("/rides", SearchRides(env.Repositories.RideRepository))
 	router.POST("/rides", PostRides(
-		env.Collections.RideCollection,
-		env.Validators,
+		env.Repositories.RideRepository,
+		env.ValidatorFactory,
 	))
-	router.DELETE("/rides/:id", DeleteRides(env.Collections.RideCollection))
+	router.DELETE("/rides/:id", DeleteRides(env.Repositories.RideRepository))
 }

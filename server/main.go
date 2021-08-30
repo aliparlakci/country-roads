@@ -27,11 +27,12 @@ func main() {
 		rdb := common.InitializeRedis(rdbUri, "", 0)
 
 		env.Rdb = rdb
-		env.Collections = &common.CollectionContainer{
-			RideCollection:     &models.RideCollection{Collection: db.Collection("rides")},
-			LocationCollection: &models.LocationCollection{Collection: db.Collection("locations")},
+		env.Repositories = &common.RepositoryContainer{
+			RideRepository:     &models.RideCollection{Collection: db.Collection("rides")},
+			LocationRepository: &models.LocationCollection{Collection: db.Collection("locations")},
+			UserRepository:     &models.UserCollection{Collection: db.Collection("locations")},
 		}
-		env.Validators = &validators.ValidatorFactory{LocationFinder: env.Collections.LocationCollection}
+		env.ValidatorFactory = &validators.ValidatorFactory{LocationFinder: env.Repositories.LocationRepository}
 	}
 
 	router := gin.Default()
@@ -44,6 +45,7 @@ func main() {
 	api := router.Group("api")
 	controllers.RegisterRideController(api, env)
 	controllers.RegisterLocationController(api, env)
+	controllers.RegisterUserController(api, env)
 
 	router.Run(":8080")
 }

@@ -8,23 +8,24 @@ import (
 )
 
 type LocationValidator struct {
-	Dto            models.NewLocationFrom
+	Dto            models.NewLocationForm
 	LocationFinder models.LocationFinder
 }
 
-func (v *LocationValidator) SetDto(dto interface{}) {
-	if d, ok := dto.(models.NewLocationFrom); ok {
+func (v *LocationValidator) SetDto(dto interface{}) error {
+	if d, ok := dto.(models.NewLocationForm); ok {
 		v.Dto = d
 	} else {
-		panic(fmt.Errorf("dto is not assignable to NewLocationFrom"))
+		return fmt.Errorf("dto is not assignable to NewLocationForm")
 	}
+	return nil
 }
 
-func (l LocationValidator) validateDisplay() bool {
+func (l LocationValidator) ValidateDisplay() bool {
 	return l.Dto.Display != ""
 }
 
-func (l LocationValidator) validateParent(ctx context.Context) (bool, error) {
+func (l LocationValidator) ValidateParent(ctx context.Context) (bool, error) {
 	if l.Dto.ParentKey == "" {
 		return true, nil
 	}
@@ -36,7 +37,7 @@ func (l LocationValidator) validateParent(ctx context.Context) (bool, error) {
 	return true, nil
 }
 
-func (l LocationValidator) validateKey(ctx context.Context) bool {
+func (l LocationValidator) ValidateKey(ctx context.Context) bool {
 	if _, err := l.LocationFinder.FindOne(ctx, bson.M{"key": l.Dto.Key}); err != nil {
 		return true
 	}
@@ -44,13 +45,13 @@ func (l LocationValidator) validateKey(ctx context.Context) bool {
 }
 
 func (l LocationValidator) Validate(ctx context.Context) (bool, error) {
-	if parent, err := l.validateParent(ctx); !parent && err != nil {
+	if parent, err := l.ValidateParent(ctx); !parent && err != nil {
 		return parent, err
 	}
-	if display := l.validateDisplay(); !display {
+	if display := l.ValidateDisplay(); !display {
 		return display, nil
 	}
-	if key := l.validateKey(ctx); !key {
+	if key := l.ValidateKey(ctx); !key {
 		return key, nil
 	}
 	return true, nil
