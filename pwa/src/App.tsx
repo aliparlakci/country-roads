@@ -1,51 +1,74 @@
 import React from "react";
+import { Redirect, Route, Switch, Link } from "react-router-dom";
+import CONSTANTS from "./constants";
+import MainView from "./views/MainView";
+import CreateRideView from "./views/CreateRideView";
+import RideDetailsView from "./views/RideDetailsView";
+import LoginView from "./views/LoginView";
+import RegisterView from "./views/RegisterView";
+import ProfileView from "./views/ProfileView";
 import styled from "styled-components";
 
-import NewRideForm from "./components/NewRideForm";
-import RideList from "./components/RideList";
-
-import "./App.css";
-import NewLocationForm from "./components/NewLocationForm";
-import useQuery from "./hooks/useQuery";
-import { IRideQuery } from "./hooks/useRides";
-import RideFilter from "./components/RideFilter";
-
 export default function App() {
-  const params = useQuery();
-  const query: IRideQuery = {
-    type: params.get("type"),
-    direction: params.get("direction"),
-    destination: params.get("destination"),
-    startDate: params.get("start_date"),
-    endDate: params.get("end_date"),
-  };
-
   return (
     <StyledContainer>
-      <h1>CountryRoads</h1>
-      <ColumnView>
-        <NewRideForm />
-        <RideFilter />
-        <NewLocationForm />
-      </ColumnView>
-      <RideList {...query} />
+      <h1>Country Roads</h1>
+      <StyledNav>
+        <StyledNavItem style={{ flex: 2 }}>
+          <Link to={CONSTANTS.ROUTES.RIDES.NEW}>Create Ride</Link>
+        </StyledNavItem>
+        <StyledNavItem style={{ flex: 1 }}>
+          <Link to={CONSTANTS.ROUTES.RIDES.MAIN}>Home</Link>
+        </StyledNavItem>
+        <StyledNavItem style={{ flex: 2 }}>
+          <Link to={CONSTANTS.ROUTES.REGISTER}>Register</Link>
+        </StyledNavItem>
+      </StyledNav>
+
+      <Switch>
+        <Route exact path={CONSTANTS.ROUTES.RIDES.NEW}>
+          <CreateRideView />
+        </Route>
+        <Route path={CONSTANTS.ROUTES.RIDES.DETAILS}>
+          <RideDetailsView />
+        </Route>
+        <Route path={CONSTANTS.ROUTES.RIDES.MAIN}>
+          <MainView/>
+        </Route>
+        <Route path={CONSTANTS.ROUTES.LOGIN}>
+          <LoginView />
+        </Route>
+        <Route path={CONSTANTS.ROUTES.REGISTER}>
+          <RegisterView />
+        </Route>
+        <Route path={CONSTANTS.ROUTES.ME}>
+          <ProfileView />
+        </Route>
+      </Switch>
     </StyledContainer>
   );
 }
 
 const StyledContainer = styled.div`
   display: flex;
-  flex-direction: column;
+  justify-items: center;
   align-items: center;
-  justify-content: center;
-  gap: 1rem;
-
-  height: 100%;
+  flex-direction: column;
   width: 100%;
+  gap: 1rem;
 `;
 
-const ColumnView = styled.div`
+const StyledNav = styled.nav`
   display: flex;
   flex-direction: row;
-  gap: 2rem;
+  justify-content: space-between;
+  align-items: center;
+  width: 20rem;
+`;
+
+const StyledNavItem = styled.div`
+  display: flex;
+  justify-content: center;
+  white-space: nowrap;
+  text-decoration: none;
 `;

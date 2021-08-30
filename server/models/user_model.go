@@ -1,6 +1,6 @@
 package models
 
-//go:generate mockgen -destination=../mocks/mock_user_model.go -package=mocks example.com/country-roads/models UserRepository,UserFinder,UserInserter,UserUpdater,UserFindUpdater
+//go:generate mockgen -destination=../mocks/mock_user_model.go -package=mocks example.com/country-roads/models UserRepository,UserFinder,UserInserter,UserUpdater,UserFindUpdater,UserFindInserter
 
 import (
 	"context"
@@ -20,7 +20,7 @@ type User struct {
 }
 
 type UserSchema struct {
-	ID          primitive.ObjectID `bson:"_id" json:"id"`
+	ID          primitive.ObjectID `bson:"_id,omitempty" json:"id"`
 	DisplayName string             `bson:"displayName" json:"displayName"`
 	Email       string             `bson:"email" json:"email"`
 	Phone       string             `bson:"phone" json:"phone"`
@@ -29,9 +29,9 @@ type UserSchema struct {
 }
 
 type NewUserForm struct {
-	DisplayName string
-	Email       string
-	Phone       string
+	DisplayName string `form:"displayName" binding:"required"`
+	Email       string `form:"email" binding:"required"`
+	Phone       string `form:"phone" binding:"required"`
 }
 
 type UserCollection struct {
@@ -61,14 +61,31 @@ type UserFindUpdater interface {
 	UserUpdater
 }
 
+type UserFindInserter interface {
+	UserFinder
+	UserInserter
+}
+
 func (u UserCollection) FindOne(ctx context.Context, filter interface{}) (User, error) {
-	return User{}, nil
+	var user User
+	result := u.Collection.FindOne(ctx, filter)
+	if err := result.Err(); err != nil {
+		return user, err
+	}
+	err := result.Decode(&user)
+	return user, err
 }
 
 func (u UserCollection) InsertOne(ctx context.Context, candidate UserSchema) (interface{}, error) {
-	return User{}, nil
+	result, err := u.Collection.InsertOne(ctx, candidate)
+	if err != nil {
+		return nil, err
+	}
+
+	return result.InsertedID, nil
 }
 
 func (u UserCollection) UpdateOne(ctx context.Context, filter interface{}, changes interface{}) error {
+	//TODO: Implement
 	return nil
 }

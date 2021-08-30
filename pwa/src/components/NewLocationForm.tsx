@@ -15,7 +15,7 @@ export default function NewLocationForm(props: INewLocationFormProps) {
     setDisabled(true);
 
     const formData = new FormData(event.currentTarget);
-    if (formData.get("parentKey")?.valueOf() === "-1")
+    if (formData.get("parentKey")?.valueOf() === "none")
       formData.delete("parentKey");
 
     try {

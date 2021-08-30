@@ -17,9 +17,9 @@ export default function LocationsDropdown(props: ILocationsDropdownProps) {
 
   return (
     <select {...props}>
-      <option value={-1}></option>
       {locationResponse && locationResponse.results && (
         <>
+          <option value="none">None</option>
           {locationResponse?.results?.map((location) => (
             <option key={location.key} value={location.key}>
               {location.display}
@@ -27,8 +27,8 @@ export default function LocationsDropdown(props: ILocationsDropdownProps) {
           ))}
         </>
       )}
-      {!locationResponse && <option>Loading...</option>}
-      {locationResponse && locationResponse.error && <option>Error!</option>}
+      {!locationResponse && <option disabled={true}>Loading...</option>}
+      {locationResponse && locationResponse.error && <option disabled={true}>Error!</option>}
     </select>
   );
 }

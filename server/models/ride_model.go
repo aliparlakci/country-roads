@@ -23,10 +23,10 @@ type Ride struct {
 type Rides []Ride
 
 type NewRideForm struct {
-	Type        string    `bson:"type" json:"type" form:"type" binding:"required"`
-	Date        time.Time `bson:"date" json:"date" form:"date" time_format:"unix" binding:"required"`
-	Direction   string    `bson:"direction" json:"direction" form:"direction" binding:"required"`
-	Destination string    `bson:"destination" json:"destination" form:"destination" binding:"required"`
+	Type         string    `bson:"type" json:"type" form:"type" binding:"required"`
+	Date         time.Time `bson:"date" json:"date" form:"date" time_format:"unix" binding:"required"`
+	Direction    string    `bson:"direction" json:"direction" form:"direction" binding:"required"`
+	Destination  string    `bson:"destination" json:"destination" form:"destination" binding:"required"`
 }
 
 type RideSchema struct {

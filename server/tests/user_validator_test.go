@@ -14,7 +14,7 @@ func TestUserValidator(t *testing.T) {
 		Expected bool
 	}{
 		{
-			Case:     models.NewUserForm{DisplayName: "Ali Parlakçı", Email: "parlakciali@sabanciuniv.edu", Phone: "+90 5420000000"},
+			Case:     models.NewUserForm{DisplayName: "Ali Parlakçı", Email: "parlakciali@sabanciuniv.edu", Phone: "+905420000000"},
 			Expected: true,
 		},
 		{
@@ -22,15 +22,15 @@ func TestUserValidator(t *testing.T) {
 			Expected: false,
 		},
 		{
-			Case:     models.NewUserForm{DisplayName: "", Email: "aliparlakci@sabanciuniv.edu", Phone: "+90 5420000000"},
+			Case:     models.NewUserForm{DisplayName: "", Email: "aliparlakci@sabanciuniv.edu", Phone: "+905420000000"},
 			Expected: false,
 		},
 		{
-			Case:     models.NewUserForm{DisplayName: "Ali Parlakçı", Email: "aliparlakci@sabanciuniv", Phone: "+90 5420000000"},
+			Case:     models.NewUserForm{DisplayName: "Ali Parlakçı", Email: "aliparlakci@sabanciuniv", Phone: "+905420000000"},
 			Expected: false,
 		},
 		{
-			Case:     models.NewUserForm{DisplayName: "Ali Parlakçı", Email: "@sabanciuniv.edu", Phone: "+90 5420000000"},
+			Case:     models.NewUserForm{DisplayName: "Ali Parlakçı", Email: "@sabanciuniv.edu", Phone: "+905420000000"},
 			Expected: false,
 		},
 	}
@@ -64,10 +64,10 @@ func TestValidatePhone(t *testing.T) {
 		Case     string
 		Expected bool
 	}{
-		{Case: "+132 5420000000", Expected: true},
-		{Case: "+90 5420000000", Expected: true},
+		{Case: "+1325420000000", Expected: true},
+		{Case: "+905420000000", Expected: true},
+		{Case: "05423530000", Expected: true},
 		{Case: "asd\n+90 5423530000\nasd", Expected: false},
-		{Case: "05423530000", Expected: false},
 		{Case: "+5423530000", Expected: false},
 		{Case: "12345", Expected: false},
 		{Case: "aaaa", Expected: false},
@@ -102,7 +102,7 @@ func TestValidateDisplayName(t *testing.T) {
 
 func TestValidateEmail(t *testing.T) {
 	tests := []struct {
-		Case         string
+		Case          string
 		ExpectedBool  bool
 		ExpectedEmail string
 	}{

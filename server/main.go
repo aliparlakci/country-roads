@@ -30,7 +30,7 @@ func main() {
 		env.Repositories = &common.RepositoryContainer{
 			RideRepository:     &models.RideCollection{Collection: db.Collection("rides")},
 			LocationRepository: &models.LocationCollection{Collection: db.Collection("locations")},
-			UserRepository:     &models.UserCollection{Collection: db.Collection("locations")},
+			UserRepository:     &models.UserCollection{Collection: db.Collection("users")},
 		}
 		env.ValidatorFactory = &validators.ValidatorFactory{LocationFinder: env.Repositories.LocationRepository}
 	}

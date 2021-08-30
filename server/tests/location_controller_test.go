@@ -24,8 +24,8 @@ func TestPostLocation(t *testing.T) {
 	}{
 		{
 			Body: multipart.Form{Value: map[string][]string{
-				"key": {"taksim"},
-				"display": {"Taksim"},
+				"key":       {"taksim"},
+				"display":   {"Taksim"},
 				"parentKey": {"istanbul_europe"},
 			}},
 			Prepare: func(inserter *mocks.MockLocationInserter, locationFinder *mocks.MockLocationFinder) {
@@ -38,14 +38,14 @@ func TestPostLocation(t *testing.T) {
 		},
 		{
 			Body: multipart.Form{Value: map[string][]string{
-				"key": {"taksim"},
+				"key":     {"taksim"},
 				"display": {"Taksim"},
 			}},
 			Prepare: func(inserter *mocks.MockLocationInserter, locationFinder *mocks.MockLocationFinder) {
 				locationFinder.EXPECT().FindOne(gomock.Any(), gomock.Any()).Times(0)
 				locationFinder.EXPECT().FindOne(gomock.Any(), bson.M{"key": "taksim"}).Return(models.Location{}, fmt.Errorf("")).MinTimes(1)
 				inserter.EXPECT().InsertOne(gomock.Any(), models.LocationSchema{
-					Key: "taksim",
+					Key:     "taksim",
 					Display: "Taksim",
 				}).Return("551137c2f9e1fac808a5f572", nil)
 			},
@@ -54,16 +54,16 @@ func TestPostLocation(t *testing.T) {
 		},
 		{
 			Body: multipart.Form{Value: map[string][]string{
-				"key": {"taksim"},
-				"display": {"Taksim"},
+				"key":       {"taksim"},
+				"display":   {"Taksim"},
 				"parentKey": {"istanbul_europe"},
 			}},
 			Prepare: func(inserter *mocks.MockLocationInserter, locationFinder *mocks.MockLocationFinder) {
 				locationFinder.EXPECT().FindOne(gomock.Any(), bson.M{"key": "istanbul_europe"}).Return(models.Location{}, nil).MinTimes(1)
 				locationFinder.EXPECT().FindOne(gomock.Any(), bson.M{"key": "taksim"}).Return(models.Location{}, fmt.Errorf("")).MinTimes(1)
 				inserter.EXPECT().InsertOne(gomock.Any(), models.LocationSchema{
-					Key: "taksim",
-					Display: "Taksim",
+					Key:       "taksim",
+					Display:   "Taksim",
 					ParentKey: "istanbul_europe",
 				}).Return("551137c2f9e1fac808a5f572", nil)
 			},

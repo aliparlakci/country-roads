@@ -28,20 +28,20 @@ func TestPostRide(t *testing.T) {
 	}{
 		{
 			Body: multipart.Form{Value: map[string][]string{
-				"type": {"offer"},
-				"direction": {"to_campus"},
+				"type":        {"offer"},
+				"direction":   {"to_campus"},
 				"destination": {"istanbul_asia"},
-				"date": {"1730227365"},
+				"date":        {"1730227365"},
 			}},
 			Prepare: func(inserter *mocks.MockRideInserter, locationFinder *mocks.MockLocationFinder) {
 				locationFinder.EXPECT().FindOne(gomock.Any(), bson.M{"key": "istanbul_asia"}).Return(models.Location{}, nil)
 				inserter.EXPECT().InsertOne(gomock.Any(), GetRideSchemaMatcher(models.RideSchema{
-					ID: primitive.ObjectID{},
-					Type: "offer",
-					Date: time.Unix(1730227365, 0),
+					ID:          primitive.ObjectID{},
+					Type:        "offer",
+					Date:        time.Unix(1730227365, 0),
 					Destination: "istanbul_asia",
-					Direction: "to_campus",
-					CreatedAt: time.Now(),
+					Direction:   "to_campus",
+					CreatedAt:   time.Now(),
 				})).Return("551137c2f9e1fac808a5f572", nil)
 			},
 			ExpectedCode: http.StatusCreated,
@@ -49,10 +49,10 @@ func TestPostRide(t *testing.T) {
 		},
 		{
 			Body: multipart.Form{Value: map[string][]string{
-				"type": {"incorrect_type"},
-				"direction": {"to_campus"},
+				"type":        {"incorrect_type"},
+				"direction":   {"to_campus"},
 				"destination": {"istanbul_asia"},
-				"date": {"1730227365"},
+				"date":        {"1730227365"},
 			}},
 			Prepare: func(inserter *mocks.MockRideInserter, locationFinder *mocks.MockLocationFinder) {
 				locationFinder.EXPECT().FindOne(gomock.Any(), bson.M{"key": "istanbul_asia"}).Return(models.Location{}, nil).MaxTimes(1)
@@ -63,10 +63,10 @@ func TestPostRide(t *testing.T) {
 		},
 		{
 			Body: multipart.Form{Value: map[string][]string{
-				"type": {"request"},
-				"direction": {"invalid_direction"},
+				"type":        {"request"},
+				"direction":   {"invalid_direction"},
 				"destination": {"istanbul_asia"},
-				"date": {"1730227365"},
+				"date":        {"1730227365"},
 			}},
 			Prepare: func(inserter *mocks.MockRideInserter, locationFinder *mocks.MockLocationFinder) {
 				locationFinder.EXPECT().FindOne(gomock.Any(), bson.M{"key": "istanbul_asia"}).Return(models.Location{}, nil).MaxTimes(1)
@@ -77,10 +77,10 @@ func TestPostRide(t *testing.T) {
 		},
 		{
 			Body: multipart.Form{Value: map[string][]string{
-				"type": {"request"},
-				"direction": {"from_campus"},
+				"type":        {"request"},
+				"direction":   {"from_campus"},
 				"destination": {"this_key_does_not_exist"},
-				"date": {"1730227365"},
+				"date":        {"1730227365"},
 			}},
 			Prepare: func(inserter *mocks.MockRideInserter, locationFinder *mocks.MockLocationFinder) {
 				locationFinder.EXPECT().FindOne(gomock.Any(), bson.M{"key": "this_key_does_not_exist"}).Return(models.Location{}, fmt.Errorf(""))
@@ -91,10 +91,10 @@ func TestPostRide(t *testing.T) {
 		},
 		{
 			Body: multipart.Form{Value: map[string][]string{
-				"type": {"request"},
-				"direction": {"from_campus"},
+				"type":        {"request"},
+				"direction":   {"from_campus"},
 				"destination": {"istanbul_asia"},
-				"date": {"1600000000"}, // At the past
+				"date":        {"1600000000"}, // At the past
 			}},
 			Prepare: func(inserter *mocks.MockRideInserter, locationFinder *mocks.MockLocationFinder) {
 				locationFinder.EXPECT().FindOne(gomock.Any(), bson.M{"key": "istanbul_asia"}).Return(models.Location{}, nil).AnyTimes()
@@ -105,10 +105,10 @@ func TestPostRide(t *testing.T) {
 		},
 		{
 			Body: multipart.Form{Value: map[string][]string{
-				"type": {"request"},
-				"direction": {"from_campus"},
+				"type":        {"request"},
+				"direction":   {"from_campus"},
 				"destination": {"istanbul_asia"},
-				"date": {"2020-08-29"},
+				"date":        {"2020-08-29"},
 			}},
 			Prepare: func(inserter *mocks.MockRideInserter, locationFinder *mocks.MockLocationFinder) {
 				locationFinder.EXPECT().FindOne(gomock.Any(), bson.M{"key": "istanbul_asia"}).Return(models.Location{}, nil).AnyTimes()

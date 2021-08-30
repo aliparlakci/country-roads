@@ -4,18 +4,50 @@ import (
 	"example.com/country-roads/common"
 	"example.com/country-roads/models"
 	"example.com/country-roads/validators"
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson"
 	"net/http"
+	"time"
 )
 
-func SignUp(finder models.UserFinder, validatorFactory validators.IValidatorFactory) gin.HandlerFunc {
+func PostUser(findInserter models.UserFindInserter, validatorFactory validators.IValidatorFactory) gin.HandlerFunc {
 	validator, err := validatorFactory.GetValidator("users")
 	if err != nil {
 		panic(err)
 	}
 	return func(c *gin.Context) {
-		validator.Validate(c)
-		c.JSON(http.StatusOK, gin.H{})
+		var userDto models.NewUserForm
+
+		if err := c.Bind(&userDto); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "user format was incorrect"})
+			return
+		}
+
+		if err := validator.SetDto(&userDto); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+			return
+		}
+		if result, err := validator.Validate(c); !result || err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "user is not valid"})
+			return
+		}
+		if _, err := findInserter.FindOne(c, bson.M{"email": userDto.Email}); err == nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "user already exists"})
+			return
+		}
+		id, err := findInserter.InsertOne(c, models.UserSchema{
+			DisplayName: userDto.DisplayName,
+			Email:       userDto.Email,
+			Phone:       userDto.Phone,
+			Verified:    false,
+			SignedUpAt:  time.Now(),
+		})
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("new user could not get created: %v", err)})
+			return
+		}
+		c.JSON(http.StatusCreated, gin.H{"id": id})
 	}
 }
 
@@ -32,10 +64,10 @@ func UpdatePhone(findUpdater models.UserFindUpdater) gin.HandlerFunc {
 }
 
 func RegisterUserController(router *gin.RouterGroup, env *common.Env) {
-	router.POST("/users/", SignUp(
-			env.Repositories.UserRepository,
-			env.ValidatorFactory,
-		))
+	router.POST("/users", PostUser(
+		env.Repositories.UserRepository,
+		env.ValidatorFactory,
+	))
 	router.PUT("/users/name", UpdateDisplayName(env.Repositories.UserRepository))
 	router.PUT("/users/phone", UpdatePhone(env.Repositories.UserRepository))
 }

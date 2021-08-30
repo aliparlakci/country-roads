@@ -19,8 +19,8 @@ type Location struct {
 type Locations []Location
 
 type NewLocationForm struct {
-	Key       string `bson:"key" json:"key" form:"key"`
-	Display   string `bson:"display" json:"display" form:"display"`
+	Key       string `bson:"key" json:"key" form:"key" binding:"required"`
+	Display   string `bson:"display" json:"display" form:"display" binding:"required"`
 	ParentKey string `bson:"parentKey,omitempty" json:"parentKey,omitempty" form:"parentKey,omitempty"`
 }
 

@@ -94,4 +94,30 @@ func (r RideSchemaMatcher) String() string {
 	return ""
 }
 
+type UserSchemaMatcher struct {
+	Expected models.UserSchema
+}
 
+func GetUserSchemaMatcher(schema models.UserSchema) gomock.Matcher {
+	return &UserSchemaMatcher{Expected: schema}
+}
+
+func (r UserSchemaMatcher) Matches(x interface{}) bool {
+	actual, succ := x.(models.UserSchema)
+	if !succ {
+		return false
+	}
+
+	result := true
+	result = result && r.Expected.ID == actual.ID
+	result = result && r.Expected.DisplayName == actual.DisplayName
+	result = result && r.Expected.Email == actual.Email
+	result = result && r.Expected.Phone == actual.Phone
+	result = result && r.Expected.Verified == actual.Verified
+	result = result && r.Expected.SignedUpAt.Unix() != common.MinDate
+	return result
+}
+
+func (r UserSchemaMatcher) String() string {
+	return ""
+}
