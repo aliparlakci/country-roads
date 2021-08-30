@@ -1,5 +1,5 @@
 import React from "react";
-import { Redirect, Route, Switch, Link } from "react-router-dom";
+import { Route, Switch, Link } from "react-router-dom";
 import styled from "styled-components";
 
 import CONSTANTS from "./constants";

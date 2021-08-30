@@ -68,7 +68,7 @@ export default function RideFilter() {
       params.set("end_date", state.endDate.value);
 
     history.push(`${pathname}?${params.toString()}`);
-  }, [state]);
+  }, [state, history, pathname]);
 
   return (
     <Container>
