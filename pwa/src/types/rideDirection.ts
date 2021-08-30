@@ -1,6 +1,6 @@
 enum RideDirection {
-  TO_CAMPUS = "to_campus",
-  FROM_CAMPUS = "from_campus",
+    TO_CAMPUS = 'to_campus',
+    FROM_CAMPUS = 'from_campus',
 }
 
-export default RideDirection;
+export default RideDirection

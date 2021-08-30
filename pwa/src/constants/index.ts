@@ -1,6 +1,6 @@
-import { API } from "./api";
-import { ROUTES } from "./routes";
+import { API } from './api'
+import { ROUTES } from './routes'
 
-const CONSTANTS = { API, ROUTES };
+const CONSTANTS = { API, ROUTES }
 
-export default CONSTANTS;
+export default CONSTANTS

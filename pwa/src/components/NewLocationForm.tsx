@@ -1,94 +1,94 @@
-import React, { useState } from "react";
-import styled from "styled-components";
-import { mutate } from "swr";
+import React, { useState } from 'react'
+import styled from 'styled-components'
+import { mutate } from 'swr'
 
-import CONSTANTS from "../constants";
-import LocationsDropdown from "./LocationsDropdown";
+import CONSTANTS from '../constants'
+import LocationsDropdown from './LocationsDropdown'
 
 export interface INewLocationFormProps {}
 
 export default function NewLocationForm(props: INewLocationFormProps) {
-  const [disabled, setDisabled] = useState(true);
+    const [disabled, setDisabled] = useState(true)
 
-  const handleSubmit = async (event: any) => {
-    event.preventDefault();
-    setDisabled(true);
+    const handleSubmit = async (event: any) => {
+        event.preventDefault()
+        setDisabled(true)
 
-    const formData = new FormData(event.currentTarget);
-    if (formData.get("parentKey")?.valueOf() === "none")
-      formData.delete("parentKey");
+        const formData = new FormData(event.currentTarget)
+        if (formData.get('parentKey')?.valueOf() === 'none')
+            formData.delete('parentKey')
 
-    try {
-      await fetch(CONSTANTS.API().LOCATIONS, {
-        method: "POST",
-        body: formData,
-      });
-    } catch (e) {
-      console.error(e);
+        try {
+            await fetch(CONSTANTS.API().LOCATIONS, {
+                method: 'POST',
+                body: formData,
+            })
+        } catch (e) {
+            console.error(e)
+        }
+
+        mutate(CONSTANTS.API().LOCATIONS)
+
+        event.target.reset()
+        setDisabled(false)
     }
 
-    mutate(CONSTANTS.API().LOCATIONS);
+    return (
+        <StyledForm onSubmit={handleSubmit}>
+            <FormItem>
+                <label htmlFor="locationKey">Key:</label>
+                <input
+                    type="text"
+                    placeholder="Type a key..."
+                    id="locationKey"
+                    name="key"
+                    disabled={disabled}
+                />
+            </FormItem>
 
-    event.target.reset();
-    setDisabled(false);
-  };
+            <FormItem>
+                <label htmlFor="displayName">Display name:</label>
+                <input
+                    type="text"
+                    placeholder="Type a name..."
+                    id="displayName"
+                    name="display"
+                    disabled={disabled}
+                />
+            </FormItem>
 
-  return (
-    <StyledForm onSubmit={handleSubmit}>
-      <FormItem>
-        <label htmlFor="locationKey">Key:</label>
-        <input
-          type="text"
-          placeholder="Type a key..."
-          id="locationKey"
-          name="key"
-          disabled={disabled}
-        />
-      </FormItem>
+            <FormItem>
+                <label htmlFor="destination">Parent:</label>
+                <LocationsDropdown
+                    id="parentKey"
+                    name="parentKey"
+                    required
+                    disabled={disabled}
+                    onData={() => setDisabled(false)}
+                />
+            </FormItem>
 
-      <FormItem>
-        <label htmlFor="displayName">Display name:</label>
-        <input
-          type="text"
-          placeholder="Type a name..."
-          id="displayName"
-          name="display"
-          disabled={disabled}
-        />
-      </FormItem>
-
-      <FormItem>
-        <label htmlFor="destination">Parent:</label>
-        <LocationsDropdown
-          id="parentKey"
-          name="parentKey"
-          required
-          disabled={disabled}
-          onData={() => setDisabled(false)}
-        />
-      </FormItem>
-
-      <input type="submit" value="Post" disabled={disabled} />
-    </StyledForm>
-  );
+            <input type="submit" value="Post" disabled={disabled} />
+        </StyledForm>
+    )
 }
 
 const StyledForm = styled.form`
-  width: fit-content;
+    width: fit-content;
 
-  display: flex;
-  flex-direction: column;
-  padding: 1rem;
-  gap: 1rem;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    gap: 1rem;
 
-  border-radius: 1rem;
-  border: 1px solid lightgrey;
-`;
+    border-radius: 1rem;
+    border: 1px solid lightgrey;
+`
 
 const FormItem = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-`;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+`

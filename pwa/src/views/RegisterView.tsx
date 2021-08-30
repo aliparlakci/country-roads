@@ -1,10 +1,10 @@
-import React from "react";
-import RegisterForm from "../components/RegisterForm";
+import React from 'react'
+import RegisterForm from '../components/RegisterForm'
 
 export default function RegisterView() {
-  return (
-    <>
-      <RegisterForm />
-    </>
-  );
+    return (
+        <>
+            <RegisterForm />
+        </>
+    )
 }
