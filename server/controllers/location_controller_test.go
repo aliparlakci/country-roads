@@ -1,18 +1,19 @@
 package controllers
 
 import (
-	"example.com/country-roads/common"
-	"example.com/country-roads/mocks"
-	"example.com/country-roads/models"
-	"example.com/country-roads/validators"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/golang/mock/gomock"
-	"go.mongodb.org/mongo-driver/bson"
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/aliparlakci/country-roads/common"
+	"github.com/aliparlakci/country-roads/mocks"
+	"github.com/aliparlakci/country-roads/models"
+	"github.com/aliparlakci/country-roads/validators"
+	"github.com/gin-gonic/gin"
+	"github.com/golang/mock/gomock"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 func TestPostLocation(t *testing.T) {

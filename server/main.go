@@ -1,15 +1,16 @@
 package main
 
 import (
-	"example.com/country-roads/controllers"
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
 	"os"
 
-	"example.com/country-roads/models"
-	"example.com/country-roads/validators"
+	"github.com/aliparlakci/country-roads/controllers"
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 
-	"example.com/country-roads/common"
+	"github.com/aliparlakci/country-roads/models"
+	"github.com/aliparlakci/country-roads/validators"
+
+	"github.com/aliparlakci/country-roads/common"
 	"github.com/joho/godotenv"
 )
 

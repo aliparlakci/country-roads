@@ -2,10 +2,11 @@ package validators
 
 import (
 	"context"
-	"example.com/country-roads/models"
 	"fmt"
-	"go.mongodb.org/mongo-driver/bson"
 	"time"
+
+	"github.com/aliparlakci/country-roads/models"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 type RideValidator struct {

@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"net/http"
 
-	"example.com/country-roads/validators"
+	"github.com/aliparlakci/country-roads/validators"
 	"go.mongodb.org/mongo-driver/bson"
 
-	"example.com/country-roads/common"
-	"example.com/country-roads/models"
+	"github.com/aliparlakci/country-roads/common"
+	"github.com/aliparlakci/country-roads/models"
 	"github.com/gin-gonic/gin"
 )
 

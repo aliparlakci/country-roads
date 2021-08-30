@@ -1,14 +1,15 @@
 package controllers
 
 import (
-	"example.com/country-roads/common"
-	"example.com/country-roads/models"
-	"example.com/country-roads/validators"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/bson"
 	"net/http"
 	"time"
+
+	"github.com/aliparlakci/country-roads/common"
+	"github.com/aliparlakci/country-roads/models"
+	"github.com/aliparlakci/country-roads/validators"
+	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 func PostUser(findInserter models.UserFindInserter, validatorFactory validators.IValidatorFactory) gin.HandlerFunc {

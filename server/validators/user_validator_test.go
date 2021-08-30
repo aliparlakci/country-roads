@@ -2,9 +2,10 @@ package validators
 
 import (
 	"context"
-	"example.com/country-roads/models"
 	"fmt"
 	"testing"
+
+	"github.com/aliparlakci/country-roads/models"
 )
 
 func TestUserValidator(t *testing.T) {

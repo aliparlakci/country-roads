@@ -5,12 +5,12 @@ import (
 	"net/http"
 	"time"
 
-	"example.com/country-roads/aggregations"
-	"example.com/country-roads/validators"
+	"github.com/aliparlakci/country-roads/aggregations"
+	"github.com/aliparlakci/country-roads/validators"
 	"go.mongodb.org/mongo-driver/bson"
 
-	"example.com/country-roads/common"
-	"example.com/country-roads/models"
+	"github.com/aliparlakci/country-roads/common"
+	"github.com/aliparlakci/country-roads/models"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )

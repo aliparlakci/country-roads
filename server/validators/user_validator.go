@@ -3,10 +3,11 @@ package validators
 import (
 	"context"
 	"errors"
-	"example.com/country-roads/models"
 	"fmt"
 	"net/mail"
 	"regexp"
+
+	"github.com/aliparlakci/country-roads/models"
 )
 
 type UserValidator struct {

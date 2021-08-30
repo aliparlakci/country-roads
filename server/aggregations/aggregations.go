@@ -1,8 +1,8 @@
 package aggregations
 
 import (
-	"example.com/country-roads/common"
-	"example.com/country-roads/models"
+	"github.com/aliparlakci/country-roads/common"
+	"github.com/aliparlakci/country-roads/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"

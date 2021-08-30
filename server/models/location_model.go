@@ -1,9 +1,10 @@
 package models
 
-//go:generate mockgen -destination=../mocks/mock_location_model.go -package=mocks example.com/country-roads/models LocationFinder,LocationInserter,LocationRepository
+//go:generate mockgen -destination=../mocks/mock_location_model.go -package=mocks github.com/aliparlakci/country-roads/models LocationFinder,LocationInserter,LocationRepository
 
 import (
 	"context"
+
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )

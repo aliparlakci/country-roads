@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"io"
 
-	"example.com/country-roads/models"
+	"github.com/aliparlakci/country-roads/models"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 )

@@ -1,4 +1,4 @@
-module example.com/country-roads
+module github.com/aliparlakci/country-roads
 
 go 1.17
 

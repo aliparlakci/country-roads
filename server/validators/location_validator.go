@@ -2,8 +2,9 @@ package validators
 
 import (
 	"context"
-	"example.com/country-roads/models"
 	"fmt"
+
+	"github.com/aliparlakci/country-roads/models"
 	"go.mongodb.org/mongo-driver/bson"
 )
 

@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	"example.com/country-roads/models"
+	"github.com/aliparlakci/country-roads/models"
 )
 
-//go:generate mockgen -destination=../mocks/mock_ride_validator.go -package=mocks example.com/country-roads/validators Validator,IValidatorFactory
+//go:generate mockgen -destination=../mocks/mock_ride_validator.go -package=mocks github.com/aliparlakci/country-roads/validators Validator,IValidatorFactory
 
 type Validator interface {
 	SetDto(dto interface{}) error

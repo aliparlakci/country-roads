@@ -1,11 +1,12 @@
 package models
 
-//go:generate mockgen -destination=../mocks/mock_user_model.go -package=mocks example.com/country-roads/models UserRepository,UserFinder,UserInserter,UserUpdater,UserFindUpdater,UserFindInserter
+//go:generate mockgen -destination=../mocks/mock_user_model.go -package=mocks github.com/aliparlakci/country-roads/models UserRepository,UserFinder,UserInserter,UserUpdater,UserFindUpdater,UserFindInserter
 
 import (
 	"context"
-	"go.mongodb.org/mongo-driver/mongo"
 	"time"
+
+	"go.mongodb.org/mongo-driver/mongo"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
