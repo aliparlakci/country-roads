@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 import RegisterForm from "../components/RegisterForm";
 
 export default function RegisterView() {
@@ -6,5 +6,5 @@ export default function RegisterView() {
     <>
       <RegisterForm />
     </>
-  )
+  );
 }

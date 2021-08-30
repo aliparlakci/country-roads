@@ -1,17 +1,16 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 
 import CONSTANTS from "../constants";
 import mutateWithQueries from "../utils/mutateWithQueries";
 import LocationsDropdown from "./LocationsDropdown";
-import {useHistory} from "react-router-dom";
+import { useHistory } from "react-router-dom";
 
-export interface INewRideFormProps {
-}
+export interface INewRideFormProps {}
 
 export default function NewRideForm(props: INewRideFormProps) {
   const [disabled, setDisabled] = useState(true);
-  const history = useHistory()
+  const history = useHistory();
 
   const handleSubmit = async (event: any) => {
     event.preventDefault();
@@ -36,7 +35,7 @@ export default function NewRideForm(props: INewRideFormProps) {
     event.target.reset();
     setDisabled(false);
 
-    history.push(CONSTANTS.ROUTES.RIDES.MAIN)
+    history.push(CONSTANTS.ROUTES.RIDES.MAIN);
   };
 
   return (
@@ -128,7 +127,7 @@ export default function NewRideForm(props: INewRideFormProps) {
         />
       </FormItem>
 
-      <input type="submit" value="Post" disabled={disabled}/>
+      <input type="submit" value="Post" disabled={disabled} />
     </StyledForm>
   );
 }

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import {mutate} from "swr";
+import { mutate } from "swr";
 
 import CONSTANTS from "../constants";
 
@@ -34,18 +34,34 @@ export default function RegisterForm(props: IRegisterFormProps) {
     <StyledForm onSubmit={handleSubmit}>
       <FormItem>
         <span>Name:</span>
-        <input type="text" name="displayName" placeholder="Enter your name..." required/>
+        <input
+          type="text"
+          name="displayName"
+          placeholder="Enter your name..."
+          required
+        />
       </FormItem>
 
       <FormItem>
         <span>Email (@sabanciuniv email):</span>
-        <input type="email" name="email" placeholder="@sabanciuniv.edu" pattern="^.+@sabanciuniv\.edu$" required/>
+        <input
+          type="email"
+          name="email"
+          placeholder="@sabanciuniv.edu"
+          pattern="^.+@sabanciuniv\.edu$"
+          required
+        />
       </FormItem>
 
       <FormItem>
         <span>Phone:</span>
         <div>
-          <input type="tel" name="phone" pattern="^(\+|)([0-9]{1,3})([0-9]{10})$" required/>
+          <input
+            type="tel"
+            name="phone"
+            pattern="^(\+|)([0-9]{1,3})([0-9]{10})$"
+            required
+          />
         </div>
       </FormItem>
 

@@ -1,7 +1,7 @@
-import React, {useEffect, useReducer} from "react";
+import React, { useEffect, useReducer } from "react";
 import styled from "styled-components";
 import LocationsDropdown from "./LocationsDropdown";
-import {useHistory, useLocation} from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 
 type RideFilterReducer = (
   state: IRideFilterState,
@@ -25,11 +25,11 @@ interface IRideFilterState {
 }
 
 const initialState = {
-  type: {value: "", disabled: true},
-  direction: {value: "", disabled: true},
-  destination: {value: "", disabled: true},
-  startDate: {value: "", disabled: true},
-  endDate: {value: "", disabled: true},
+  type: { value: "", disabled: true },
+  direction: { value: "", disabled: true },
+  destination: { value: "", disabled: true },
+  startDate: { value: "", disabled: true },
+  endDate: { value: "", disabled: true },
 };
 
 const reducer: RideFilterReducer = (state, action) => {
@@ -37,12 +37,12 @@ const reducer: RideFilterReducer = (state, action) => {
     case "set":
       return {
         ...state,
-        [action.field]: {...state[action.field], value: action.payload},
+        [action.field]: { ...state[action.field], value: action.payload },
       } as IRideFilterState;
     case "disable":
       return {
         ...state,
-        [action.field]: {...state[action.field], disabled: action.payload},
+        [action.field]: { ...state[action.field], disabled: action.payload },
       } as IRideFilterState;
     default:
       return state;
@@ -52,7 +52,7 @@ const reducer: RideFilterReducer = (state, action) => {
 export default function RideFilter() {
   const [state, dispatch] = useReducer(reducer, initialState);
   const history = useHistory();
-  const {pathname} = useLocation();
+  const { pathname } = useLocation();
 
   useEffect(() => {
     const params = new URLSearchParams();
@@ -63,11 +63,11 @@ export default function RideFilter() {
     if (!state.direction.disabled && state.direction.value)
       params.set("direction", state.direction.value);
     if (!state.startDate.disabled && state.startDate.value)
-      params.set("start_date", state.startDate.value)
+      params.set("start_date", state.startDate.value);
     if (!state.startDate.disabled && state.endDate.value)
-      params.set("end_date", state.endDate.value)
+      params.set("end_date", state.endDate.value);
 
-      history.push(`${pathname}?${params.toString()}`);
+    history.push(`${pathname}?${params.toString()}`);
   }, [state]);
 
   return (
@@ -172,18 +172,32 @@ export default function RideFilter() {
             })
           }
         />
-        <input type="date" disabled={state.startDate.disabled}
-               onChange={(event) => dispatch({
-                 type: "set",
-                 field: "startDate",
-                 payload: (new Date(event.target.value).getTime() / 1000).toString(),
-               })}/>
-        <input type="date" disabled={state.endDate.disabled}
-               onChange={(event) => dispatch({
-                 type: "set",
-                 field: "endDate",
-                 payload: (new Date(event.target.value).getTime() / 1000).toString(),
-               })}/>
+        <input
+          type="date"
+          disabled={state.startDate.disabled}
+          onChange={(event) =>
+            dispatch({
+              type: "set",
+              field: "startDate",
+              payload: (
+                new Date(event.target.value).getTime() / 1000
+              ).toString(),
+            })
+          }
+        />
+        <input
+          type="date"
+          disabled={state.endDate.disabled}
+          onChange={(event) =>
+            dispatch({
+              type: "set",
+              field: "endDate",
+              payload: (
+                new Date(event.target.value).getTime() / 1000
+              ).toString(),
+            })
+          }
+        />
         <input
           type="checkbox"
           id="disableEndDate"

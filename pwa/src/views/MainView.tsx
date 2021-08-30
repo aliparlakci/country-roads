@@ -3,7 +3,7 @@ import styled from "styled-components";
 
 import RideList from "../components/RideList";
 import useQuery from "../hooks/useQuery";
-import {IRideQuery} from "../hooks/useRides";
+import { IRideQuery } from "../hooks/useRides";
 import RideFilter from "../components/RideFilter";
 
 export default function MainView() {
@@ -19,7 +19,7 @@ export default function MainView() {
   return (
     <StyledContainer>
       <ColumnView>
-        <RideFilter/>
+        <RideFilter />
       </ColumnView>
       <RideList {...query} />
     </StyledContainer>

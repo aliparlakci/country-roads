@@ -4,10 +4,10 @@ export const ROUTES = {
   RIDES: {
     MAIN: "/rides",
     NEW: "/rides/new",
-    DETAILS: "/rides/:id"
+    DETAILS: "/rides/:id",
   },
   ME: "/me",
   LOCATIONS: {
-    NEW: "/locations/new"
-  }
-}
+    NEW: "/locations/new",
+  },
+};

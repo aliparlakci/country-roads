@@ -7,6 +7,6 @@ export const API = () => {
     RIDE: (id: string) => withHost(`/api/rides/${id}`),
     RIDES: withHost("/api/rides"),
     LOCATIONS: withHost("/api/locations"),
-    USERS: withHost("/api/users")
+    USERS: withHost("/api/users"),
   };
 };

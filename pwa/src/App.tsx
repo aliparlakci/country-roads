@@ -1,5 +1,7 @@
 import React from "react";
 import { Redirect, Route, Switch, Link } from "react-router-dom";
+import styled from "styled-components";
+
 import CONSTANTS from "./constants";
 import MainView from "./views/MainView";
 import CreateRideView from "./views/CreateRideView";
@@ -7,7 +9,6 @@ import RideDetailsView from "./views/RideDetailsView";
 import LoginView from "./views/LoginView";
 import RegisterView from "./views/RegisterView";
 import ProfileView from "./views/ProfileView";
-import styled from "styled-components";
 
 export default function App() {
   return (
@@ -33,7 +34,7 @@ export default function App() {
           <RideDetailsView />
         </Route>
         <Route path={CONSTANTS.ROUTES.RIDES.MAIN}>
-          <MainView/>
+          <MainView />
         </Route>
         <Route path={CONSTANTS.ROUTES.LOGIN}>
           <LoginView />

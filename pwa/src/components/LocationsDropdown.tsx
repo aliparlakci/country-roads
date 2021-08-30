@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+
 import useLocations from "../hooks/useLocations";
 
 export interface ILocationsDropdownProps
@@ -28,7 +29,9 @@ export default function LocationsDropdown(props: ILocationsDropdownProps) {
         </>
       )}
       {!locationResponse && <option disabled={true}>Loading...</option>}
-      {locationResponse && locationResponse.error && <option disabled={true}>Error!</option>}
+      {locationResponse && locationResponse.error && (
+        <option disabled={true}>Error!</option>
+      )}
     </select>
   );
 }
