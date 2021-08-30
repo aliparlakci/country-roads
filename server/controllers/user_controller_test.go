@@ -1,20 +1,21 @@
-package tests
+package controllers
 
 import (
 	"errors"
-	"example.com/country-roads/controllers"
-	"example.com/country-roads/mocks"
-	"example.com/country-roads/models"
-	"example.com/country-roads/validators"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/golang/mock/gomock"
-	"go.mongodb.org/mongo-driver/bson"
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
+
+	"example.com/country-roads/common"
+	"example.com/country-roads/mocks"
+	"example.com/country-roads/models"
+	"example.com/country-roads/validators"
+	"github.com/gin-gonic/gin"
+	"github.com/golang/mock/gomock"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 func TestSignUp(t *testing.T) {
@@ -34,7 +35,7 @@ func TestSignUp(t *testing.T) {
 				findInserter.EXPECT().FindOne(gomock.Any(), bson.M{
 					"email": "aliparlakci@sabanciuniv.edu",
 				}).Return(models.User{}, errors.New(""))
-				findInserter.EXPECT().InsertOne(gomock.Any(), GetUserSchemaMatcher(models.UserSchema{
+				findInserter.EXPECT().InsertOne(gomock.Any(), common.GetUserSchemaMatcher(models.UserSchema{
 					DisplayName: "Ali",
 					Email:       "aliparlakci@sabanciuniv.edu",
 					Phone:       "+905423538751",
@@ -55,7 +56,7 @@ func TestSignUp(t *testing.T) {
 				findInserter.EXPECT().FindOne(gomock.Any(), bson.M{
 					"email": "aliparlakci@sabanciuniv.edu",
 				}).Return(models.User{}, nil)
-				findInserter.EXPECT().InsertOne(gomock.Any(), GetUserSchemaMatcher(models.UserSchema{
+				findInserter.EXPECT().InsertOne(gomock.Any(), common.GetUserSchemaMatcher(models.UserSchema{
 					DisplayName: "Ali",
 					Email:       "aliparlakci@sabanciuniv.edu",
 					Phone:       "+905423538751",
@@ -76,7 +77,7 @@ func TestSignUp(t *testing.T) {
 				findInserter.EXPECT().FindOne(gomock.Any(), bson.M{
 					"email": "@sabanciuniv.edu",
 				}).Return(models.User{}, errors.New("")).MaxTimes(1)
-				findInserter.EXPECT().InsertOne(gomock.Any(), GetUserSchemaMatcher(models.UserSchema{
+				findInserter.EXPECT().InsertOne(gomock.Any(), common.GetUserSchemaMatcher(models.UserSchema{
 					DisplayName: "Ali",
 					Email:       "@sabanciuniv.edu",
 					Phone:       "+905423538751",
@@ -97,7 +98,7 @@ func TestSignUp(t *testing.T) {
 				findInserter.EXPECT().FindOne(gomock.Any(), bson.M{
 					"email": "aliparlakci@sabanciuniv.edu",
 				}).Return(models.User{}, nil).MaxTimes(1)
-				findInserter.EXPECT().InsertOne(gomock.Any(), GetUserSchemaMatcher(models.UserSchema{
+				findInserter.EXPECT().InsertOne(gomock.Any(), common.GetUserSchemaMatcher(models.UserSchema{
 					DisplayName: "Ali",
 					Email:       "aliparlakci@sabanciuniv.edu",
 					Phone:       "+905423538751",
@@ -124,7 +125,7 @@ func TestSignUp(t *testing.T) {
 
 			recorder := httptest.NewRecorder()
 			_, r := gin.CreateTestContext(recorder)
-			r.POST("/users", controllers.PostUser(mockUserFindInserter, validator))
+			r.POST("/users", PostUser(mockUserFindInserter, validator))
 
 			request, err := http.NewRequest(http.MethodPost, "/users", nil)
 			request.MultipartForm = &tt.Body
@@ -136,7 +137,7 @@ func TestSignUp(t *testing.T) {
 
 			r.ServeHTTP(recorder, request)
 
-			if bodyAssertion, err := IsBodyEqual(tt.ExpectedBody, recorder.Result().Body); err != nil {
+			if bodyAssertion, err := common.IsBodyEqual(tt.ExpectedBody, recorder.Result().Body); err != nil {
 				t.Fatal(err)
 			} else if !bodyAssertion {
 				t.Errorf("response bodies don't match")

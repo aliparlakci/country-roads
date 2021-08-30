@@ -1,7 +1,7 @@
-package tests
+package controllers
 
 import (
-	"example.com/country-roads/controllers"
+	"example.com/country-roads/common"
 	"example.com/country-roads/mocks"
 	"example.com/country-roads/models"
 	"example.com/country-roads/validators"
@@ -87,7 +87,7 @@ func TestPostLocation(t *testing.T) {
 
 			recorder := httptest.NewRecorder()
 			_, r := gin.CreateTestContext(recorder)
-			r.POST("/rides", controllers.PostLocation(mockedLocationInserter, validator))
+			r.POST("/rides", PostLocation(mockedLocationInserter, validator))
 
 			request, err := http.NewRequest(http.MethodPost, "/rides", nil)
 			request.MultipartForm = &tt.Body
@@ -99,7 +99,7 @@ func TestPostLocation(t *testing.T) {
 
 			r.ServeHTTP(recorder, request)
 
-			if bodyAssertion, err := IsBodyEqual(tt.ExpectedBody, recorder.Result().Body); err != nil {
+			if bodyAssertion, err := common.IsBodyEqual(tt.ExpectedBody, recorder.Result().Body); err != nil {
 				t.Fatal(err)
 			} else if !bodyAssertion {
 				t.Errorf("response bodies don't match")
@@ -144,7 +144,7 @@ func TestGetAllLocations(t *testing.T) {
 
 			recorder := httptest.NewRecorder()
 			_, r := gin.CreateTestContext(recorder)
-			r.GET("/locations", controllers.GetAllLocations(mockedLocationFinder))
+			r.GET("/locations", GetAllLocations(mockedLocationFinder))
 
 			request, err := http.NewRequest(http.MethodGet, "/locations", nil)
 			if err != nil {
@@ -152,7 +152,7 @@ func TestGetAllLocations(t *testing.T) {
 			}
 			r.ServeHTTP(recorder, request)
 
-			if bodyAssertion, err := IsResultsSameLength(tt.ExpectedResultLength, recorder.Result().Body); err != nil {
+			if bodyAssertion, err := common.IsResultsSameLength(tt.ExpectedResultLength, recorder.Result().Body); err != nil {
 				t.Fatal(err)
 			} else if !bodyAssertion {
 				t.Errorf("response bodies don't match")

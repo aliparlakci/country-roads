@@ -86,6 +86,6 @@ func (u UserCollection) InsertOne(ctx context.Context, candidate UserSchema) (in
 }
 
 func (u UserCollection) UpdateOne(ctx context.Context, filter interface{}, changes interface{}) error {
-	//TODO: Implement
+	//TODO: Implement UpdateOne
 	return nil
 }

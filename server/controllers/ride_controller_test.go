@@ -1,21 +1,21 @@
-package tests
+package controllers
 
 import (
-	"example.com/country-roads/aggregations"
-	"example.com/country-roads/validators"
 	"fmt"
-	"go.mongodb.org/mongo-driver/bson"
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
 
-	"example.com/country-roads/controllers"
+	"example.com/country-roads/aggregations"
+	"example.com/country-roads/common"
 	"example.com/country-roads/mocks"
 	"example.com/country-roads/models"
+	"example.com/country-roads/validators"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -35,7 +35,7 @@ func TestPostRide(t *testing.T) {
 			}},
 			Prepare: func(inserter *mocks.MockRideInserter, locationFinder *mocks.MockLocationFinder) {
 				locationFinder.EXPECT().FindOne(gomock.Any(), bson.M{"key": "istanbul_asia"}).Return(models.Location{}, nil)
-				inserter.EXPECT().InsertOne(gomock.Any(), GetRideSchemaMatcher(models.RideSchema{
+				inserter.EXPECT().InsertOne(gomock.Any(), common.GetRideSchemaMatcher(models.RideSchema{
 					ID:          primitive.ObjectID{},
 					Type:        "offer",
 					Date:        time.Unix(1730227365, 0),
@@ -134,7 +134,7 @@ func TestPostRide(t *testing.T) {
 
 			recorder := httptest.NewRecorder()
 			_, r := gin.CreateTestContext(recorder)
-			r.POST("/rides", controllers.PostRides(mockedRideInserter, validator))
+			r.POST("/rides", PostRides(mockedRideInserter, validator))
 
 			request, err := http.NewRequest(http.MethodPost, "/rides", nil)
 			request.MultipartForm = &tt.Body
@@ -146,7 +146,7 @@ func TestPostRide(t *testing.T) {
 
 			r.ServeHTTP(recorder, request)
 
-			if bodyAssertion, err := IsBodyEqual(tt.ExpectedBody, recorder.Result().Body); err != nil {
+			if bodyAssertion, err := common.IsBodyEqual(tt.ExpectedBody, recorder.Result().Body); err != nil {
 				t.Fatal(err)
 			} else if !bodyAssertion {
 				t.Errorf("response bodies don't match")
@@ -244,7 +244,7 @@ func TestGetRide(t *testing.T) {
 
 			recorder := httptest.NewRecorder()
 			_, r := gin.CreateTestContext(recorder)
-			r.GET("/rides/:id", controllers.GetRide(mockedRideFinder))
+			r.GET("/rides/:id", GetRide(mockedRideFinder))
 
 			request, err := http.NewRequest(http.MethodGet, tt.Url, nil)
 			if err != nil {
@@ -252,7 +252,7 @@ func TestGetRide(t *testing.T) {
 			}
 			r.ServeHTTP(recorder, request)
 
-			if bodyAssertion, err := IsBodyEqual(tt.ExpectedBody, recorder.Result().Body); err != nil {
+			if bodyAssertion, err := common.IsBodyEqual(tt.ExpectedBody, recorder.Result().Body); err != nil {
 				t.Fatal(err)
 			} else if !bodyAssertion {
 				t.Errorf("response bodies don't match")
@@ -300,7 +300,7 @@ func TestSearchRidesInvalid(t *testing.T) {
 
 			recorder := httptest.NewRecorder()
 			_, r := gin.CreateTestContext(recorder)
-			r.GET("/rides", controllers.SearchRides(mockedRideFinder))
+			r.GET("/rides", SearchRides(mockedRideFinder))
 
 			request, err := http.NewRequest(http.MethodGet, tt.Url, nil)
 			if err != nil {
@@ -385,7 +385,7 @@ func TestSearchRidesMany(t *testing.T) {
 
 			recorder := httptest.NewRecorder()
 			_, r := gin.CreateTestContext(recorder)
-			r.GET("/rides", controllers.SearchRides(mockedRideFinder))
+			r.GET("/rides", SearchRides(mockedRideFinder))
 
 			request, err := http.NewRequest(http.MethodGet, tt.Url, nil)
 			if err != nil {
@@ -393,7 +393,7 @@ func TestSearchRidesMany(t *testing.T) {
 			}
 			r.ServeHTTP(recorder, request)
 
-			if bodyAssertion, err := IsResultsSameLength(tt.ExpectedResultLength, recorder.Result().Body); err != nil {
+			if bodyAssertion, err := common.IsResultsSameLength(tt.ExpectedResultLength, recorder.Result().Body); err != nil {
 				t.Fatal(err)
 			} else if !bodyAssertion {
 				t.Errorf("response bodies don't match")
@@ -461,7 +461,7 @@ func TestDeleteRide(t *testing.T) {
 
 			recorder := httptest.NewRecorder()
 			_, r := gin.CreateTestContext(recorder)
-			r.GET("/rides/:id", controllers.DeleteRides(mockedRideDeleter))
+			r.GET("/rides/:id", DeleteRides(mockedRideDeleter))
 
 			request, err := http.NewRequest(http.MethodGet, tt.Url, nil)
 			if err != nil {
@@ -469,7 +469,7 @@ func TestDeleteRide(t *testing.T) {
 			}
 			r.ServeHTTP(recorder, request)
 
-			if bodyAssertion, err := IsBodyEqual(tt.ExpectedBody, recorder.Result().Body); err != nil {
+			if bodyAssertion, err := common.IsBodyEqual(tt.ExpectedBody, recorder.Result().Body); err != nil {
 				t.Fatal(err)
 			} else if !bodyAssertion {
 				t.Errorf("response bodies don't match")

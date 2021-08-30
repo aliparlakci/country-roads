@@ -1,9 +1,8 @@
-package tests
+package validators
 
 import (
 	"context"
 	"example.com/country-roads/models"
-	"example.com/country-roads/validators"
 	"fmt"
 	"testing"
 )
@@ -35,7 +34,7 @@ func TestUserValidator(t *testing.T) {
 		},
 	}
 
-	validatorFactory := validators.ValidatorFactory{LocationFinder: nil}
+	validatorFactory := ValidatorFactory{LocationFinder: nil}
 
 	for _, tt := range tests {
 		testName := fmt.Sprintf("%s__%s__%s", tt.Case.DisplayName, tt.Case.Email, tt.Case.Phone)
@@ -75,7 +74,7 @@ func TestValidatePhone(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.Case, func(t *testing.T) {
-			if result := validators.ValidatePhone(tt.Case); result != tt.Expected {
+			if result := ValidatePhone(tt.Case); result != tt.Expected {
 				t.Errorf("expected %v, got %v", tt.Expected, result)
 			}
 		})
@@ -93,7 +92,7 @@ func TestValidateDisplayName(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.Case, func(t *testing.T) {
-			if result := validators.ValidateDisplayName(tt.Case); result != tt.Expected {
+			if result := ValidateDisplayName(tt.Case); result != tt.Expected {
 				t.Errorf("expected %v, got %v", tt.Expected, result)
 			}
 		})
@@ -117,7 +116,7 @@ func TestValidateEmail(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.Case, func(t *testing.T) {
-			if email, success := validators.ValidateEmail(tt.Case); success != tt.ExpectedBool {
+			if email, success := ValidateEmail(tt.Case); success != tt.ExpectedBool {
 				t.Errorf("expected %v, got %v", tt.ExpectedBool, success)
 			} else {
 				if email != tt.ExpectedEmail {
