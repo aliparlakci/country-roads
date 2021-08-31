@@ -1,5 +1,6 @@
 export const API = () => {
-    const URI = process.env.BACKEND_URI || 'http://localhost:8080'
+    //const URI = process.env.BACKEND_URI || 'http://localhost:8080'
+    const URI = ""
 
     const withHost = (endpoint: string) => `${URI}${endpoint}`
 

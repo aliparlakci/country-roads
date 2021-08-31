@@ -54,12 +54,14 @@ func PostUser(findInserter models.UserFindInserter, validatorFactory validators.
 
 func UpdateDisplayName(findUpdater models.UserFindUpdater) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		//TODO: Implement
 		c.JSON(http.StatusOK, gin.H{})
 	}
 }
 
 func UpdatePhone(findUpdater models.UserFindUpdater) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		//TODO: Implement
 		c.JSON(http.StatusOK, gin.H{})
 	}
 }
@@ -69,6 +71,6 @@ func RegisterUserController(router *gin.RouterGroup, env *common.Env) {
 		env.Repositories.UserRepository,
 		env.ValidatorFactory,
 	))
-	router.PUT("/users/name", UpdateDisplayName(env.Repositories.UserRepository))
-	router.PUT("/users/phone", UpdatePhone(env.Repositories.UserRepository))
+	// router.PUT("/users/name", UpdateDisplayName(env.Repositories.UserRepository))
+	// router.PUT("/users/phone", UpdatePhone(env.Repositories.UserRepository))
 }

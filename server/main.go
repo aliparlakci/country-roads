@@ -1,16 +1,18 @@
 package main
 
 import (
+	"github.com/aliparlakci/country-roads/middlewares"
+	"github.com/aliparlakci/country-roads/services"
 	"os"
 
-	"github.com/aliparlakci/country-roads/controllers"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 
+	"github.com/aliparlakci/country-roads/common"
+	"github.com/aliparlakci/country-roads/controllers"
 	"github.com/aliparlakci/country-roads/models"
 	"github.com/aliparlakci/country-roads/validators"
 
-	"github.com/aliparlakci/country-roads/common"
 	"github.com/joho/godotenv"
 )
 
@@ -37,16 +39,18 @@ func main() {
 	}
 
 	router := gin.Default()
-
 	router.Use(cors.New(cors.Config{
 		AllowAllOrigins: true,
 		AllowMethods:    []string{"GET", "POST", "DELETE"},
 	}))
-
+	router.Use(middlewares.SessionMiddleware(&services.SessionService{Client: env.Rdb}))
+	router.Use(middlewares.AuthMiddleware())
 	api := router.Group("api")
-	controllers.RegisterRideController(api, env)
-	controllers.RegisterLocationController(api, env)
-	controllers.RegisterUserController(api, env)
+	{
+		controllers.RegisterRideController(api, env)
+		controllers.RegisterLocationController(api, env)
+		controllers.RegisterUserController(api, env)
+	}
 
 	router.Run(":8080")
 }
