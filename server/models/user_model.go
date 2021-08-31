@@ -35,6 +35,10 @@ type NewUserForm struct {
 	Phone       string `form:"phone" binding:"required"`
 }
 
+type LoginRequestForm struct {
+	Email string `form:"email" binding:"required"`
+}
+
 type UserCollection struct {
 	Collection *mongo.Collection
 }
@@ -67,7 +71,7 @@ type UserFindInserter interface {
 	UserInserter
 }
 
-func (u UserCollection) FindOne(ctx context.Context, filter interface{}) (User, error) {
+func (u *UserCollection) FindOne(ctx context.Context, filter interface{}) (User, error) {
 	var user User
 	result := u.Collection.FindOne(ctx, filter)
 	if err := result.Err(); err != nil {
@@ -77,7 +81,7 @@ func (u UserCollection) FindOne(ctx context.Context, filter interface{}) (User, 
 	return user, err
 }
 
-func (u UserCollection) InsertOne(ctx context.Context, candidate UserSchema) (interface{}, error) {
+func (u *UserCollection) InsertOne(ctx context.Context, candidate UserSchema) (interface{}, error) {
 	result, err := u.Collection.InsertOne(ctx, candidate)
 	if err != nil {
 		return nil, err
@@ -86,7 +90,7 @@ func (u UserCollection) InsertOne(ctx context.Context, candidate UserSchema) (in
 	return result.InsertedID, nil
 }
 
-func (u UserCollection) UpdateOne(ctx context.Context, filter interface{}, changes interface{}) error {
+func (u *UserCollection) UpdateOne(ctx context.Context, filter interface{}, changes interface{}) error {
 	//TODO: Implement UpdateOne
 	return nil
 }
