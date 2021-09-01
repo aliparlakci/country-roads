@@ -39,11 +39,11 @@ type RideSchema struct {
 }
 
 type SearchRideQueries struct {
-	Type        string    `form:"type"`
-	StartDate   time.Time `form:"start_date" time_format:"unix"`
-	EndDate     time.Time `form:"end_date" time_format:"unix"`
-	Direction   string    `form:"direction"`
-	Destination string    `form:"destination"`
+	Type        string    `form:"type" json:"type"`
+	StartDate   time.Time `form:"start_date" json:"start_date" time_format:"unix"`
+	EndDate     time.Time `form:"end_date" json:"end_date" time_format:"unix"`
+	Direction   string    `form:"direction" json:"direction"`
+	Destination string    `form:"destination" json:"destination"`
 }
 
 type RideCollection struct {

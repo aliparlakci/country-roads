@@ -18,22 +18,32 @@ func PostUser(findInserter models.UserFindInserter, validatorFactory validators.
 		panic(err)
 	}
 	return func(c *gin.Context) {
+		logger := common.LoggerWithRequestId(c.Copy())
+
 		var userDto models.NewUserForm
 
 		if err := c.Bind(&userDto); err != nil {
+			logger.WithField("body", c.Request.MultipartForm).Debug("cannot bind request body to models.NewUserForm")
 			c.JSON(http.StatusBadRequest, gin.H{"error": "user format was incorrect"})
 			return
 		}
 
 		if err := validator.SetDto(&userDto); err != nil {
+			logger.WithField("error", err.Error()).Debug("validator.SetDto() raised and error")
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 			return
 		}
 		if result, err := validator.Validate(c.Copy()); !result || err != nil {
+			if err != nil {
+				logger.WithField("data", common.JsonMarshalNoError(userDto)).Debug("models.NewUserForm is not valid")
+			} else {
+				logger.WithField("error", err.Error()).Error("validator.Validate raised an error")
+			}
 			c.JSON(http.StatusBadRequest, gin.H{"error": "user is not valid"})
 			return
 		}
 		if _, err := findInserter.FindOne(c.Copy(), bson.M{"email": userDto.Email}); err == nil {
+			logger.WithField("email", userDto.Email).Debug("user with email already exists")
 			c.JSON(http.StatusBadRequest, gin.H{"error": "user already exists"})
 			return
 		}
@@ -45,9 +55,11 @@ func PostUser(findInserter models.UserFindInserter, validatorFactory validators.
 			SignedUpAt:  time.Now(),
 		})
 		if err != nil {
+			logger.WithField("error", err.Error()).Error("models.UserFindInserter.InsertOne() raised an error")
 			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("new user could not get created: %v", err)})
 			return
 		}
+		logger.WithField("id", id).Info("new user with id is created")
 		c.JSON(http.StatusCreated, gin.H{"id": id})
 	}
 }

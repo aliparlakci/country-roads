@@ -3,6 +3,8 @@ package main
 import (
 	"github.com/aliparlakci/country-roads/middlewares"
 	"github.com/aliparlakci/country-roads/services"
+	"github.com/google/uuid"
+	"github.com/sirupsen/logrus"
 	"os"
 
 	"github.com/gin-contrib/cors"
@@ -12,12 +14,15 @@ import (
 	"github.com/aliparlakci/country-roads/controllers"
 	"github.com/aliparlakci/country-roads/models"
 	"github.com/aliparlakci/country-roads/validators"
-
 	"github.com/joho/godotenv"
 )
 
 func main() {
 	godotenv.Load()
+
+	logrus.SetLevel(logrus.DebugLevel)
+	logrus.SetReportCaller(false)
+	logrus.SetFormatter(&logrus.TextFormatter{PadLevelText: true})
 
 	env := &common.Env{}
 	{
@@ -40,11 +45,16 @@ func main() {
 	}
 
 	router := gin.Default()
+	router.Use(func(c *gin.Context) {
+		c.Set("request_id", uuid.New().String())
+		c.Next()
+	})
+	router.Use(middlewares.Logger())
 	router.Use(cors.New(cors.Config{
 		AllowAllOrigins: true,
 		AllowMethods:    []string{"GET", "POST", "DELETE"},
 	}))
-	// TODO: not sure if the struct is copied or passed as a reference
+
 	router.Use(middlewares.SessionMiddleware(env.Services.SessionService))
 	router.Use(middlewares.AuthMiddleware(env.Repositories.UserRepository))
 	api := router.Group("api")

@@ -30,9 +30,9 @@ type UserSchema struct {
 }
 
 type NewUserForm struct {
-	DisplayName string `form:"displayName" binding:"required"`
-	Email       string `form:"email" binding:"required"`
-	Phone       string `form:"phone" binding:"required"`
+	DisplayName string `form:"displayName" json:"displayName" binding:"required"`
+	Email       string `form:"email" json:"email" binding:"required"`
+	Phone       string `form:"phone" json:"phone" binding:"required"`
 }
 
 type LoginRequestForm struct {

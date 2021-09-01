@@ -2,6 +2,7 @@ package common
 
 import (
 	"encoding/json"
+	"github.com/sirupsen/logrus"
 	"io"
 
 	"github.com/aliparlakci/country-roads/models"
@@ -15,6 +16,18 @@ func NoError(err error, callback func()) {
 	if err != nil {
 		callback()
 	}
+}
+
+func JsonMarshalNoError(v interface{}) string {
+	if bytes, err := json.Marshal(v); err != nil {
+		return "cannot marshal"
+	} else {
+		return string(bytes)
+	}
+}
+
+func LoggerWithRequestId(c *gin.Context) *logrus.Entry {
+	return logrus.WithFields(logrus.Fields{"request_id": c.GetString("request_id"), "ip": c.Request.RemoteAddr})
 }
 
 func BodyReader(reader io.Reader) ([]byte, error) {
