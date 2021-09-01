@@ -12,8 +12,8 @@ export interface IRideItemProps {
 export default function RideItem({ ride }: IRideItemProps) {
     const doDelete = async () => {
         try {
-            await fetch(CONSTANTS.API().RIDE(ride.id), { method: 'delete' })
-            mutate(CONSTANTS.API().RIDES)
+            await fetch(CONSTANTS.API.RIDE(ride.id), { method: 'delete' })
+            mutate(CONSTANTS.API.RIDES)
         } catch (err) {
             console.error(err)
         }

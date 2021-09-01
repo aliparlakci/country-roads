@@ -39,6 +39,11 @@ type LoginRequestForm struct {
 	Email string `form:"email" binding:"required"`
 }
 
+type VerifyRequestForm struct {
+	Email string `form:"email" binding:"required"`
+	OTP string `form:"otp" binding:"required"`
+}
+
 type UserCollection struct {
 	Collection *mongo.Collection
 }

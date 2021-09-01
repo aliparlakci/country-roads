@@ -19,7 +19,7 @@ export default function NewLocationForm(props: INewLocationFormProps) {
             formData.delete('parentKey')
 
         try {
-            await fetch(CONSTANTS.API().LOCATIONS, {
+            await fetch(CONSTANTS.API.LOCATIONS, {
                 method: 'POST',
                 body: formData,
             })
@@ -27,7 +27,7 @@ export default function NewLocationForm(props: INewLocationFormProps) {
             console.error(e)
         }
 
-        mutate(CONSTANTS.API().LOCATIONS)
+        mutate(CONSTANTS.API.LOCATIONS)
 
         event.target.reset()
         setDisabled(false)

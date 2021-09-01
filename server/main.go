@@ -27,15 +27,14 @@ func main() {
 		defer close()
 
 		rdbUri := os.Getenv("RDB_URI")
-		rdb := common.InitializeRedis(rdbUri, "", 0)
-
 		env.Repositories = &common.RepositoryContainer{
 			RideRepository:     &models.RideCollection{Collection: db.Collection("rides")},
 			LocationRepository: &models.LocationCollection{Collection: db.Collection("locations")},
 			UserRepository:     &models.UserCollection{Collection: db.Collection("users")},
 		}
 		env.Services = &common.ServiceContainer{
-			SessionService: &services.SessionsClient{Client: rdb},
+			SessionService: &services.SessionStore{Store: common.InitializeRedis(rdbUri, "", 0)},
+			AuthService: &services.AuthStore{Store: common.InitializeRedis(rdbUri, "", 1)},
 		}
 		env.ValidatorFactory = &validators.ValidatorFactory{LocationFinder: env.Repositories.LocationRepository}
 	}
@@ -45,6 +44,7 @@ func main() {
 		AllowAllOrigins: true,
 		AllowMethods:    []string{"GET", "POST", "DELETE"},
 	}))
+	// TODO: not sure if the struct is copied or passed as a reference
 	router.Use(middlewares.SessionMiddleware(env.Services.SessionService))
 	router.Use(middlewares.AuthMiddleware(env.Repositories.UserRepository))
 	api := router.Group("api")

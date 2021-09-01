@@ -1,13 +1,10 @@
-export const API = () => {
-    //const URI = process.env.BACKEND_URI || 'http://localhost:8080'
-    const URI = ""
-
-    const withHost = (endpoint: string) => `${URI}${endpoint}`
-
-    return {
-        RIDE: (id: string) => withHost(`/api/rides/${id}`),
-        RIDES: withHost('/api/rides'),
-        LOCATIONS: withHost('/api/locations'),
-        USERS: withHost('/api/users'),
-    }
+export const API = {
+    RIDE: (id: string) => `/api/rides/${id}`,
+    RIDES: '/api/rides',
+    LOCATIONS: '/api/locations',
+    USERS: '/api/users',
+    AUTH: {
+        LOGIN: '/api/auth/login',
+        VERIFY: 'api/auth/verify'
+    },
 }

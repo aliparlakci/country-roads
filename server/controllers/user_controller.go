@@ -29,15 +29,15 @@ func PostUser(findInserter models.UserFindInserter, validatorFactory validators.
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 			return
 		}
-		if result, err := validator.Validate(c); !result || err != nil {
+		if result, err := validator.Validate(c.Copy()); !result || err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "user is not valid"})
 			return
 		}
-		if _, err := findInserter.FindOne(c, bson.M{"email": userDto.Email}); err == nil {
+		if _, err := findInserter.FindOne(c.Copy(), bson.M{"email": userDto.Email}); err == nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "user already exists"})
 			return
 		}
-		id, err := findInserter.InsertOne(c, models.UserSchema{
+		id, err := findInserter.InsertOne(c.Copy(), models.UserSchema{
 			DisplayName: userDto.DisplayName,
 			Email:       userDto.Email,
 			Phone:       userDto.Phone,

@@ -18,7 +18,7 @@ export interface IRideQuery {
 }
 
 export default function useRides(query: IRideQuery) {
-    const endpoint = `${CONSTANTS.API().RIDES}?${filterBuilder(query)}`
+    const endpoint = `${CONSTANTS.API.RIDES}?${filterBuilder(query)}`
     console.log(endpoint)
     const { data, error } = useSWR<IRideResponse>(endpoint)
     if (error) console.error(error)

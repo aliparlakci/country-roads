@@ -22,7 +22,7 @@ export default function NewRideForm(props: INewRideFormProps) {
             formData.set('date', (new Date(date).getTime() / 1000).toString())
 
         try {
-            await fetch(CONSTANTS.API().RIDES, {
+            await fetch(CONSTANTS.API.RIDES, {
                 method: 'POST',
                 body: formData,
             })
@@ -30,7 +30,7 @@ export default function NewRideForm(props: INewRideFormProps) {
             console.error(e)
         }
 
-        mutateWithQueries(CONSTANTS.API().RIDES)
+        mutateWithQueries(CONSTANTS.API.RIDES)
 
         event.target.reset()
         setDisabled(false)

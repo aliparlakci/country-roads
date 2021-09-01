@@ -16,7 +16,7 @@ export default function RegisterForm(props: IRegisterFormProps) {
         const formData = new FormData(event.currentTarget)
 
         try {
-            await fetch(CONSTANTS.API().USERS, {
+            await fetch(CONSTANTS.API.USERS, {
                 method: 'POST',
                 body: formData,
             })
@@ -24,7 +24,7 @@ export default function RegisterForm(props: IRegisterFormProps) {
             console.error(e)
         }
 
-        mutate(CONSTANTS.API().USERS)
+        mutate(CONSTANTS.API.USERS)
 
         event.target.reset()
         setDisabled(false)

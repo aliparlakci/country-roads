@@ -27,7 +27,7 @@ func GetRide(finder models.RideFinder) gin.HandlerFunc {
 		filter := bson.D{primitive.E{Key: "$match", Value: bson.M{"_id": objID}}}
 		pipeline := aggregations.BuildAggregation([]bson.D{filter})
 
-		rides, err := finder.FindMany(c, pipeline)
+		rides, err := finder.FindMany(c.Copy(), pipeline)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
@@ -54,7 +54,7 @@ func SearchRides(finder models.RideFinder) gin.HandlerFunc {
 		pipeline := aggregations.BuildAggregation(aggregations.FilterRides(queries), aggregations.RideWithDestination)
 
 		results := make([]map[string]interface{}, 0)
-		if rides, err := finder.FindMany(c, pipeline); err != nil {
+		if rides, err := finder.FindMany(c.Copy(), pipeline); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		} else {
@@ -81,12 +81,12 @@ func PostRides(inserter models.RideInserter, validators validators.IValidatorFac
 		}
 
 		validator.SetDto(rideDto)
-		if isValid, err := validator.Validate(c); !isValid || err != nil {
+		if isValid, err := validator.Validate(c.Copy()); !isValid || err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Ride format was incorrect: %v", err)})
 			return
 		}
 
-		id, err := inserter.InsertOne(c, models.RideSchema{
+		id, err := inserter.InsertOne(c.Copy(), models.RideSchema{
 			Type:        rideDto.Type,
 			Date:        rideDto.Date,
 			Destination: rideDto.Destination,
@@ -110,7 +110,7 @@ func DeleteRides(deleter models.RideDeleter) gin.HandlerFunc {
 			return
 		}
 
-		deletedCount, err := deleter.DeleteOne(c, bson.M{"_id": objID})
+		deletedCount, err := deleter.DeleteOne(c.Copy(), bson.M{"_id": objID})
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return

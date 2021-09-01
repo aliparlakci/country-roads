@@ -9,7 +9,7 @@ export interface ILocationResponse {
 }
 
 export default function useLocations() {
-    const { data, error } = useSWR<ILocationResponse>(CONSTANTS.API().LOCATIONS)
+    const { data, error } = useSWR<ILocationResponse>(CONSTANTS.API.LOCATIONS)
     if (error) console.error(error)
     return { data, error }
 }

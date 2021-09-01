@@ -13,12 +13,12 @@ import (
 )
 
 type Session struct {
-	UserId string `json:"userId"`
-	
+	UserId string `json:"userId,omitempty"`
+
 }
 
-type SessionsClient struct {
-	Client *redis.Client
+type SessionStore struct {
+	Store *redis.Client
 	mutex sync.Mutex
 }
 
@@ -46,9 +46,9 @@ type SessionUpdater interface {
 	Unlock()
 }
 
-func (s *SessionsClient) FetchSession(c context.Context, sessionId string) (Session, error) {
+func (s *SessionStore) FetchSession(c context.Context, sessionId string) (Session, error) {
 	var session Session
-	raw, err := s.Client.Get(sessionId).Result()
+	raw, err := s.Store.Get(sessionId).Result()
 	if err != nil {
 		return session, errors.New("session does not exist")
 	}
@@ -58,7 +58,7 @@ func (s *SessionsClient) FetchSession(c context.Context, sessionId string) (Sess
 	return session, nil
 }
 
-func (s *SessionsClient) CreateSession(c context.Context, value Session) (string, error) {
+func (s *SessionStore) CreateSession(c context.Context, value Session) (string, error) {
 	id, err := uuid.NewUUID()
 	if err != nil {
 		return "", errors.New("uuid cannot get created")
@@ -67,14 +67,15 @@ func (s *SessionsClient) CreateSession(c context.Context, value Session) (string
 	if err != nil {
 		return "", errors.New("cannot marshal given session value")
 	}
-	if err := s.Client.Set(id.String(), string(rawSession), 0).Err(); err != nil {
+	// TODO: Set expiration
+	if err := s.Store.Set(id.String(), string(rawSession), 0).Err(); err != nil {
 		return "", fmt.Errorf("cannot create a new session: %v", err)
 	}
 
 	return id.String(), nil
 }
 
-func (s *SessionsClient) UpdateSession(c context.Context, sessionId string, value Session) error {
+func (s *SessionStore) UpdateSession(c context.Context, sessionId string, value Session) error {
 	if _, err := s.FetchSession(c, sessionId); err != nil {
 		return fmt.Errorf("sessionId does not exist [sessionId=%v]", sessionId)
 	}
@@ -82,16 +83,16 @@ func (s *SessionsClient) UpdateSession(c context.Context, sessionId string, valu
 	if err != nil {
 		return errors.New("cannot marshal given session value")
 	}
-	if err := s.Client.Do("SET", sessionId, string(rawSession), "keepttl").Err(); err != nil {
+	if err := s.Store.Do("SET", sessionId, string(rawSession), "keepttl").Err(); err != nil {
 		return fmt.Errorf("session could not get update: %v", err)
 	}
 	return nil
 }
 
-func (s *SessionsClient) Lock() {
+func (s *SessionStore) Lock() {
 	s.mutex.Lock()
 }
 
-func (s *SessionsClient) Unlock() {
+func (s *SessionStore) Unlock() {
 	s.mutex.Unlock()
 }

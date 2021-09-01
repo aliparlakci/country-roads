@@ -1,9 +1,10 @@
 import React from 'react'
+import LoginForm from "../components/LoginForm";
 
 export default function LoginView() {
     return (
-        <>
-            <h2>LoginView</h2>
-        </>
+      <div>
+        <LoginForm />
+      </div>
     )
 }

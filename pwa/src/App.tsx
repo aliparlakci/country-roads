@@ -15,13 +15,16 @@ export default function App() {
         <StyledContainer>
             <h1>Country Roads</h1>
             <StyledNav>
-                <StyledNavItem style={{ flex: 2 }}>
+                <StyledNavItem>
                     <Link to={CONSTANTS.ROUTES.RIDES.NEW}>Create Ride</Link>
                 </StyledNavItem>
-                <StyledNavItem style={{ flex: 1 }}>
+                <StyledNavItem>
                     <Link to={CONSTANTS.ROUTES.RIDES.MAIN}>Home</Link>
                 </StyledNavItem>
-                <StyledNavItem style={{ flex: 2 }}>
+                <StyledNavItem>
+                    <Link to={CONSTANTS.ROUTES.LOGIN}>Login</Link>
+                </StyledNavItem>
+                <StyledNavItem>
                     <Link to={CONSTANTS.ROUTES.REGISTER}>Register</Link>
                 </StyledNavItem>
             </StyledNav>
