@@ -1,7 +1,7 @@
 package common
 
 import (
-	"github.com/aliparlakci/country-roads/models"
+	"github.com/aliparlakci/country-roads/repositories"
 	"github.com/aliparlakci/country-roads/services"
 )
 
@@ -11,9 +11,9 @@ type Env struct {
 }
 
 type RepositoryContainer struct {
-	models.RideRepository
-	models.LocationRepository
-	models.UserRepository
+	repositories.RideRepository
+	repositories.LocationRepository
+	repositories.UserRepository
 }
 
 type ServiceContainer struct {

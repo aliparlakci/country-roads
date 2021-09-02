@@ -3,14 +3,11 @@ package models
 //go:generate mockgen -destination=../mocks/mock_user_model.go -package=mocks github.com/aliparlakci/country-roads/models UserRepository,UserFinder,UserInserter,UserUpdater,UserFindUpdater,UserFindInserter
 
 import (
-	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/mail"
 	"regexp"
 	"time"
-
-	"go.mongodb.org/mongo-driver/mongo"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -98,58 +95,3 @@ func (n *NewUserForm) Bind(c *gin.Context) error {
 	return nil
 }
 
-type UserCollection struct {
-	Collection *mongo.Collection
-}
-
-type UserRepository interface {
-	UserFinder
-	UserInserter
-	UserUpdater
-}
-
-type UserFinder interface {
-	FindOne(ctx context.Context, filter interface{}) (User, error)
-}
-
-type UserInserter interface {
-	InsertOne(ctx context.Context, candidate UserSchema) (interface{}, error)
-}
-
-type UserUpdater interface {
-	UpdateOne(ctx context.Context, filter interface{}, changes interface{}) error
-}
-
-type UserFindUpdater interface {
-	UserFinder
-	UserUpdater
-}
-
-type UserFindInserter interface {
-	UserFinder
-	UserInserter
-}
-
-func (u *UserCollection) FindOne(ctx context.Context, filter interface{}) (User, error) {
-	var user User
-	result := u.Collection.FindOne(ctx, filter)
-	if err := result.Err(); err != nil {
-		return user, err
-	}
-	err := result.Decode(&user)
-	return user, err
-}
-
-func (u *UserCollection) InsertOne(ctx context.Context, candidate UserSchema) (interface{}, error) {
-	result, err := u.Collection.InsertOne(ctx, candidate)
-	if err != nil {
-		return nil, err
-	}
-
-	return result.InsertedID, nil
-}
-
-func (u *UserCollection) UpdateOne(ctx context.Context, filter interface{}, changes interface{}) error {
-	//TODO: Implement UpdateOne
-	return nil
-}

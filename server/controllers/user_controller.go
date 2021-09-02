@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"github.com/aliparlakci/country-roads/repositories"
 	"net/http"
 	"time"
 
@@ -11,7 +12,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-func PostUser(findInserter models.UserFindInserter) gin.HandlerFunc {
+func PostUser(findInserter repositories.UserFindInserter) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		logger := common.LoggerWithRequestId(c.Copy())
 
@@ -44,14 +45,14 @@ func PostUser(findInserter models.UserFindInserter) gin.HandlerFunc {
 	}
 }
 
-func UpdateDisplayName(findUpdater models.UserFindUpdater) gin.HandlerFunc {
+func UpdateDisplayName(findUpdater repositories.UserFindUpdater) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		//TODO: Implement
 		c.JSON(http.StatusOK, gin.H{})
 	}
 }
 
-func UpdatePhone(findUpdater models.UserFindUpdater) gin.HandlerFunc {
+func UpdatePhone(findUpdater repositories.UserFindUpdater) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		//TODO: Implement
 		c.JSON(http.StatusOK, gin.H{})

@@ -2,7 +2,7 @@ package middlewares
 
 import (
 	"github.com/aliparlakci/country-roads/common"
-	"github.com/aliparlakci/country-roads/models"
+	"github.com/aliparlakci/country-roads/repositories"
 	"github.com/aliparlakci/country-roads/services"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
@@ -11,7 +11,7 @@ import (
 	"net/http"
 )
 
-func AuthMiddleware(userFinder models.UserFinder, sessions services.SessionService) gin.HandlerFunc {
+func AuthMiddleware(userFinder repositories.UserFinder, sessions services.SessionService) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		logger := common.LoggerWithRequestId(c.Copy())
 

@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"github.com/aliparlakci/country-roads/repositories"
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/mongo"
 	"net/http"
@@ -16,7 +17,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func GetRide(finder models.RideFinder) gin.HandlerFunc {
+func GetRide(finder repositories.RideFinder) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		logger := common.LoggerWithRequestId(c.Copy())
 
@@ -33,7 +34,7 @@ func GetRide(finder models.RideFinder) gin.HandlerFunc {
 
 		rides, err := finder.FindMany(c.Copy(), pipeline)
 		if err != nil {
-			logger.Errorf("models.RideFinder.FindMany raised an error: %v", err.Error())
+			logger.Errorf("RideFinder.FindMany raised an error: %v", err.Error())
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
@@ -48,7 +49,7 @@ func GetRide(finder models.RideFinder) gin.HandlerFunc {
 	}
 }
 
-func SearchRides(finder models.RideFinder) gin.HandlerFunc {
+func SearchRides(finder repositories.RideFinder) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		logger := common.LoggerWithRequestId(c.Copy())
 
@@ -64,7 +65,7 @@ func SearchRides(finder models.RideFinder) gin.HandlerFunc {
 
 		results := make([]map[string]interface{}, 0)
 		if rides, err := finder.FindMany(c.Copy(), pipeline); err != nil {
-			logger.Errorf("models.RideFinder.FindMany raised an error: %v", err.Error())
+			logger.Errorf("RideFinder.FindMany raised an error: %v", err.Error())
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		} else {
@@ -77,7 +78,7 @@ func SearchRides(finder models.RideFinder) gin.HandlerFunc {
 	}
 }
 
-func PostRides(rideInserter models.RideInserter, locationFinder models.LocationFinder) gin.HandlerFunc {
+func PostRides(rideInserter repositories.RideInserter, locationFinder repositories.LocationFinder) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		logger := common.LoggerWithRequestId(c.Copy())
 
@@ -106,7 +107,7 @@ func PostRides(rideInserter models.RideInserter, locationFinder models.LocationF
 		}
 		id, err := rideInserter.InsertOne(c.Copy(), newRide)
 		if err != nil {
-			logger.Errorf("models.RideInserter.InsertOne raised an error %v", err.Error())
+			logger.Errorf("RideInserter.InsertOne raised an error %v", err.Error())
 			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Ride couldn't get created: %v", err)})
 			return
 		}
@@ -115,7 +116,7 @@ func PostRides(rideInserter models.RideInserter, locationFinder models.LocationF
 	}
 }
 
-func DeleteRides(deleter models.RideDeleter) gin.HandlerFunc {
+func DeleteRides(deleter repositories.RideDeleter) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		logger := common.LoggerWithRequestId(c.Copy())
 
@@ -128,7 +129,7 @@ func DeleteRides(deleter models.RideDeleter) gin.HandlerFunc {
 
 		deletedCount, err := deleter.DeleteOne(c.Copy(), bson.M{"_id": objID})
 		if err != nil {
-			logger.Errorf("models.RideDeleter.DeleteOne raised an error: %v", err.Error())
+			logger.Errorf("RideDeleter.DeleteOne raised an error: %v", err.Error())
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}

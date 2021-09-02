@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/aliparlakci/country-roads/middlewares"
+	"github.com/aliparlakci/country-roads/repositories"
 	"github.com/aliparlakci/country-roads/services"
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
@@ -12,7 +13,6 @@ import (
 
 	"github.com/aliparlakci/country-roads/common"
 	"github.com/aliparlakci/country-roads/controllers"
-	"github.com/aliparlakci/country-roads/models"
 	"github.com/joho/godotenv"
 )
 
@@ -33,9 +33,9 @@ func main() {
 
 		rdbUri := os.Getenv("RDB_URI")
 		env.Repositories = &common.RepositoryContainer{
-			RideRepository:     &models.RideCollection{Collection: db.Collection("rides")},
-			LocationRepository: &models.LocationCollection{Collection: db.Collection("locations")},
-			UserRepository:     &models.UserCollection{Collection: db.Collection("users")},
+			RideRepository:     &repositories.RideCollection{Collection: db.Collection("rides")},
+			LocationRepository: &repositories.LocationCollection{Collection: db.Collection("locations")},
+			UserRepository:     &repositories.UserCollection{Collection: db.Collection("users")},
 		}
 		env.Services = &common.ServiceContainer{
 			SessionService: &services.SessionStore{Store: common.InitializeRedis(rdbUri, "", 0)},

@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"github.com/aliparlakci/country-roads/repositories"
 	"net/http"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -11,7 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func GetAllLocations(finder models.LocationFinder) gin.HandlerFunc {
+func GetAllLocations(finder repositories.LocationFinder) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		logger := common.LoggerWithRequestId(c)
 
@@ -25,7 +26,7 @@ func GetAllLocations(finder models.LocationFinder) gin.HandlerFunc {
 	}
 }
 
-func PostLocation(repository models.LocationRepository) gin.HandlerFunc {
+func PostLocation(repository repositories.LocationRepository) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		logger := common.LoggerWithRequestId(c)
 

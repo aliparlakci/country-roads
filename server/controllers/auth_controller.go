@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/aliparlakci/country-roads/common"
 	"github.com/aliparlakci/country-roads/models"
+	"github.com/aliparlakci/country-roads/repositories"
 	"github.com/aliparlakci/country-roads/services"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -11,7 +12,7 @@ import (
 	"net/http"
 )
 
-func Login(otpService services.OTPService, finder models.UserFinder) gin.HandlerFunc {
+func Login(otpService services.OTPService, finder repositories.UserFinder) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		logger := common.LoggerWithRequestId(c.Copy())
 
@@ -49,7 +50,7 @@ func Login(otpService services.OTPService, finder models.UserFinder) gin.Handler
 	}
 }
 
-func Verify(otpService services.OTPService, sessions services.SessionService, userFinder models.UserFinder) gin.HandlerFunc {
+func Verify(otpService services.OTPService, sessions services.SessionService, userFinder repositories.UserFinder) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		logger := common.LoggerWithRequestId(c.Copy())
 
@@ -111,7 +112,7 @@ func Verify(otpService services.OTPService, sessions services.SessionService, us
 	}
 }
 
-func User(userFinder models.UserFinder) gin.HandlerFunc {
+func User(userFinder repositories.UserFinder) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		logger := common.LoggerWithRequestId(c.Copy())
 
