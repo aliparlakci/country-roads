@@ -20,13 +20,13 @@ func Logger() gin.HandlerFunc {
 			uri = uri + "?" + raw
 		}
 
-		requestFields := logrus.Fields{
+		/*requestFields := logrus.Fields{
 			"time_stamp":  start.Format("2006/01/02 - 15:04:05"),
 			"method":      c.Request.Method,
 			"path":        uri,
-		}
+		}*/
 
-		logger.WithFields(requestFields).Debug("request is received")
+		// logger.WithFields(requestFields).Debug("request is received")
 
 		// Process request
 		c.Next()
@@ -45,6 +45,6 @@ func Logger() gin.HandlerFunc {
 			responseFields["error"] = error
 		}
 
-		logger.WithFields(responseFields).Debug("response has been sent")
+		logger.WithFields(responseFields).Debug()
 	}
 }

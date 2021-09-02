@@ -21,8 +21,9 @@ func main() {
 	godotenv.Load()
 
 	logrus.SetLevel(logrus.DebugLevel)
-	logrus.SetReportCaller(false)
+	logrus.SetReportCaller(true)
 	logrus.SetFormatter(&logrus.TextFormatter{PadLevelText: true})
+	//logrus.SetFormatter(&logrus.JSONFormatter{PrettyPrint: true})
 
 	env := &common.Env{}
 	{
@@ -39,7 +40,7 @@ func main() {
 		}
 		env.Services = &common.ServiceContainer{
 			SessionService: &services.SessionStore{Store: common.InitializeRedis(rdbUri, "", 0)},
-			AuthService: &services.AuthStore{Store: common.InitializeRedis(rdbUri, "", 1)},
+			OTPService:     &services.OTPStore{Store: common.InitializeRedis(rdbUri, "", 1)},
 		}
 		env.ValidatorFactory = &validators.ValidatorFactory{LocationFinder: env.Repositories.LocationRepository}
 	}
@@ -55,8 +56,10 @@ func main() {
 		AllowMethods:    []string{"GET", "POST", "DELETE"},
 	}))
 
-	router.Use(middlewares.SessionMiddleware(env.Services.SessionService))
-	router.Use(middlewares.AuthMiddleware(env.Repositories.UserRepository))
+	router.Use(middlewares.AuthMiddleware(
+		env.Repositories.UserRepository,
+		env.Services.SessionService,
+	))
 	api := router.Group("api")
 	{
 		controllers.RegisterRideController(api, env)

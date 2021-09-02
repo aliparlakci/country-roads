@@ -33,7 +33,7 @@ func GetRide(finder models.RideFinder) gin.HandlerFunc {
 
 		rides, err := finder.FindMany(c.Copy(), pipeline)
 		if err != nil {
-			logger.WithField("error", err.Error()).Error("models.RideFinder.FindMany raised an error")
+			logger.Errorf("models.RideFinder.FindMany raised an error: %v", err.Error())
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
@@ -55,10 +55,7 @@ func SearchRides(finder models.RideFinder) gin.HandlerFunc {
 		// TODO: Queries should be validated before running against the database to prevent attacks
 		var queries models.SearchRideQueries
 		if err := c.BindQuery(&queries); err != nil {
-			logger.WithFields(logrus.Fields{
-				"queries": c.Request.URL.RawQuery,
-				"error": err.Error(),
-			}).Debug("cannot bind query parameters to models.SearchRideQueries")
+			logger.WithField("queries", c.Request.URL.RawQuery).Debugf("cannot bind query parameters to models.SearchRideQueries: %v", err.Error())
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
@@ -67,9 +64,7 @@ func SearchRides(finder models.RideFinder) gin.HandlerFunc {
 
 		results := make([]map[string]interface{}, 0)
 		if rides, err := finder.FindMany(c.Copy(), pipeline); err != nil {
-			logger.WithFields(logrus.Fields{
-				"error": err.Error(),
-			}).Error("models.RideFinder.FindMany raised an error")
+			logger.Errorf("models.RideFinder.FindMany raised an error: %v", err.Error())
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		} else {
@@ -92,17 +87,14 @@ func PostRides(inserter models.RideInserter, validators validators.IValidatorFac
 
 		var rideDto models.NewRideForm
 		if err := c.Bind(&rideDto); err != nil {
-			logger.WithField("error", err.Error()).Debug("cannot bind to models.NewRideForm")
+			logger.Debugf("cannot bind to models.NewRideForm: %v", err.Error())
 			c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Ride format was incorrect: %v", err)})
 			return
 		}
 
 		validator.SetDto(rideDto)
 		if isValid, err := validator.Validate(c.Copy()); !isValid || err != nil {
-			logger.WithFields(logrus.Fields{
-				"data": common.JsonMarshalNoError(rideDto),
-				"error": err.Error(),
-			}).Debug("rideDto (models.NewRideForm) is not a valid ride")
+			logger.WithField("data", common.JsonMarshalNoError(rideDto)).Debugf("rideDto (models.NewRideForm) is not a valid ride: %v", err.Error())
 			c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Ride format was incorrect: %v", err)})
 			return
 		}
@@ -116,7 +108,7 @@ func PostRides(inserter models.RideInserter, validators validators.IValidatorFac
 		}
 		id, err := inserter.InsertOne(c.Copy(), newRide)
 		if err != nil {
-			logger.WithFields(logrus.Fields{"error": err.Error()}).Error("models.RideInserter.InsertOne raised an error")
+			logger.Errorf("models.RideInserter.InsertOne raised an error %v", err.Error())
 			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Ride couldn't get created: %v", err)})
 			return
 		}
@@ -138,7 +130,7 @@ func DeleteRides(deleter models.RideDeleter) gin.HandlerFunc {
 
 		deletedCount, err := deleter.DeleteOne(c.Copy(), bson.M{"_id": objID})
 		if err != nil {
-			logger.WithFields(logrus.Fields{"error": err.Error()}).Error("models.RideDeleter.DeleteOne raised an error")
+			logger.Errorf("models.RideDeleter.DeleteOne raised an error: %v", err.Error())
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}

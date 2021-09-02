@@ -11,14 +11,20 @@ import (
 	"net/http"
 )
 
-func Login(auth services.AuthService, finder models.UserFinder) gin.HandlerFunc {
+func Login(otpService services.OTPService, finder models.UserFinder) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		logger := common.LoggerWithRequestId(c.Copy())
 
 		var creds models.LoginRequestForm
 		if err := c.Bind(&creds); err != nil {
-			logger.WithField("error", err.Error()).Debug("cannot bind request body to models.LoginRequestForm")
+			logger.Debugf("cannot bind request body to models.LoginRequestForm: %v", err.Error())
 			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
+			return
+		}
+
+		if user, isLoggedIn := c.Get("user"); isLoggedIn {
+			logger.WithField("user_id", user.(models.User).ID).Debug("user with user_id is already logged in on this session")
+			c.JSON(http.StatusBadRequest, gin.H{"error": "user is already logged in"})
 			return
 		}
 
@@ -29,35 +35,28 @@ func Login(auth services.AuthService, finder models.UserFinder) gin.HandlerFunc 
 			return
 		}
 
-		if err := auth.CreateOTP(user.ID.Hex()); err != nil {
-			logger.WithField("error", err.Error()).Error("auth.CreateOTP raised an error")
+		if err := otpService.CreateOTP(user.ID.Hex()); err != nil {
+			logger.WithField("user_id", user.ID.Hex()).Errorf("while creating OTP for user with user_id, otpService.CreateOTP raised an error: %v", err.Error())
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 			return
 		}
 
 		logger.WithFields(logrus.Fields{
 			"user_id": user.ID.Hex(),
-			"email": user.Email,
-		}).Info("login flow is started for user with user_id and email")
+			"email":   user.Email,
+		}).Debug("login flow is started for user with user_id and email")
 		c.JSON(http.StatusOK, gin.H{})
 	}
 }
 
-func Verify(auth services.AuthService, sessions services.SessionService, userFinder models.UserFinder) gin.HandlerFunc {
+func Verify(otpService services.OTPService, sessions services.SessionService, userFinder models.UserFinder) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		logger := common.LoggerWithRequestId(c.Copy())
 
 		var creds models.VerifyRequestForm
 		if err := c.Bind(&creds); err != nil {
-			logger.WithField("error", err).Debug("cannot bind request body to models.VerifyRequestForm")
+			logger.Debugf("cannot bind request body to models.VerifyRequestForm: %v", err.Error())
 			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
-			return
-		}
-
-		rawSessionId, exists := c.Get("sessionId")
-		if !exists {
-			logger.Error("cannot find sessionId parameter in the context")
-			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Errorf("no sessionId is set in the context")})
 			return
 		}
 
@@ -68,69 +67,116 @@ func Verify(auth services.AuthService, sessions services.SessionService, userFin
 			return
 		}
 
-		verified, err := auth.VerifyOTP(user.ID.Hex(), creds.OTP)
+		verified, err := otpService.VerifyOTP(user.ID.Hex(), creds.OTP)
 		if err != nil {
 			logger.WithFields(logrus.Fields{
 				"user_id": user.ID.Hex(),
-				"email": creds.Email,
+				"email":   creds.Email,
 			}).Debug("no OTP has found for user with user_id and email")
 			c.JSON(http.StatusBadRequest, gin.H{"error": "OTP has expired"})
 			return
 		}
 		if !verified {
 			logger.WithFields(logrus.Fields{
-				"otp": creds.OTP,
+				"otp":     creds.OTP,
 				"user_id": user.ID.Hex(),
-				"email": creds.Email,
+				"email":   creds.Email,
 			}).Debug("otp does not match for user with user_id and email")
 			c.JSON(http.StatusBadRequest, gin.H{"error": "OTP did not match"})
 			return
 		}
 
-		sessionId := rawSessionId.(string)
-		sessions.Lock()
-		session, err := sessions.FetchSession(c.Copy(), sessionId)
+		sessionId, err := sessions.CreateSession(c.Copy(), user.ID.Hex())
 		if err != nil {
-			sessions.Unlock()
-			logger.WithField("id", sessionId).Debug("session with id no longer exists")
-			c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Errorf("sessionId no longer exists: [sessionId=%v]", sessionId)})
+			logger.WithField("user_id", user.ID.Hex()).Errorf("SessionService.CreateSession raised an error while creating a new session for user with user_id: %v", err.Error())
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "cannot log in"})
 			return
 		}
-		session.UserId = user.ID.Hex()
-		if err := sessions.UpdateSession(c.Copy(), sessionId, session); err != nil {
-			sessions.Unlock()
-			logger.WithFields(logrus.Fields{
-				"id": sessionId,
-				"error": err.Error(),
-			}).Error("session with sessionId cannot get updated, SessionService.UpdateSession() raised an error")
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-		sessions.Unlock()
+		c.Header("Set-Cookie", fmt.Sprintf("session=%v; Max-Age=7776000; path=/;", sessionId))
 
-		auth.RevokeOTP(user.ID.Hex())
-		logger.WithFields(logrus.Fields{
-			"id": user.ID.Hex(),
-			"email": user.Email,
-		}).Info("OTP for user with id and email is revoked")
+		if err := otpService.RevokeOTP(user.ID.Hex()); err != nil {
+			logger.WithField("user_id", user.ID.Hex()).Warn("cannot revoke otp for user with user_id: %v", err.Error())
+		} else {
+			logger.WithFields(logrus.Fields{
+				"id":    user.ID.Hex(),
+				"email": user.Email,
+			}).Info("OTP for user with id and email is revoked")
+		}
 
 		logger.WithFields(logrus.Fields{
 			"user_id": user.ID.Hex(),
-			"email": user.Email,
-			"sessionId": sessionId,
-		}).Info("user with user_id and email is logged in in the session with sessionId")
+			"email":   user.Email,
+		}).Info("user with user_id and email is logged in")
 		c.JSON(http.StatusOK, gin.H{"status": "logged in"})
+	}
+}
+
+func User(userFinder models.UserFinder) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		logger := common.LoggerWithRequestId(c.Copy())
+
+		var user models.User
+		if value, exists := c.Get("user"); !exists {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "not logged in"})
+			return
+		} else {
+			var success bool
+			if user, success = value.(models.User); !success {
+				logger.Errorf("type assertion for user in context failed")
+				c.JSON(http.StatusUnauthorized, gin.H{"error": "cannot find user"})
+				return
+			}
+		}
+
+		c.JSON(http.StatusOK, gin.H{"user": user})
+	}
+}
+
+func Logout(sessions services.SessionService) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		logger := common.LoggerWithRequestId(c)
+		sessionId, err := c.Cookie("session")
+		if err != nil {
+			logger.Debug("no user is logged in")
+			c.JSON(http.StatusBadRequest, gin.H{"error": "no user is logged in"})
+			return
+		}
+
+		userId, err := sessions.FetchSession(c.Copy(), sessionId)
+		if err != nil {
+			logger.WithField("session_id", sessionId).Info("session with session_id no longer exists")
+			c.JSON(http.StatusOK, gin.H{})
+			return
+		}
+
+		if err := sessions.RevokeSession(c.Copy(), sessionId); err != nil {
+			logger.Errorf("cannot revoke session: %v", err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "cannot log you out"})
+			return
+		}
+
+		logger.WithFields(logrus.Fields{
+			"user_id":    userId,
+			"session_id": sessionId,
+		}).Info("user with user_id is logged out of the session with session_id")
+		c.JSON(http.StatusOK, gin.H{})
 	}
 }
 
 func RegisterAuthController(router *gin.RouterGroup, env *common.Env) {
 	router.POST("/auth/login", Login(
-		env.Services.AuthService,
+		env.Services.OTPService,
 		env.Repositories.UserRepository,
 	))
 	router.POST("/auth/verify", Verify(
-		env.Services.AuthService,
+		env.Services.OTPService,
 		env.Services.SessionService,
 		env.Repositories.UserRepository,
+	))
+	router.GET("/auth/user", User(
+		env.Repositories.UserRepository,
+	))
+	router.POST("/auth/logout", Logout(
+		env.Services.SessionService,
 	))
 }

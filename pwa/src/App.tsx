@@ -9,25 +9,16 @@ import RideDetailsView from './views/RideDetailsView'
 import LoginView from './views/LoginView'
 import RegisterView from './views/RegisterView'
 import ProfileView from './views/ProfileView'
+import Navbar from './components/Navbar'
+import LogoutView from './views/LogoutView'
 
 export default function App() {
     return (
         <StyledContainer>
-            <h1>Country Roads</h1>
-            <StyledNav>
-                <StyledNavItem>
-                    <Link to={CONSTANTS.ROUTES.RIDES.NEW}>Create Ride</Link>
-                </StyledNavItem>
-                <StyledNavItem>
-                    <Link to={CONSTANTS.ROUTES.RIDES.MAIN}>Home</Link>
-                </StyledNavItem>
-                <StyledNavItem>
-                    <Link to={CONSTANTS.ROUTES.LOGIN}>Login</Link>
-                </StyledNavItem>
-                <StyledNavItem>
-                    <Link to={CONSTANTS.ROUTES.REGISTER}>Register</Link>
-                </StyledNavItem>
-            </StyledNav>
+            <Link to="/">
+                <h1>Country Roads</h1>
+            </Link>
+            <Navbar />
 
             <Switch>
                 <Route exact path={CONSTANTS.ROUTES.RIDES.NEW}>
@@ -45,6 +36,9 @@ export default function App() {
                 <Route path={CONSTANTS.ROUTES.REGISTER}>
                     <RegisterView />
                 </Route>
+                <Route path={CONSTANTS.ROUTES.LOGOUT}>
+                    <LogoutView />
+                </Route>
                 <Route path={CONSTANTS.ROUTES.ME}>
                     <ProfileView />
                 </Route>
@@ -60,19 +54,4 @@ const StyledContainer = styled.div`
     flex-direction: column;
     width: 100%;
     gap: 1rem;
-`
-
-const StyledNav = styled.nav`
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    width: 20rem;
-`
-
-const StyledNavItem = styled.div`
-    display: flex;
-    justify-content: center;
-    white-space: nowrap;
-    text-decoration: none;
 `

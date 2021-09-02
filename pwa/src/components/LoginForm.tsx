@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
+import { mutate } from 'swr'
 import CONSTANTS from '../constants'
 
 interface ILoginFormProps {}
@@ -47,7 +48,8 @@ export default function LoginForm(props: ILoginFormProps) {
         } catch (e) {
             console.error(e)
         }
-
+        
+        mutate(CONSTANTS.API.AUTH.USER)
         history.push(CONSTANTS.ROUTES.RIDES.MAIN)
     }
 

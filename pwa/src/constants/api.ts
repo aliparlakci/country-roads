@@ -5,6 +5,8 @@ export const API = {
     USERS: '/api/users',
     AUTH: {
         LOGIN: '/api/auth/login',
-        VERIFY: 'api/auth/verify'
+        VERIFY: '/api/auth/verify',
+        USER: '/api/auth/user',
+        LOGOUT: '/api/auth/logout',
     },
 }

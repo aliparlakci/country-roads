@@ -29,15 +29,15 @@ func PostUser(findInserter models.UserFindInserter, validatorFactory validators.
 		}
 
 		if err := validator.SetDto(&userDto); err != nil {
-			logger.WithField("error", err.Error()).Debug("validator.SetDto() raised and error")
+			logger.Debugf("validator.SetDto() raised and error: %v", err.Error())
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 			return
 		}
 		if result, err := validator.Validate(c.Copy()); !result || err != nil {
-			if err != nil {
+			if err == nil {
 				logger.WithField("data", common.JsonMarshalNoError(userDto)).Debug("models.NewUserForm is not valid")
 			} else {
-				logger.WithField("error", err.Error()).Error("validator.Validate raised an error")
+				logger.Errorf("validator.Validate raised an error: %v", err.Error())
 			}
 			c.JSON(http.StatusBadRequest, gin.H{"error": "user is not valid"})
 			return
@@ -55,7 +55,7 @@ func PostUser(findInserter models.UserFindInserter, validatorFactory validators.
 			SignedUpAt:  time.Now(),
 		})
 		if err != nil {
-			logger.WithField("error", err.Error()).Error("models.UserFindInserter.InsertOne() raised an error")
+			logger.Errorf("models.UserFindInserter.InsertOne() raised an error: %v", err.Error())
 			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("new user could not get created: %v", err)})
 			return
 		}
@@ -83,6 +83,7 @@ func RegisterUserController(router *gin.RouterGroup, env *common.Env) {
 		env.Repositories.UserRepository,
 		env.ValidatorFactory,
 	))
+	router.GET("/users")
 	// router.PUT("/users/name", UpdateDisplayName(env.Repositories.UserRepository))
 	// router.PUT("/users/phone", UpdatePhone(env.Repositories.UserRepository))
 }

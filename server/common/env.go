@@ -20,5 +20,5 @@ type RepositoryContainer struct {
 
 type ServiceContainer struct {
 	services.SessionService
-	services.AuthService
+	services.OTPService
 }

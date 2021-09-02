@@ -9,18 +9,18 @@ import (
 	"github.com/go-redis/redis"
 )
 
-type AuthStore struct {
+type OTPStore struct {
 	Store *redis.Client
 	mutex sync.Mutex
 }
 
-type AuthService interface {
+type OTPService interface {
 	CreateOTP(owner string) error
 	RevokeOTP(owner string) error
 	VerifyOTP(owner, otp string) (bool, error)
 }
 
-func (a *AuthStore) CreateOTP(owner string) error {
+func (a *OTPStore) CreateOTP(owner string) error {
 	if err := a.Store.Get(owner).Err(); err == nil {
 		return nil
 	}
@@ -39,7 +39,7 @@ func (a *AuthStore) CreateOTP(owner string) error {
 	return a.Store.Set(owner, fmt.Sprintf("%06d",otp), 0).Err()
 }
 
-func (a *AuthStore) VerifyOTP(owner, givenOTP string) (bool, error) {
+func (a *OTPStore) VerifyOTP(owner, givenOTP string) (bool, error) {
 	otpInDb, err := a.Store.Get(owner).Result()
 	if err != nil {
 		return false, fmt.Errorf("owner does not exist in DB [owner=%v]", owner)
@@ -47,6 +47,6 @@ func (a *AuthStore) VerifyOTP(owner, givenOTP string) (bool, error) {
 	return givenOTP != "" && otpInDb == givenOTP, err
 }
 
-func (a *AuthStore) RevokeOTP(owner string) error {
+func (a *OTPStore) RevokeOTP(owner string) error {
 	return a.Store.Del(owner).Err()
 }
