@@ -4,6 +4,10 @@ package models
 
 import (
 	"context"
+	"fmt"
+	"github.com/gin-gonic/gin"
+	"net/mail"
+	"regexp"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -42,6 +46,56 @@ type LoginRequestForm struct {
 type VerifyRequestForm struct {
 	Email string `form:"email" binding:"required"`
 	OTP string `form:"otp" binding:"required"`
+}
+
+func (n NewUserForm) validateDisplayName() bool {
+	return len(n.DisplayName) > 1
+}
+
+func (n NewUserForm) validatePhone() bool {
+	return regexp.MustCompile(`^(\+|)([0-9]{1,3})([0-9]{10})$`).MatchString(n.Phone)
+}
+
+func (n NewUserForm) validateEmail() (string, bool) {
+	parsedEmail, err := mail.ParseAddress(n.Email)
+	if err != nil {
+		return "", false
+	}
+
+	if regexp.MustCompile(`^.+@sabanciuniv\.edu$`).MatchString(parsedEmail.Address) {
+		return parsedEmail.Address, true
+	} else {
+		return "", false
+	}
+}
+
+func (n *NewUserForm) validate() (bool, error) {
+	if isValidName := n.validateDisplayName(); !isValidName {
+		return false, fmt.Errorf("display name is not valid")
+	}
+	if validEmail, isValidEmail := n.validateEmail(); !isValidEmail {
+		return false, fmt.Errorf("email is not valid")
+	} else {
+		n.Email = validEmail
+	}
+	if isValidPhone := n.validatePhone(); !isValidPhone {
+		return false, fmt.Errorf("phone is not valid")
+	}
+
+	return true, nil
+}
+
+func (n *NewUserForm) Bind(c *gin.Context) error {
+	if err := c.Bind(n); err != nil {
+		return fmt.Errorf(err.Error())
+	}
+
+	if result, err := n.validate(); err != nil {
+		return err
+	} else if !result {
+		return fmt.Errorf("")
+	}
+	return nil
 }
 
 type UserCollection struct {

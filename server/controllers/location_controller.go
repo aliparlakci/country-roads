@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/aliparlakci/country-roads/validators"
 	"go.mongodb.org/mongo-driver/bson"
 
 	"github.com/aliparlakci/country-roads/common"
@@ -13,56 +12,70 @@ import (
 )
 
 func GetAllLocations(finder models.LocationFinder) gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		results, err := finder.FindMany(ctx.Copy(), bson.D{})
+	return func(c *gin.Context) {
+		logger := common.LoggerWithRequestId(c)
+
+		results, err := finder.FindMany(c.Copy(), bson.D{})
 		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			logger.Errorf("models.LocationFinder.FindMany raised an error while fetching all locations: %v", err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
-		ctx.JSON(http.StatusOK, gin.H{"results": results})
+		c.JSON(http.StatusOK, gin.H{"results": results})
 	}
 }
 
-func PostLocation(inserter models.LocationInserter, validators validators.IValidatorFactory) gin.HandlerFunc {
-	validator, err := validators.GetValidator("locations")
-	if err != nil {
-		panic(err)
-	}
-	return func(ctx *gin.Context) {
-		var locationDto models.NewLocationForm
+func PostLocation(repository models.LocationRepository) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		logger := common.LoggerWithRequestId(c)
 
-		if err := ctx.Bind(&locationDto); err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Location format was incorrect: %v", err)})
+		var locationDto models.NewLocationForm
+		if err := locationDto.Bind(c); err != nil {
+			logger.Debugf("cannot bind request to locationDto: %v", err)
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Location format was incorrect"})
 			return
 		}
 
-		validator.SetDto(locationDto)
-		if isValid, err := validator.Validate(ctx.Copy()); !isValid || err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Location format was invalid"})
+		// does the key already exist?
+		if exists, err := repository.Exists(c.Copy(), bson.M{"key": locationDto.Key}); err != nil {
+			logger.WithField("location_key", locationDto.Key).Errorf("models.LocationRepository.Exists raised an error when querying for location_key: %v", err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "cannot validate the key"})
+			return
+		} else if exists {
+			logger.WithField("location_key", locationDto.Key).Debug("location_key already exists in the collection")
+			c.JSON(http.StatusBadRequest, gin.H{"error": "key already exists"})
 			return
 		}
 
 		var schema models.LocationSchema
 		if locationDto.ParentKey != "" {
+			if exists, err := repository.Exists(c.Copy(), bson.M{"key": locationDto.ParentKey}); err != nil {
+				logger.WithField("location_key", locationDto.ParentKey).Errorf("models.LocationRepository.Exists raised an error when querying for parent_key: %v", err)
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "cannot validate the key"})
+				return
+			} else if !exists {
+				logger.WithField("parent_key", locationDto.ParentKey).Debug("parent_key does not exist in the collection")
+				c.JSON(http.StatusBadRequest, gin.H{"error": "parentKey does not exist"})
+				return
+			}
 			schema = models.LocationSchema{Key: locationDto.Key, Display: locationDto.Display, ParentKey: locationDto.ParentKey}
 		} else {
 			schema = models.LocationSchema{Key: locationDto.Key, Display: locationDto.Display}
 		}
 
-		id, err := inserter.InsertOne(ctx.Copy(), schema)
+		id, err := repository.InsertOne(c.Copy(), schema)
 		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Location couldn't get created: %v", err)})
+			logger.Errorf("models.LocationRepository.InsertOne raised an error while inserting a new location: %v", err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Location couldn't get created: %v", err)})
 			return
 		}
 
-		ctx.JSON(http.StatusCreated, gin.H{"id": id})
+		logger.WithField("id", id).WithField("key", schema.Key).Info("new location with key and id is inserted")
+		c.JSON(http.StatusCreated, gin.H{"id": id})
 	}
 }
 
 func RegisterLocationController(router *gin.RouterGroup, env *common.Env) {
 	router.GET("/locations", GetAllLocations(env.Repositories.LocationRepository))
-	router.POST("/locations", PostLocation(
-		env.Repositories.LocationRepository,
-		env.ValidatorFactory,
-	))
+	router.POST("/locations", PostLocation(env.Repositories.LocationRepository))
 }

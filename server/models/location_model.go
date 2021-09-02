@@ -4,6 +4,8 @@ package models
 
 import (
 	"context"
+	"errors"
+	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -31,6 +33,31 @@ type LocationSchema struct {
 	ParentKey string             `bson:"parentKey,omitempty" json:"parentKey"`
 }
 
+func (n NewLocationForm) validateDisplay() bool {
+	return n.Display != ""
+}
+
+func (n NewLocationForm) validate() (bool, error) {
+	if display := n.validateDisplay(); !display {
+		return display, nil
+	}
+	return true, nil
+}
+
+func (n *NewLocationForm) Bind(c *gin.Context) error {
+	if err := c.Bind(n); err != nil {
+		return err
+	}
+
+	if result, err := n.validate(); err != nil {
+		return err
+	} else if !result {
+		return errors.New("")
+	}
+	return nil
+}
+
+
 type LocationCollection struct {
 	Collection *mongo.Collection
 }
@@ -47,11 +74,25 @@ type LocationInserter interface {
 type LocationRepository interface {
 	LocationFinder
 	LocationInserter
+	Exists(c context.Context, filter interface{}) (bool, error)
+}
+
+func (l *LocationCollection) Exists(c context.Context, filter interface{}) (bool, error) {
+	if _, err := l.FindOne(c, filter); err == mongo.ErrNoDocuments {
+		return false, nil
+	} else if err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 func (l *LocationCollection) FindOne(ctx context.Context, filter interface{}) (Location, error) {
 	var location Location
-	err := l.Collection.FindOne(ctx, filter).Decode(&location)
+	result := l.Collection.FindOne(ctx, filter)
+	if err := result.Err(); err != nil {
+		return location, err
+	}
+	err := result.Decode(&location)
 	return location, err
 }
 

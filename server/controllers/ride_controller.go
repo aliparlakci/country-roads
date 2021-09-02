@@ -3,11 +3,11 @@ package controllers
 import (
 	"fmt"
 	"github.com/sirupsen/logrus"
+	"go.mongodb.org/mongo-driver/mongo"
 	"net/http"
 	"time"
 
 	"github.com/aliparlakci/country-roads/aggregations"
-	"github.com/aliparlakci/country-roads/validators"
 	"go.mongodb.org/mongo-driver/bson"
 
 	"github.com/aliparlakci/country-roads/common"
@@ -77,36 +77,34 @@ func SearchRides(finder models.RideFinder) gin.HandlerFunc {
 	}
 }
 
-func PostRides(inserter models.RideInserter, validators validators.IValidatorFactory) gin.HandlerFunc {
-	validator, err := validators.GetValidator("rides")
-	if err != nil {
-		panic(err)
-	}
+func PostRides(rideInserter models.RideInserter, locationFinder models.LocationFinder) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		logger := common.LoggerWithRequestId(c.Copy())
 
 		var rideDto models.NewRideForm
-		if err := c.Bind(&rideDto); err != nil {
+		if err := rideDto.Bind(c); err != nil {
 			logger.Debugf("cannot bind to models.NewRideForm: %v", err.Error())
 			c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Ride format was incorrect: %v", err)})
 			return
 		}
 
-		validator.SetDto(rideDto)
-		if isValid, err := validator.Validate(c.Copy()); !isValid || err != nil {
-			logger.WithField("data", common.JsonMarshalNoError(rideDto)).Debugf("rideDto (models.NewRideForm) is not a valid ride: %v", err.Error())
-			c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Ride format was incorrect: %v", err)})
+		if _, err := locationFinder.FindOne(c.Copy(), bson.M{"key": rideDto.Destination}); err == mongo.ErrNoDocuments {
+			logger.WithField("destination",rideDto.Destination).Debug("no location with the destination key exists")
+			c.JSON(http.StatusBadRequest, gin.H{"error": "destination does not exist"})
+		} else if err != nil {
+			logger.Errorf("locaitionFinder.FindOne raised an error while querying for destination: %v", err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "cannot validate the destination"})
 			return
 		}
 
-		newRide := models.RideSchema{
+			newRide := models.RideSchema{
 			Type:        rideDto.Type,
 			Date:        rideDto.Date,
 			Destination: rideDto.Destination,
 			Direction:   rideDto.Direction,
 			CreatedAt:   time.Now(),
 		}
-		id, err := inserter.InsertOne(c.Copy(), newRide)
+		id, err := rideInserter.InsertOne(c.Copy(), newRide)
 		if err != nil {
 			logger.Errorf("models.RideInserter.InsertOne raised an error %v", err.Error())
 			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Ride couldn't get created: %v", err)})
@@ -151,7 +149,7 @@ func RegisterRideController(router *gin.RouterGroup, env *common.Env) {
 	router.GET("/rides", SearchRides(env.Repositories.RideRepository))
 	router.POST("/rides", PostRides(
 		env.Repositories.RideRepository,
-		env.ValidatorFactory,
+		env.Repositories.LocationRepository,
 	))
 	router.DELETE("/rides/:id", DeleteRides(env.Repositories.RideRepository))
 }

@@ -4,6 +4,9 @@ package models
 
 import (
 	"context"
+	"errors"
+	"fmt"
+	"github.com/gin-gonic/gin"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -44,6 +47,74 @@ type SearchRideQueries struct {
 	EndDate     time.Time `form:"end_date" json:"end_date" time_format:"unix"`
 	Direction   string    `form:"direction" json:"direction"`
 	Destination string    `form:"destination" json:"destination"`
+}
+
+func (n NewRideForm) validateDate() bool {
+	date := n.Date
+	today := time.Now()
+	if today.Year() < date.Year() {
+		return true
+	} else if today.Year() == date.Year() {
+		if today.Month() < date.Month() {
+			return true
+		} else if today.Month() == date.Month() {
+			if today.Day() <= date.Day() {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func (n NewRideForm) validateType() bool {
+	switch n.Type {
+	case "offer":
+		return true
+	case "request":
+		return true
+	case "taxi":
+		return true
+	default:
+		return false
+	}
+}
+
+func (n NewRideForm) validateDirection() bool {
+	switch n.Direction {
+	case "to_campus":
+		return true
+	case "from_campus":
+		return true
+	default:
+		return false
+	}
+}
+
+func (n NewRideForm) validate() (bool, error) {
+	if !n.validateDate() {
+		return false, fmt.Errorf("ride date is not valid")
+	}
+	if !n.validateDirection() {
+		return false, fmt.Errorf("ride direction is not valid")
+	}
+	if !n.validateType() {
+		return false, fmt.Errorf("ride type is not valid")
+	}
+
+	return true, nil
+}
+
+func (n *NewRideForm) Bind(c *gin.Context) error {
+	if err := c.Bind(n); err != nil {
+		return fmt.Errorf(err.Error())
+	}
+
+	if result, err := n.validate(); err != nil {
+		return err
+	} else if !result {
+		return errors.New("")
+	}
+	return nil
 }
 
 type RideCollection struct {

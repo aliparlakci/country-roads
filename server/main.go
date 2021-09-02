@@ -13,7 +13,6 @@ import (
 	"github.com/aliparlakci/country-roads/common"
 	"github.com/aliparlakci/country-roads/controllers"
 	"github.com/aliparlakci/country-roads/models"
-	"github.com/aliparlakci/country-roads/validators"
 	"github.com/joho/godotenv"
 )
 
@@ -42,7 +41,6 @@ func main() {
 			SessionService: &services.SessionStore{Store: common.InitializeRedis(rdbUri, "", 0)},
 			OTPService:     &services.OTPStore{Store: common.InitializeRedis(rdbUri, "", 1)},
 		}
-		env.ValidatorFactory = &validators.ValidatorFactory{LocationFinder: env.Repositories.LocationRepository}
 	}
 
 	router := gin.Default()
