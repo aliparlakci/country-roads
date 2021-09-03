@@ -1,6 +1,6 @@
 package services
 
-//go:generate mockgen -destination=../mocks/mock_session_service.go -package=mocks github.com/aliparlakci/country-roads/services SessionRepository,SessionFetcher,SessionUpdater,SessionCreator
+//go:generate mockgen -destination=../mocks/mock_session_service.go -package=mocks github.com/aliparlakci/country-roads/services SessionService,SessionFetcher,SessionRevoker,SessionCreator
 
 import (
 	"context"

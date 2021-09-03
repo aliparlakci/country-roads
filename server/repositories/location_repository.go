@@ -1,5 +1,7 @@
 package repositories
 
+//go:generate mockgen -destination=../mocks/mock_location_repository.go -package=mocks github.com/aliparlakci/country-roads/repositories LocationFinder,LocationInserter,LocationRepository
+
 import (
 	"context"
 	"github.com/aliparlakci/country-roads/models"

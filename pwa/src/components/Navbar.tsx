@@ -32,7 +32,11 @@ export default function Navbar() {
             {user && (
                 <StyledNavRow>
                     <StyledNavItem>
-                        <span>{user.email}</span>
+                        <span>
+                            <Link to={CONSTANTS.ROUTES.ME}>
+                                {user.email}
+                            </Link>
+                        </span>
                     </StyledNavItem>
                     <StyledNavItem>
                         <Link to={CONSTANTS.ROUTES.LOGOUT}>Logout</Link>

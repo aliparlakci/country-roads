@@ -50,7 +50,7 @@ func Login(otpService services.OTPService, finder repositories.UserFinder) gin.H
 	}
 }
 
-func Verify(otpService services.OTPService, sessions services.SessionService, userFinder repositories.UserFinder) gin.HandlerFunc {
+func Verify(otpService services.OTPService, sessions services.SessionService, users repositories.UserRepository) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		logger := common.LoggerWithRequestId(c.Copy())
 
@@ -61,14 +61,14 @@ func Verify(otpService services.OTPService, sessions services.SessionService, us
 			return
 		}
 
-		user, err := userFinder.FindOne(c.Copy(), bson.M{"email": creds.Email})
+		user, err := users.FindOne(c.Copy(), bson.M{"email": creds.Email})
 		if err != nil {
 			logger.WithField("email", creds.Email).Debug("no user exists with the email")
 			c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Errorf("no user with the email exists: [email=%v]", creds.Email)})
 			return
 		}
 
-		verified, err := otpService.VerifyOTP(user.ID.Hex(), creds.OTP)
+		correct, err := otpService.VerifyOTP(user.ID.Hex(), creds.OTP)
 		if err != nil {
 			logger.WithFields(logrus.Fields{
 				"user_id": user.ID.Hex(),
@@ -77,7 +77,7 @@ func Verify(otpService services.OTPService, sessions services.SessionService, us
 			c.JSON(http.StatusBadRequest, gin.H{"error": "OTP has expired"})
 			return
 		}
-		if !verified {
+		if !correct {
 			logger.WithFields(logrus.Fields{
 				"otp":     creds.OTP,
 				"user_id": user.ID.Hex(),
@@ -104,6 +104,16 @@ func Verify(otpService services.OTPService, sessions services.SessionService, us
 			}).Info("OTP for user with id and email is revoked")
 		}
 
+		if !user.Verified {
+			if err := users.UpdateOne(
+				c.Copy(),
+				bson.M{"_id": user.ID},
+				bson.D{{"$set", bson.D{{"verified", true}}}},
+			); err != nil {
+				logger.WithField("user_id", user.ID.Hex()).Errorf("RideRepository.UpdateOne raised an error while setting user verified: %v", err)
+			}
+		}
+
 		logger.WithFields(logrus.Fields{
 			"user_id": user.ID.Hex(),
 			"email":   user.Email,
@@ -112,7 +122,7 @@ func Verify(otpService services.OTPService, sessions services.SessionService, us
 	}
 }
 
-func User(userFinder repositories.UserFinder) gin.HandlerFunc {
+func User() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		logger := common.LoggerWithRequestId(c.Copy())
 
@@ -146,6 +156,7 @@ func Logout(sessions services.SessionService) gin.HandlerFunc {
 		userId, err := sessions.FetchSession(c.Copy(), sessionId)
 		if err != nil {
 			logger.WithField("session_id", sessionId).Info("session with session_id no longer exists")
+			c.Header("Set-Cookie", fmt.Sprintf("session=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;"))
 			c.JSON(http.StatusOK, gin.H{})
 			return
 		}
@@ -155,11 +166,13 @@ func Logout(sessions services.SessionService) gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "cannot log you out"})
 			return
 		}
+		c.Header("Set-Cookie", fmt.Sprintf("session=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;"))
 
 		logger.WithFields(logrus.Fields{
 			"user_id":    userId,
 			"session_id": sessionId,
 		}).Info("user with user_id is logged out of the session with session_id")
+
 		c.JSON(http.StatusOK, gin.H{})
 	}
 }
@@ -174,9 +187,7 @@ func RegisterAuthController(router *gin.RouterGroup, env *common.Env) {
 		env.Services.SessionService,
 		env.Repositories.UserRepository,
 	))
-	router.GET("/auth/user", User(
-		env.Repositories.UserRepository,
-	))
+	router.GET("/auth/user", User())
 	router.POST("/auth/logout", Logout(
 		env.Services.SessionService,
 	))

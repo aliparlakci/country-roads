@@ -19,7 +19,7 @@ import (
 func main() {
 	godotenv.Load()
 
-	logrus.SetLevel(logrus.DebugLevel)
+	logrus.SetLevel(logrus.InfoLevel)
 	logrus.SetReportCaller(true)
 	logrus.SetFormatter(&logrus.TextFormatter{PadLevelText: true})
 	//logrus.SetFormatter(&logrus.JSONFormatter{PrettyPrint: true})

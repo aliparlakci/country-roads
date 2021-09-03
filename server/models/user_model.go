@@ -1,7 +1,5 @@
 package models
 
-//go:generate mockgen -destination=../mocks/mock_user_model.go -package=mocks github.com/aliparlakci/country-roads/models UserRepository,UserFinder,UserInserter,UserUpdater,UserFindUpdater,UserFindInserter
-
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -19,6 +17,11 @@ type User struct {
 	Phone       string             `bson:"phone" json:"phone"`
 	Verified    bool               `bson:"verified" json:"verified"`
 	SignedUpAt  time.Time          `bson:"signedUpAt" json:"signedUpAt" time_format:"unix"`
+}
+
+type UserResponse struct {
+	ID          primitive.ObjectID `bson:"_id" json:"id"`
+	DisplayName string             `bson:"displayName" json:"displayName"`
 }
 
 type UserSchema struct {
@@ -42,7 +45,7 @@ type LoginRequestForm struct {
 
 type VerifyRequestForm struct {
 	Email string `form:"email" binding:"required"`
-	OTP string `form:"otp" binding:"required"`
+	OTP   string `form:"otp" binding:"required"`
 }
 
 func (n NewUserForm) validateDisplayName() bool {
@@ -95,3 +98,9 @@ func (n *NewUserForm) Bind(c *gin.Context) error {
 	return nil
 }
 
+func (u UserResponse) Jsonify() map[string]interface{} {
+	return map[string]interface{}{
+		"id":          u.ID,
+		"displayName": u.DisplayName,
+	}
+}

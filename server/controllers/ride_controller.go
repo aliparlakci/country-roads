@@ -61,7 +61,7 @@ func SearchRides(finder repositories.RideFinder) gin.HandlerFunc {
 			return
 		}
 
-		pipeline := aggregations.BuildAggregation(aggregations.FilterRides(queries), aggregations.RideWithDestination)
+		pipeline := aggregations.BuildAggregation(aggregations.FilterRides(queries), aggregations.RideResponseAggregation)
 
 		results := make([]map[string]interface{}, 0)
 		if rides, err := finder.FindMany(c.Copy(), pipeline); err != nil {
@@ -82,6 +82,14 @@ func PostRides(rideInserter repositories.RideInserter, locationFinder repositori
 	return func(c *gin.Context) {
 		logger := common.LoggerWithRequestId(c.Copy())
 
+		var user models.User
+		if u, exists := c.Get("user"); !exists {
+			c.JSON(http.StatusUnauthorized, gin.H{})
+			return
+		} else {
+			user = u.(models.User)
+		}
+
 		var rideDto models.NewRideForm
 		if err := rideDto.Bind(c); err != nil {
 			logger.Debugf("cannot bind to models.NewRideForm: %v", err.Error())
@@ -90,7 +98,7 @@ func PostRides(rideInserter repositories.RideInserter, locationFinder repositori
 		}
 
 		if _, err := locationFinder.FindOne(c.Copy(), bson.M{"key": rideDto.Destination}); err == mongo.ErrNoDocuments {
-			logger.WithField("destination",rideDto.Destination).Debug("no location with the destination key exists")
+			logger.WithField("destination", rideDto.Destination).Debug("no location with the destination key exists")
 			c.JSON(http.StatusBadRequest, gin.H{"error": "destination does not exist"})
 		} else if err != nil {
 			logger.Errorf("locaitionFinder.FindOne raised an error while querying for destination: %v", err)
@@ -98,12 +106,13 @@ func PostRides(rideInserter repositories.RideInserter, locationFinder repositori
 			return
 		}
 
-			newRide := models.RideSchema{
+		newRide := models.RideSchema{
 			Type:        rideDto.Type,
 			Date:        rideDto.Date,
 			Destination: rideDto.Destination,
 			Direction:   rideDto.Direction,
 			CreatedAt:   time.Now(),
+			Owner:       user.ID,
 		}
 		id, err := rideInserter.InsertOne(c.Copy(), newRide)
 		if err != nil {
@@ -116,9 +125,17 @@ func PostRides(rideInserter repositories.RideInserter, locationFinder repositori
 	}
 }
 
-func DeleteRides(deleter repositories.RideDeleter) gin.HandlerFunc {
+func DeleteRides(repository repositories.RideRepository) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		logger := common.LoggerWithRequestId(c.Copy())
+
+		var user models.User
+		if u, exists := c.Get("user"); !exists {
+			c.JSON(http.StatusUnauthorized, gin.H{})
+			return
+		} else {
+			user = u.(models.User)
+		}
 
 		objID, err := primitive.ObjectIDFromHex(c.Param("id"))
 		if err != nil {
@@ -127,7 +144,27 @@ func DeleteRides(deleter repositories.RideDeleter) gin.HandlerFunc {
 			return
 		}
 
-		deletedCount, err := deleter.DeleteOne(c.Copy(), bson.M{"_id": objID})
+		ride, err := repository.FindOne(c.Copy(), bson.M{"_id": objID})
+		if err == mongo.ErrNoDocuments {
+			logger.WithField("id", objID.Hex()).Debug("cannot find ride with id")
+			c.JSON(http.StatusBadRequest, gin.H{"error": "ride does not exist"})
+			return
+		} else if err != nil {
+			logger.WithField("id", objID.Hex()).Errorf("RideRepository.FindOne raised an error while fetching ride with id: %v", err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "cannot fetch the ride with id"})
+			return
+		}
+
+		if ride.Owner != user.ID {
+			logger.WithFields(logrus.Fields{
+				"requester": user.ID.Hex(),
+				"owner": ride.Owner.Hex(),
+			}).Debug("requester cannot delete ride of owner")
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "you cannot delete someone else's post"})
+			return
+		}
+
+		deletedCount, err := repository.DeleteOne(c.Copy(), bson.M{"_id": objID})
 		if err != nil {
 			logger.Errorf("RideDeleter.DeleteOne raised an error: %v", err.Error())
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

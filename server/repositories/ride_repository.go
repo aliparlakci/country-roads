@@ -1,5 +1,7 @@
 package repositories
 
+//go:generate mockgen -destination=../mocks/mock_ride_repository.go -package=mocks github.com/aliparlakci/country-roads/repositories RideRepository,RideFinder,RideInserter,RideDeleter
+
 import (
 	"context"
 	"github.com/aliparlakci/country-roads/models"
@@ -11,7 +13,7 @@ type RideCollection struct {
 }
 
 type RideFinder interface {
-	FindOne(ctx context.Context, filter interface{}) (models.Ride, error)
+	FindOne(ctx context.Context, filter interface{}) (models.RideSchema, error)
 	FindMany(ctx context.Context, pipeline interface{}) (models.Rides, error)
 }
 
@@ -29,8 +31,8 @@ type RideRepository interface {
 	RideDeleter
 }
 
-func (r *RideCollection) FindOne(ctx context.Context, filter interface{}) (models.Ride, error) {
-	var ride models.Ride
+func (r *RideCollection) FindOne(ctx context.Context, filter interface{}) (models.RideSchema, error) {
+	var ride models.RideSchema
 	result := r.Collection.FindOne(ctx, filter)
 	if err := result.Err(); err != nil {
 		return ride, err
@@ -40,7 +42,7 @@ func (r *RideCollection) FindOne(ctx context.Context, filter interface{}) (model
 }
 
 func (r *RideCollection) FindMany(ctx context.Context, pipeline interface{}) (models.Rides, error) {
-	results := make([]models.Ride, 0)
+	results := make([]models.RideResponse, 0)
 
 	cursor, err := r.Collection.Aggregate(ctx, pipeline)
 	if err != nil {
@@ -48,7 +50,7 @@ func (r *RideCollection) FindMany(ctx context.Context, pipeline interface{}) (mo
 	}
 
 	for cursor.Next(ctx) {
-		var ride models.Ride
+		var ride models.RideResponse
 		if err := cursor.Decode(&ride); err != nil {
 			return nil, err
 		}

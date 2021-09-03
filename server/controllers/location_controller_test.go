@@ -10,7 +10,6 @@ import (
 	"github.com/aliparlakci/country-roads/common"
 	"github.com/aliparlakci/country-roads/mocks"
 	"github.com/aliparlakci/country-roads/models"
-	"github.com/aliparlakci/country-roads/validators"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"go.mongodb.org/mongo-driver/bson"
@@ -19,7 +18,7 @@ import (
 func TestPostLocation(t *testing.T) {
 	tests := []struct {
 		Body         multipart.Form
-		Prepare      func(inserter *mocks.MockLocationInserter, locationFinder *mocks.MockLocationFinder)
+		Prepare      func(repository *mocks.MockLocationRepository)
 		ExpectedCode int
 		ExpectedBody gin.H
 	}{
@@ -29,10 +28,10 @@ func TestPostLocation(t *testing.T) {
 				"display":   {"Taksim"},
 				"parentKey": {"istanbul_europe"},
 			}},
-			Prepare: func(inserter *mocks.MockLocationInserter, locationFinder *mocks.MockLocationFinder) {
-				locationFinder.EXPECT().FindOne(gomock.Any(), bson.M{"key": "istanbul_europe"}).Return(models.Location{}, nil).MinTimes(1)
-				locationFinder.EXPECT().FindOne(gomock.Any(), bson.M{"key": "taksim"}).Return(models.Location{}, nil).MinTimes(1)
-				inserter.EXPECT().InsertOne(gomock.Any(), gomock.Any()).Times(0)
+			Prepare: func(repository *mocks.MockLocationRepository) {
+				repository.EXPECT().FindOne(gomock.Any(), bson.M{"key": "istanbul_europe"}).Return(models.Location{}, nil).MinTimes(1)
+				repository.EXPECT().FindOne(gomock.Any(), bson.M{"key": "taksim"}).Return(models.Location{}, nil).MinTimes(1)
+				repository.EXPECT().InsertOne(gomock.Any(), gomock.Any()).Times(0)
 			},
 			ExpectedCode: http.StatusBadRequest,
 			ExpectedBody: gin.H{"error": "Location format was invalid"},
@@ -42,10 +41,10 @@ func TestPostLocation(t *testing.T) {
 				"key":     {"taksim"},
 				"display": {"Taksim"},
 			}},
-			Prepare: func(inserter *mocks.MockLocationInserter, locationFinder *mocks.MockLocationFinder) {
-				locationFinder.EXPECT().FindOne(gomock.Any(), gomock.Any()).Times(0)
-				locationFinder.EXPECT().FindOne(gomock.Any(), bson.M{"key": "taksim"}).Return(models.Location{}, fmt.Errorf("")).MinTimes(1)
-				inserter.EXPECT().InsertOne(gomock.Any(), models.LocationSchema{
+			Prepare: func(repository *mocks.MockLocationRepository) {
+				repository.EXPECT().FindOne(gomock.Any(), gomock.Any()).Times(0)
+				repository.EXPECT().FindOne(gomock.Any(), bson.M{"key": "taksim"}).Return(models.Location{}, fmt.Errorf("")).MinTimes(1)
+				repository.EXPECT().InsertOne(gomock.Any(), models.LocationSchema{
 					Key:     "taksim",
 					Display: "Taksim",
 				}).Return("551137c2f9e1fac808a5f572", nil)
@@ -59,10 +58,10 @@ func TestPostLocation(t *testing.T) {
 				"display":   {"Taksim"},
 				"parentKey": {"istanbul_europe"},
 			}},
-			Prepare: func(inserter *mocks.MockLocationInserter, locationFinder *mocks.MockLocationFinder) {
-				locationFinder.EXPECT().FindOne(gomock.Any(), bson.M{"key": "istanbul_europe"}).Return(models.Location{}, nil).MinTimes(1)
-				locationFinder.EXPECT().FindOne(gomock.Any(), bson.M{"key": "taksim"}).Return(models.Location{}, fmt.Errorf("")).MinTimes(1)
-				inserter.EXPECT().InsertOne(gomock.Any(), models.LocationSchema{
+			Prepare: func(repository *mocks.MockLocationRepository) {
+				repository.EXPECT().FindOne(gomock.Any(), bson.M{"key": "istanbul_europe"}).Return(models.Location{}, nil).MinTimes(1)
+				repository.EXPECT().FindOne(gomock.Any(), bson.M{"key": "taksim"}).Return(models.Location{}, fmt.Errorf("")).MinTimes(1)
+				repository.EXPECT().InsertOne(gomock.Any(), models.LocationSchema{
 					Key:       "taksim",
 					Display:   "Taksim",
 					ParentKey: "istanbul_europe",
@@ -78,17 +77,15 @@ func TestPostLocation(t *testing.T) {
 		t.Run(testName, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
-			mockedLocationInserter := mocks.NewMockLocationInserter(ctrl)
-			mockedLocationFinder := mocks.NewMockLocationFinder(ctrl)
-			validator := validators.ValidatorFactory{LocationFinder: mockedLocationFinder}
+			mockedLocationRepository := mocks.NewMockLocationRepository(ctrl)
 
 			if tt.Prepare != nil {
-				tt.Prepare(mockedLocationInserter, mockedLocationFinder)
+				tt.Prepare(mockedLocationRepository)
 			}
 
 			recorder := httptest.NewRecorder()
 			_, r := gin.CreateTestContext(recorder)
-			r.POST("/rides", PostLocation(mockedLocationInserter, validator))
+			r.POST("/rides", PostLocation(mockedLocationRepository))
 
 			request, err := http.NewRequest(http.MethodPost, "/rides", nil)
 			request.MultipartForm = &tt.Body

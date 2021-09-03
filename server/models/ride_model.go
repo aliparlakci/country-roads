@@ -1,7 +1,5 @@
 package models
 
-//go:generate mockgen -destination=../mocks/mock_ride_model.go -package=mocks github.com/aliparlakci/country-roads/models RideRepository,RideFinder,RideInserter,RideDeleter
-
 import (
 	"errors"
 	"fmt"
@@ -11,17 +9,17 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type Ride struct {
+type RideResponse struct {
 	ID          primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
 	Type        string             `bson:"type" json:"type"`
 	Date        time.Time          `bson:"date" json:"date" time_format:"unix"`
 	Direction   string             `bson:"direction" json:"direction"`
 	Destination Location           `bson:"destination" json:"destination"`
 	CreatedAt   time.Time          `bson:"createdAt" json:"createdAt" time_format:"unix"`
-	// Author      User               `bson:"author" json:"author"`
+	Owner       UserResponse       `bson:"owner" json:"owner"`
 }
 
-type Rides []Ride
+type Rides []RideResponse
 
 type NewRideForm struct {
 	Type        string    `bson:"type" json:"type" form:"type" binding:"required"`
@@ -37,6 +35,7 @@ type RideSchema struct {
 	Direction   string             `bson:"direction" json:"direction"`
 	Destination string             `bson:"destination" json:"destination"`
 	CreatedAt   time.Time          `bson:"createdAt" json:"createdAt,omitempty" time_format:"unix"`
+	Owner       primitive.ObjectID `bson:"owner" json:"owner"`
 }
 
 type SearchRideQueries struct {
@@ -115,7 +114,7 @@ func (n *NewRideForm) Bind(c *gin.Context) error {
 	return nil
 }
 
-func (r Ride) Jsonify() map[string]interface{} {
+func (r RideResponse) Jsonify() map[string]interface{} {
 	return map[string]interface{}{
 		"id":          r.ID.Hex(),
 		"type":        r.Type,
@@ -123,6 +122,7 @@ func (r Ride) Jsonify() map[string]interface{} {
 		"direction":   r.Direction,
 		"destination": r.Destination.Jsonify(),
 		"createdAt":   r.CreatedAt.Unix(),
+		"owner":       r.Owner.Jsonify(),
 	}
 }
 

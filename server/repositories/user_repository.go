@@ -1,5 +1,7 @@
 package repositories
 
+//go:generate mockgen -destination=../mocks/mock_user_repository.go -package=mocks github.com/aliparlakci/country-roads/repositories UserRepository,UserFinder,UserInserter,UserUpdater,UserFindUpdater,UserFindInserter
+
 import (
 	"context"
 	"github.com/aliparlakci/country-roads/models"
@@ -58,6 +60,6 @@ func (u *UserCollection) InsertOne(ctx context.Context, candidate models.UserSch
 }
 
 func (u *UserCollection) UpdateOne(ctx context.Context, filter interface{}, changes interface{}) error {
-	//TODO: Implement UpdateOne
-	return nil
+	_, err := u.Collection.UpdateOne(ctx, filter, changes)
+	return err
 }

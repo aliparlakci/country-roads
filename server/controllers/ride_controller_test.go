@@ -12,7 +12,6 @@ import (
 	"github.com/aliparlakci/country-roads/common"
 	"github.com/aliparlakci/country-roads/mocks"
 	"github.com/aliparlakci/country-roads/models"
-	"github.com/aliparlakci/country-roads/validators"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"go.mongodb.org/mongo-driver/bson"
@@ -126,7 +125,6 @@ func TestPostRide(t *testing.T) {
 			defer ctrl.Finish()
 			mockedRideInserter := mocks.NewMockRideInserter(ctrl)
 			mockedLocationFinder := mocks.NewMockLocationFinder(ctrl)
-			validator := validators.ValidatorFactory{LocationFinder: mockedLocationFinder}
 
 			if tt.Prepare != nil {
 				tt.Prepare(mockedRideInserter, mockedLocationFinder)
@@ -134,7 +132,7 @@ func TestPostRide(t *testing.T) {
 
 			recorder := httptest.NewRecorder()
 			_, r := gin.CreateTestContext(recorder)
-			r.POST("/rides", PostRides(mockedRideInserter, validator))
+			r.POST("/rides", PostRides(mockedRideInserter, mockedLocationFinder))
 
 			request, err := http.NewRequest(http.MethodPost, "/rides", nil)
 			request.MultipartForm = &tt.Body
@@ -173,7 +171,7 @@ func TestGetRide(t *testing.T) {
 			Prepare: func(finder *mocks.MockRideFinder) {
 				objID, _ := primitive.ObjectIDFromHex("551137c2f9e1fac808a5f572")
 				finder.EXPECT().FindMany(gomock.Any(), gomock.Any()).Return(models.Rides{
-					models.Ride{
+					models.RideResponse{
 						ID:        objID,
 						Direction: "to_campus",
 						Type:      "offer",
@@ -332,11 +330,11 @@ func TestSearchRidesMany(t *testing.T) {
 					StartDate:   time.Unix(1630227365, 0),
 					EndDate:     time.Unix(1630227365, 0),
 				}
-				pipeline := aggregations.BuildAggregation(aggregations.FilterRides(queries), aggregations.RideWithDestination)
+				pipeline := aggregations.BuildAggregation(aggregations.FilterRides(queries), aggregations.RideResponseAggregation)
 				finder.EXPECT().FindMany(gomock.Any(), pipeline).Return(models.Rides{
-					models.Ride{},
-					models.Ride{},
-					models.Ride{},
+					models.RideResponse{},
+					models.RideResponse{},
+					models.RideResponse{},
 				}, nil)
 			},
 			ExpectedCode:         http.StatusOK,
@@ -346,10 +344,10 @@ func TestSearchRidesMany(t *testing.T) {
 			Url: "/rides?it=should&ignore=this&queries=also",
 			Prepare: func(finder *mocks.MockRideFinder) {
 				queries := models.SearchRideQueries{}
-				pipeline := aggregations.BuildAggregation(aggregations.FilterRides(queries), aggregations.RideWithDestination)
+				pipeline := aggregations.BuildAggregation(aggregations.FilterRides(queries), aggregations.RideResponseAggregation)
 				finder.EXPECT().FindMany(gomock.Any(), pipeline).Return(models.Rides{
-					models.Ride{},
-					models.Ride{},
+					models.RideResponse{},
+					models.RideResponse{},
 				}, nil)
 			},
 			ExpectedCode:         http.StatusOK,
@@ -359,12 +357,12 @@ func TestSearchRidesMany(t *testing.T) {
 			Url: "/rides",
 			Prepare: func(finder *mocks.MockRideFinder) {
 				queries := models.SearchRideQueries{}
-				pipeline := aggregations.BuildAggregation(aggregations.FilterRides(queries), aggregations.RideWithDestination)
+				pipeline := aggregations.BuildAggregation(aggregations.FilterRides(queries), aggregations.RideResponseAggregation)
 				finder.EXPECT().FindMany(gomock.Any(), pipeline).Return(models.Rides{
-					models.Ride{},
-					models.Ride{},
-					models.Ride{},
-					models.Ride{},
+					models.RideResponse{},
+					models.RideResponse{},
+					models.RideResponse{},
+					models.RideResponse{},
 				}, nil)
 			},
 			ExpectedCode:         http.StatusOK,
@@ -409,13 +407,13 @@ func TestSearchRidesMany(t *testing.T) {
 func TestDeleteRide(t *testing.T) {
 	tests := []struct {
 		Url          string
-		Prepare      func(finder *mocks.MockRideDeleter)
+		Prepare      func(finder *mocks.MockRideRepository)
 		ExpectedCode int
 		ExpectedBody gin.H
 	}{
 		{
 			Url: "/rides/551137c2f9e1fac808a5f572",
-			Prepare: func(finder *mocks.MockRideDeleter) {
+			Prepare: func(finder *mocks.MockRideRepository) {
 				objID, _ := primitive.ObjectIDFromHex("551137c2f9e1fac808a5f572")
 				finder.EXPECT().DeleteOne(gomock.Any(), bson.M{"_id": objID}).Return(int64(1), nil)
 			},
@@ -424,7 +422,7 @@ func TestDeleteRide(t *testing.T) {
 		},
 		{
 			Url: "/rides/tooshort",
-			Prepare: func(finder *mocks.MockRideDeleter) {
+			Prepare: func(finder *mocks.MockRideRepository) {
 				finder.EXPECT().DeleteOne(gomock.Any(), gomock.Any()).Times(0)
 			},
 			ExpectedCode: http.StatusBadRequest,
@@ -432,7 +430,7 @@ func TestDeleteRide(t *testing.T) {
 		},
 		{
 			Url: "/rides/551137c2f9e1fac808a5f572",
-			Prepare: func(finder *mocks.MockRideDeleter) {
+			Prepare: func(finder *mocks.MockRideRepository) {
 				finder.EXPECT().DeleteOne(gomock.Any(), gomock.Any()).Return(int64(0), fmt.Errorf("cikolatayi severim"))
 			},
 			ExpectedCode: http.StatusInternalServerError,
@@ -440,7 +438,7 @@ func TestDeleteRide(t *testing.T) {
 		},
 		{
 			Url: "/rides/551137c2f9e1fac808a5f572",
-			Prepare: func(finder *mocks.MockRideDeleter) {
+			Prepare: func(finder *mocks.MockRideRepository) {
 				finder.EXPECT().DeleteOne(gomock.Any(), gomock.Any()).Return(int64(0), nil)
 			},
 			ExpectedCode: http.StatusNotFound,
@@ -453,15 +451,15 @@ func TestDeleteRide(t *testing.T) {
 		t.Run(testName, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
-			mockedRideDeleter := mocks.NewMockRideDeleter(ctrl)
+			mockedRideRepository := mocks.NewMockRideRepository(ctrl)
 
 			if tt.Prepare != nil {
-				tt.Prepare(mockedRideDeleter)
+				tt.Prepare(mockedRideRepository)
 			}
 
 			recorder := httptest.NewRecorder()
 			_, r := gin.CreateTestContext(recorder)
-			r.GET("/rides/:id", DeleteRides(mockedRideDeleter))
+			r.GET("/rides/:id", DeleteRides(mockedRideRepository))
 
 			request, err := http.NewRequest(http.MethodGet, tt.Url, nil)
 			if err != nil {

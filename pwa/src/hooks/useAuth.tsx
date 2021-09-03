@@ -1,5 +1,5 @@
 import React, { createContext, useContext } from 'react'
-import useSWR, { mutate } from 'swr'
+import useSWR from 'swr'
 import CONSTANTS from '../constants'
 import { IUser } from '../types/user'
 

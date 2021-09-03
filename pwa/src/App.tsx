@@ -1,5 +1,5 @@
 import React from 'react'
-import { Route, Switch, Link } from 'react-router-dom'
+import { Route, Switch, Link, Redirect } from 'react-router-dom'
 import styled from 'styled-components'
 
 import CONSTANTS from './constants'
@@ -11,8 +11,11 @@ import RegisterView from './views/RegisterView'
 import ProfileView from './views/ProfileView'
 import Navbar from './components/Navbar'
 import LogoutView from './views/LogoutView'
+import useAuth from './hooks/useAuth'
 
 export default function App() {
+    const { user } = useAuth()
+
     return (
         <StyledContainer>
             <Link to="/">
@@ -40,6 +43,7 @@ export default function App() {
                     <LogoutView />
                 </Route>
                 <Route path={CONSTANTS.ROUTES.ME}>
+                    {!user && <Redirect to={CONSTANTS.ROUTES.RIDES.MAIN} />}
                     <ProfileView />
                 </Route>
             </Switch>

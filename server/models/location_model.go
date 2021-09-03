@@ -1,7 +1,5 @@
 package models
 
-//go:generate mockgen -destination=../mocks/mock_location_model.go -package=mocks github.com/aliparlakci/country-roads/models LocationFinder,LocationInserter,LocationRepository
-
 import (
 	"errors"
 	"github.com/gin-gonic/gin"

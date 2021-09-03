@@ -1,19 +1,22 @@
 import React from 'react'
 import styled from 'styled-components'
-import { mutate } from 'swr'
 import CONSTANTS from '../constants'
+import useAuth from '../hooks/useAuth'
 import IRide from '../types/ride'
 import capitalize from '../utils/capitalize'
+import mutateWithQueries from '../utils/mutateWithQueries'
 
 export interface IRideItemProps {
     ride: IRide
 }
 
 export default function RideItem({ ride }: IRideItemProps) {
+    const { user } = useAuth()
+
     const doDelete = async () => {
         try {
             await fetch(CONSTANTS.API.RIDE(ride.id), { method: 'delete' })
-            mutate(CONSTANTS.API.RIDES)
+            mutateWithQueries(CONSTANTS.API.RIDES)
         } catch (err) {
             console.error(err)
         }
@@ -23,9 +26,11 @@ export default function RideItem({ ride }: IRideItemProps) {
         <RideItemContainer>
             <TitleArea>
                 <b>{capitalize(ride.type)}</b>
-                <CloseButton onClick={doDelete}>
-                    <b>X</b>
-                </CloseButton>
+                {ride.owner.id === user?.id && (
+                    <CloseButton onClick={doDelete}>
+                        <b>X</b>
+                    </CloseButton>
+                )}
             </TitleArea>
             <span>
                 From{' '}
@@ -40,6 +45,7 @@ export default function RideItem({ ride }: IRideItemProps) {
                     : ride.destination.display}
             </span>
             <i>on {new Date(ride.date * 1000).toDateString()}</i>
+            <span>{ride.owner.displayName}</span>
         </RideItemContainer>
     )
 }
