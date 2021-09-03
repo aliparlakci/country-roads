@@ -14,48 +14,48 @@ import LogoutView from './views/LogoutView'
 import useAuth from './hooks/useAuth'
 
 export default function App() {
-    const { user } = useAuth()
+  const { user } = useAuth()
 
-    return (
-        <StyledContainer>
-            <Link to="/">
-                <h1>Country Roads</h1>
-            </Link>
-            <Navbar />
+  return (
+    <StyledContainer>
+      <Link to="/">
+        <h1>Country Roads</h1>
+      </Link>
+      <Navbar />
 
-            <Switch>
-                <Route exact path={CONSTANTS.ROUTES.RIDES.NEW}>
-                    <CreateRideView />
-                </Route>
-                <Route path={CONSTANTS.ROUTES.RIDES.DETAILS}>
-                    <RideDetailsView />
-                </Route>
-                <Route path={CONSTANTS.ROUTES.RIDES.MAIN}>
-                    <MainView />
-                </Route>
-                <Route path={CONSTANTS.ROUTES.LOGIN}>
-                    <LoginView />
-                </Route>
-                <Route path={CONSTANTS.ROUTES.REGISTER}>
-                    <RegisterView />
-                </Route>
-                <Route path={CONSTANTS.ROUTES.LOGOUT}>
-                    <LogoutView />
-                </Route>
-                <Route path={CONSTANTS.ROUTES.ME}>
-                    {!user && <Redirect to={CONSTANTS.ROUTES.RIDES.MAIN} />}
-                    <ProfileView />
-                </Route>
-            </Switch>
-        </StyledContainer>
-    )
+      <Switch>
+        <Route exact path={CONSTANTS.ROUTES.RIDES.NEW}>
+          <CreateRideView />
+        </Route>
+        <Route path={CONSTANTS.ROUTES.RIDES.DETAILS}>
+          <RideDetailsView />
+        </Route>
+        <Route path={CONSTANTS.ROUTES.RIDES.MAIN}>
+          <MainView />
+        </Route>
+        <Route path={CONSTANTS.ROUTES.LOGIN}>
+          <LoginView />
+        </Route>
+        <Route path={CONSTANTS.ROUTES.REGISTER}>
+          <RegisterView />
+        </Route>
+        <Route path={CONSTANTS.ROUTES.LOGOUT}>
+          <LogoutView />
+        </Route>
+        <Route path={CONSTANTS.ROUTES.ME}>
+          {!user && <Redirect to={CONSTANTS.ROUTES.RIDES.MAIN} />}
+          <ProfileView />
+        </Route>
+      </Switch>
+    </StyledContainer>
+  )
 }
 
 const StyledContainer = styled.div`
-    display: flex;
-    justify-items: center;
-    align-items: center;
-    flex-direction: column;
-    width: 100%;
-    gap: 1rem;
+  display: flex;
+  justify-items: center;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
+  gap: 1rem;
 `
