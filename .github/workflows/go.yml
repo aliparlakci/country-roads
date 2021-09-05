@@ -24,6 +24,6 @@ jobs:
 
     - name: Test
       working-directory: ./server
-      run: go test -v github.com/aliparlakci/country-roads/
+      run: go test -v github.com/aliparlakci/country-roads/...
       env:
         GIN_MODE: release
