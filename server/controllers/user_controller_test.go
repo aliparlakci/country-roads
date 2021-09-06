@@ -12,7 +12,6 @@ import (
 	"github.com/aliparlakci/country-roads/common"
 	"github.com/aliparlakci/country-roads/mocks"
 	"github.com/aliparlakci/country-roads/models"
-	"github.com/aliparlakci/country-roads/validators"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"go.mongodb.org/mongo-driver/bson"

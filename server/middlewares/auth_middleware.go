@@ -1,6 +1,8 @@
 package middlewares
 
 import (
+	"net/http"
+
 	"github.com/aliparlakci/country-roads/common"
 	"github.com/aliparlakci/country-roads/repositories"
 	"github.com/aliparlakci/country-roads/services"
@@ -8,7 +10,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"net/http"
 )
 
 func AuthMiddleware(userFinder repositories.UserFinder, sessions services.SessionService) gin.HandlerFunc {
@@ -27,6 +28,7 @@ func AuthMiddleware(userFinder repositories.UserFinder, sessions services.Sessio
 		}
 
 		userId, err := sessions.FetchSession(c.Copy(), sessionId)
+		c.Header("Set-Cookie", "session=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;")
 		if err != nil {
 			logger.WithField("session_id", sessionId).Errorf("sessions.FetchSession raised an error when fetching session with session_id: %v", err.Error())
 			c.Next()

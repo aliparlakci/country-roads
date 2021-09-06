@@ -1,12 +1,13 @@
 package main
 
 import (
+	"os"
+
 	"github.com/aliparlakci/country-roads/middlewares"
 	"github.com/aliparlakci/country-roads/repositories"
 	"github.com/aliparlakci/country-roads/services"
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
-	"os"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -26,20 +27,24 @@ func main() {
 
 	env := &common.Env{}
 	{
-		dbUri := os.Getenv("MDB_URI")
-		dbName := "country-roads"
-		db, close := common.InitializeDb(dbUri, dbName)
+		db, close := common.InitializeDb(
+			os.Getenv("MDB_URI"),
+			os.Getenv("MDB_DBNAME"),
+			os.Getenv("MDB_USERNAME"),
+			os.Getenv("MDB_PASSWORD"),
+		)
 		defer close()
 
 		rdbUri := os.Getenv("RDB_URI")
+		redis := common.RedisInitilizer(rdbUri, os.Getenv("RDB_PASSWORD"))
 		env.Repositories = &common.RepositoryContainer{
 			RideRepository:     &repositories.RideCollection{Collection: db.Collection("rides")},
 			LocationRepository: &repositories.LocationCollection{Collection: db.Collection("locations")},
 			UserRepository:     &repositories.UserCollection{Collection: db.Collection("users")},
 		}
 		env.Services = &common.ServiceContainer{
-			SessionService: &services.SessionStore{Store: common.InitializeRedis(rdbUri, "", 0)},
-			OTPService:     &services.OTPStore{Store: common.InitializeRedis(rdbUri, "", 1)},
+			SessionService: &services.SessionStore{Store: redis(0)},
+			OTPService:     &services.OTPStore{Store: redis(1)},
 		}
 	}
 
@@ -66,5 +71,5 @@ func main() {
 		controllers.RegisterAuthController(api, env)
 	}
 
-	router.Run(":8080")
+	router.Run(":5000")
 }

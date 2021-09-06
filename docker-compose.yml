@@ -1,0 +1,42 @@
+version: '3.4'
+services:
+  server:
+    build: 
+      context: server
+    restart: always
+    depends_on:
+      - database
+    env_file: .env
+
+  database:
+    image: 'mongo'
+    restart: always
+    env_file: .env
+    volumes:
+      - ./volumes/mongo:/data/db
+    ports:
+      - '27017:27017'
+
+  pwa:
+    build:
+      context: pwa
+    restart: always
+
+  redis:
+    image: "redis:alpine"
+    restart: always
+    env_file: .env
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./volumes/redis:/data
+
+  proxy:
+    build: 
+      context: proxy
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - server
+      - pwa
