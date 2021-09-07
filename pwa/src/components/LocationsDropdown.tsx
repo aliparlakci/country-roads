@@ -7,20 +7,21 @@ export interface ILocationsDropdownProps
     React.SelectHTMLAttributes<HTMLSelectElement>,
     HTMLSelectElement
   > {
-  onData: CallableFunction
+  children?: any
+  onData?: CallableFunction
 }
 
 export default function LocationsDropdown(props: ILocationsDropdownProps) {
-  const { onData } = props
+  const { onData, children } = props
   const { data: locationResponse } = useLocations()
 
-  useEffect(() => locationResponse && onData(), [onData, locationResponse])
+  useEffect(() => locationResponse && onData && onData(), [onData, locationResponse])
 
   return (
     <select {...props}>
       {locationResponse && locationResponse.results && (
         <>
-          <option value="none">None</option>
+          {children}
           {locationResponse?.results?.map((location) => (
             <option key={location.key} value={location.key}>
               {location.display}

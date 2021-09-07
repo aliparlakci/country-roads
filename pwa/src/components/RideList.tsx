@@ -14,17 +14,17 @@ export default function RideList(props: IRideListProps) {
   if (data && data.error) return <div>Error</div>
 
   return (
-    <RideListContainer>
+    <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-5">
       {data &&
         data.results &&
         data.results.map((ride, i) => <RideItem key={i} ride={ride} />)}
-    </RideListContainer>
+    </div>
   )
 }
 
-const RideListContainer = styled.div`
+const div = styled.div`
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: 1fr 1fr 1fr;
   grid-template-rows: auto;
   flex-direction: column;
   gap: 0.5rem;

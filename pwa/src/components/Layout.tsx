@@ -15,7 +15,7 @@ export default function Layout({ children }: any) {
       <Transition.Root show={sidebarOpen} as={Fragment}>
         <Dialog
           as="div"
-          className="fixed inset-0 flex z-40 md:hidden"
+          className="fixed inset-0 flex z-40 lg:hidden"
           onClose={setSidebarOpen}
         >
           <Transition.Child
@@ -50,7 +50,6 @@ export default function Layout({ children }: any) {
               >
                 <div className="absolute top-0 right-0 -mr-12 pt-2">
                   <button
-                    type="button"
                     className="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
                     onClick={() => setSidebarOpen(false)}
                   >
@@ -59,7 +58,9 @@ export default function Layout({ children }: any) {
                   </button>
                 </div>
               </Transition.Child>
-              <Sidenav />
+              <div className="bg-indigo-700 h-full">
+                <Sidenav dark={true} />
+              </div>
             </div>
           </Transition.Child>
           <div className="flex-shrink-0 w-14" aria-hidden="true">
@@ -69,16 +70,11 @@ export default function Layout({ children }: any) {
       </Transition.Root>
 
       {/* Static sidebar for desktop */}
-      <div className="hidden md:flex md:flex-shrink-0">
-        <div className="w-64">
-          <Sidenav />
-        </div>
-      </div>
-      <div className="flex flex-col w-0 flex-1 overflow-hidden">
+      <div className="flex flex-col w-screen flex-1 overflow-hidden">
         <div className="relative z-10 flex-shrink-0 flex items-center h-16 bg-white shadow">
           <button
             type="button"
-            className="px-4 border-r border-gray-200 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 md:hidden"
+            className="px-4 border-r border-gray-200 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 lg:hidden"
             onClick={() => setSidebarOpen(true)}
           >
             <span className="sr-only">Open sidebar</span>
@@ -98,7 +94,7 @@ export default function Layout({ children }: any) {
               {user && (
                 <Link
                   to={CONSTANTS.ROUTES.RIDES.NEW}
-                  className="flex border-2 border-indigo-600 hover:border-indigo-800 text-indigo-600 hover:text-indigo-800 group items-center px-4 py-2 text-base font-medium rounded-full shadow max-h-12 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 border-transparent"
+                  className="flex border-2 border-indigo-600 hover:bg-indigo-600 text-indigo-600 hover:text-white transition group items-center px-4 py-2 text-base font-medium rounded-full shadow max-h-12 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 border-transparent"
                 >
                   New Post
                 </Link>
@@ -106,8 +102,16 @@ export default function Layout({ children }: any) {
             </div>
           </div>
         </div>
-
-        <main className="my-6 px-4 sm:px-6 md:px-8">{children}</main>
+        <div className="flex flex-row justify-center items-start h-full w-full">
+          <div className="hidden lg:flex md:flex-shrink-0 w-64 h-full">
+            <Sidenav dark={false} />
+          </div>
+          <main
+            className="my-6 px-4 w-full sm:px-6 md:px-8 max-w-4xl"
+          >
+            {children}
+          </main>
+        </div>
       </div>
     </div>
   )
