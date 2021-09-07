@@ -10,6 +10,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"net/http"
+	"os"
 )
 
 func Login(otpService services.OTPService, finder repositories.UserFinder) gin.HandlerFunc {
@@ -93,7 +94,11 @@ func Verify(otpService services.OTPService, sessions services.SessionService, us
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "cannot log in"})
 			return
 		}
-		c.Header("Set-Cookie", fmt.Sprintf("session=%v; Max-Age=7776000; path=/;", sessionId))
+		if os.Getenv("GIN_MODE") == "release" {
+			c.SetCookie("session", sessionId, 7776000, "/", "tuzlapool.xyz", false, false)
+		} else {
+			c.SetCookie("session", sessionId, 7776000, "/", "localhost", false, false)
+		}
 
 		if err := otpService.RevokeOTP(user.ID.Hex()); err != nil {
 			logger.WithField("user_id", user.ID.Hex()).Warn("cannot revoke otp for user with user_id: %v", err.Error())

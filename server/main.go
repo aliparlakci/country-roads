@@ -36,7 +36,7 @@ func main() {
 		defer close()
 
 		rdbUri := os.Getenv("RDB_URI")
-		redis := common.RedisInitilizer(rdbUri, os.Getenv("RDB_PASSWORD"))
+		redis := common.RedisInitializer(rdbUri, os.Getenv("RDB_PASSWORD"))
 		env.Repositories = &common.RepositoryContainer{
 			RideRepository:     &repositories.RideCollection{Collection: db.Collection("rides")},
 			LocationRepository: &repositories.LocationCollection{Collection: db.Collection("locations")},

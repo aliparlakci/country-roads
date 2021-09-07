@@ -13,11 +13,16 @@ func InitializeDb(uri, name, username, password string) (database *mongo.Databas
 	c, cancel := context.WithTimeout(context.TODO(), 10*time.Second)
 	defer cancel()
 
-	credentials := options.Credential{
-		Username: username,
-		Password: password,
+	clientOptions := options.Client()
+	if username != "" {
+		credentials := options.Credential{
+			Username: username,
+			Password: password,
+		}
+		clientOptions = clientOptions.SetAuth(credentials)
 	}
-	client, err := mongo.Connect(c, options.Client().SetAuth(credentials).ApplyURI(uri))
+
+	client, err := mongo.Connect(c, clientOptions.ApplyURI(uri))
 	if err != nil {
 		panic(err)
 	}
@@ -33,7 +38,7 @@ func InitializeDb(uri, name, username, password string) (database *mongo.Databas
 	return
 }
 
-func RedisInitilizer(uri, password string) func(db int) *redis.Client {
+func RedisInitializer(uri, password string) func(db int) *redis.Client {
 	return func(db int) *redis.Client {
 		return redis.NewClient(&redis.Options{
 			Addr:     uri,

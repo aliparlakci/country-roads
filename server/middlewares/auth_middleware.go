@@ -28,9 +28,9 @@ func AuthMiddleware(userFinder repositories.UserFinder, sessions services.Sessio
 		}
 
 		userId, err := sessions.FetchSession(c.Copy(), sessionId)
-		c.Header("Set-Cookie", "session=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;")
 		if err != nil {
 			logger.WithField("session_id", sessionId).Errorf("sessions.FetchSession raised an error when fetching session with session_id: %v", err.Error())
+			c.Header("Set-Cookie", "session=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;")
 			c.Next()
 			return
 		}
@@ -38,6 +38,7 @@ func AuthMiddleware(userFinder repositories.UserFinder, sessions services.Sessio
 		objId, err := primitive.ObjectIDFromHex(userId)
 		if err != nil {
 			logger.WithField("user_id", userId).Errorf("cannot create objID from user_id: %v", err.Error())
+			c.Header("Set-Cookie", "session=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;")
 			c.Next()
 			return
 		}
@@ -45,11 +46,13 @@ func AuthMiddleware(userFinder repositories.UserFinder, sessions services.Sessio
 		user, err := userFinder.FindOne(c.Copy(), bson.M{"_id": objId})
 		if err == mongo.ErrNoDocuments {
 			logger.WithField("user_id", objId.Hex()).Debug("user with user_id does not exist")
+			c.Header("Set-Cookie", "session=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;")
 			c.Next()
 			return
 		}
 		if err != nil {
 			logger.WithField("user_id", user.ID.Hex()).Errorf("UserFinder.FindOne() raised an error while finding user with user_id: %v", err.Error())
+			c.Header("Set-Cookie", "session=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;")
 			c.Next()
 			return
 		}
