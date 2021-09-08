@@ -41,9 +41,8 @@ func InitializeDb(uri, name, username, password string) (database *mongo.Databas
 func RedisInitializer(uri, password string) func(db int) *redis.Client {
 	return func(db int) *redis.Client {
 		return redis.NewClient(&redis.Options{
-			Addr:     uri,
-			Password: password,
-			DB:       db,
+			Addr: uri,
+			DB:   db,
 		})
 	}
 }
