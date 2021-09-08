@@ -1,6 +1,5 @@
 import React from 'react'
-import { Route, Switch, Link, Redirect } from 'react-router-dom'
-import styled from 'styled-components'
+import { Route, Switch, Redirect } from 'react-router-dom'
 
 import CONSTANTS from './constants'
 import MainView from './views/MainView'
@@ -9,23 +8,26 @@ import RideDetailsView from './views/RideDetailsView'
 import LoginView from './views/LoginView'
 import RegisterView from './views/RegisterView'
 import ProfileView from './views/ProfileView'
-import Navbar from './components/Navbar'
 import LogoutView from './views/LogoutView'
 import useAuth from './hooks/useAuth'
 import Layout from './components/Layout'
+import OTPView from './views/OTPView'
 
 export default function App() {
   const { user } = useAuth()
 
   return (
     <Switch>
-      <Route exact path={CONSTANTS.ROUTES.LOGIN}>
+      <Route path={CONSTANTS.ROUTES.LOGIN}>
         <LoginView />
       </Route>
-      <Route exact path={CONSTANTS.ROUTES.REGISTER}>
+      <Route path={CONSTANTS.ROUTES.REGISTER}>
         <RegisterView />
       </Route>
-      <Route exact path={CONSTANTS.ROUTES.LOGOUT}>
+      <Route path={CONSTANTS.ROUTES.OTP}>
+        <OTPView />
+      </Route>
+      <Route path={CONSTANTS.ROUTES.LOGOUT}>
         <LogoutView />
       </Route>
 

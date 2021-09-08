@@ -15,7 +15,10 @@ export default function LocationsDropdown(props: ILocationsDropdownProps) {
   const { onData, children } = props
   const { data: locationResponse } = useLocations()
 
-  useEffect(() => locationResponse && onData && onData(), [onData, locationResponse])
+  useEffect(
+    () => locationResponse && onData && onData(),
+    [onData, locationResponse],
+  )
 
   return (
     <select {...props}>

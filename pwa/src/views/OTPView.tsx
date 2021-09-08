@@ -1,8 +1,8 @@
-import React from 'react'
-import { useLocation } from 'react-router-dom'
-import LoginForm from '../components/LoginForm'
+import OTPForm from '../components/OTPForm'
+import { Redirect, useLocation } from 'react-router-dom'
+import CONSTANTS from '../constants'
 
-export default function LoginView() {
+export default function OTPView() {
   const { search } = useLocation()
   const params = new URLSearchParams(search)
   const email = params.get('email')
@@ -10,7 +10,8 @@ export default function LoginView() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <LoginForm email={email || ""} />
+        {!email && <Redirect to={CONSTANTS.ROUTES.LOGIN} /> }
+        <OTPForm email={params.get('email') || ""} />
       </div>
     </div>
   )

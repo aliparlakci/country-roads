@@ -1,12 +1,11 @@
 import React from 'react'
-import styled from 'styled-components'
+import { Disclosure } from '@headlessui/react'
+import { ArrowDownIcon, ArrowUpIcon } from '@heroicons/react/outline'
 
 import RideList from '../components/RideList'
 import useQuery from '../hooks/useQuery'
 import { IRideQuery } from '../hooks/useRides'
 import RideFilter from '../components/RideFilter'
-import { Disclosure } from '@headlessui/react'
-import { ArrowDownIcon, ArrowUpIcon } from '@heroicons/react/outline'
 
 export default function MainView() {
   const params = useQuery()
@@ -19,7 +18,7 @@ export default function MainView() {
   }
 
   return (
-    <StyledContainer>
+    <div className="flex flex-col gap-4 h-full w-full">
       <Disclosure>
         <Disclosure.Button
           as="button"
@@ -28,7 +27,7 @@ export default function MainView() {
           {({ open }) => (
             <div className="flex items-center gap-1 ml-2 text-black">  
               Filters
-              {!open && <ArrowDownIcon className="h-4" />}
+              {!open && <ArrowDownIcon className="animate-bounce h-4" />}
               {open && <ArrowUpIcon className="h-4" />}
             </div>
           )}
@@ -38,21 +37,6 @@ export default function MainView() {
         </Disclosure.Panel>
       </Disclosure>
       <RideList {...query} />
-    </StyledContainer>
+    </div>
   )
 }
-
-const StyledContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-
-  height: 100%;
-  width: 100%;
-`
-
-const ColumnView = styled.div`
-  display: flex;
-  flex-direction: row;
-  gap: 2rem;
-`
