@@ -5,17 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2184203d-af06-4b3d-8c06-bb8cd61e9c5c" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../pwa/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/../pwa/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../pwa/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../pwa/src/App.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../pwa/src/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/../pwa/src/index.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../pwa/src/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../pwa/src/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../pwa/src/views/TailwindView.jsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../pwa/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/../pwa/yarn.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/database.go" beforeDir="false" afterPath="$PROJECT_DIR$/common/database.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/controllers/auth_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/auth_controller.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/middlewares/auth_middleware.go" beforeDir="false" afterPath="$PROJECT_DIR$/middlewares/auth_middleware.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

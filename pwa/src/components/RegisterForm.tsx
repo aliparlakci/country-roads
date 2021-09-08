@@ -1,91 +1,77 @@
-import React, { useState } from 'react'
-import styled from 'styled-components'
-import { mutate } from 'swr'
+import React from 'react'
 
-import CONSTANTS from '../constants'
-
-export interface IRegisterFormProps {}
-
-export default function RegisterForm(props: IRegisterFormProps) {
-  const [disabled, setDisabled] = useState(false)
-
-  const handleSubmit = async (event: any) => {
-    event.preventDefault()
-    setDisabled(true)
-
-    const formData = new FormData(event.currentTarget)
-
-    try {
-      await fetch(CONSTANTS.API.USERS, {
-        method: 'POST',
-        body: formData,
-      })
-    } catch (e) {
-      console.error(e)
-    }
-
-    mutate(CONSTANTS.API.USERS)
-
-    event.target.reset()
-    setDisabled(false)
-  }
-
+export default function RegisterForm() {
   return (
-    <StyledForm onSubmit={handleSubmit}>
-      <FormItem>
-        <span>Name:</span>
-        <input
-          type="text"
-          name="displayName"
-          placeholder="Enter your name..."
-          required
-        />
-      </FormItem>
+    <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+      <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+        <form className="space-y-6" action="#" method="POST">
+          <div>
+            <label
+              htmlFor="name"
+              className="block text-base sm:text-sm font-medium text-gray-700"
+            >
+              Name
+            </label>
+            <div className="mt-1">
+              <input
+                id="name"
+                name="name"
+                type="name"
+                autoComplete="name"
+                className="appearance-none block w-full px-3 py-2 border-2 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-base sm:text-sm"
+                required
+              />
+            </div>
+          </div>
 
-      <FormItem>
-        <span>Email (@sabanciuniv email):</span>
-        <input
-          type="email"
-          name="email"
-          placeholder="@sabanciuniv.edu"
-          pattern="^.+@sabanciuniv\.edu$"
-          required
-        />
-      </FormItem>
+          <div>
+            <label
+              htmlFor="email"
+              className="block text-base sm:text-sm font-medium text-gray-700"
+            >
+              Email address
+            </label>
+            <div className="mt-1">
+              <input
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                required
+                className="appearance-none block w-full px-3 py-2 border-2 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-base sm:text-sm"
+              />
+            </div>
+          </div>
 
-      <FormItem>
-        <span>Phone:</span>
-        <div>
-          <input
-            type="tel"
-            name="phone"
-            pattern="^(\+|)([0-9]{1,3})([0-9]{10})$"
-            required
-          />
-        </div>
-      </FormItem>
+          <div>
+            <label
+              htmlFor="email"
+              className="block text-base sm:text-sm font-medium text-gray-700"
+            >
+              Phone
+            </label>
+            <div className="mt-1">
+              <input
+                id="phone"
+                name="phone"
+                type="tel"
+                autoComplete="tel"
+                required
+                className="appearance-none block w-full px-3 py-2 border-2 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-base sm:text-sm"
+              />
+            </div>
+          </div>
 
-      <input type="submit" value="Register" disabled={disabled} />
-    </StyledForm>
+          <div>
+            <button
+              type="submit"
+              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-base sm:text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+              Register
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   )
 }
-
-const StyledForm = styled.form`
-  width: 16rem;
-
-  display: flex;
-  flex-direction: column;
-  padding: 1rem;
-  gap: 1rem;
-
-  border-radius: 1rem;
-  border: 1px solid lightgrey;
-`
-
-const FormItem = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: start;
-  gap: 0.25rem;
-`

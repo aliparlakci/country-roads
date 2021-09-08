@@ -11,7 +11,13 @@ export default function Layout({ children }: any) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
-    <div className="h-screen flex overflow-hidden bg-gray-100">
+    <div
+      className="flex bg-gray-100"
+      style={{ height: 'min-content', minHeight: '100vh' }}
+    >
+      <div className="hidden lg:flex md:flex-shrink-0 w-64 h-screen bg-indigo-700">
+        <Sidenav dark />
+      </div>
       <Transition.Root show={sidebarOpen} as={Fragment}>
         <Dialog
           as="div"
@@ -70,7 +76,7 @@ export default function Layout({ children }: any) {
       </Transition.Root>
 
       {/* Static sidebar for desktop */}
-      <div className="flex flex-col w-screen flex-1 overflow-hidden">
+      <div className="flex flex-col w-screen flex-1">
         <div className="relative z-10 flex-shrink-0 flex items-center h-16 bg-white shadow">
           <button
             type="button"
@@ -103,12 +109,7 @@ export default function Layout({ children }: any) {
           </div>
         </div>
         <div className="flex flex-row justify-center items-start h-full w-full">
-          <div className="hidden lg:flex md:flex-shrink-0 w-64 h-full">
-            <Sidenav dark={false} />
-          </div>
-          <main
-            className="my-6 px-4 w-full sm:px-6 md:px-8 max-w-4xl"
-          >
+          <main className="my-6 px-4 w-full sm:px-6 md:px-8 max-w-4xl">
             {children}
           </main>
         </div>

@@ -76,14 +76,14 @@ function MenuItem({ label, Icon, href, current, dark }: IMenuItemProps) {
       className={cn(
         'group flex items-center px-2 py-2 text-base font-medium rounded-md hover:bg-indigo-600',
         { 'text-indigo-200 hover:text-white': dark },
-        { 'text-indigo-700 hover:text-white': !dark },
+        { 'text-black hover:text-white': !dark },
       )}
     >
       <Icon
         className={cn(
           'mr-4 flex-shrink-0 h-6 w-6 group-hover:text-white',
           { 'text-indigo-200': dark },
-          { 'text-indigo-700': !dark },
+          { 'text-black': !dark },
         )}
         aria-hidden="true"
       />
@@ -98,11 +98,11 @@ function Credits({ dark }: { dark?: boolean }) {
       <div
         className={cn(
           { 'text-indigo-200': dark },
-          { 'text-indigo-700': !dark },
+          { 'text-gray-500': !dark },
           'text-sm text-left select-none',
         )}
       >
-        This project is developed by <b>Ali Parlakçı</b>
+        {/* This project is developed by <b>Ali Parlakçı</b> */}
       </div>
       <div className="gap-2 justify-center flex flex-col">
         <div className="flex items-center">
@@ -111,14 +111,14 @@ function Credits({ dark }: { dark?: boolean }) {
             className={cn(
               'text-xl',
               { 'text-indigo-200': dark },
-              { 'text-indigo-700': !dark },
+              { 'text-gray-500': !dark },
             )}
           />
           <a
             href="https://github.com/aliparlakci"
             className={cn(
               { 'text-indigo-200': dark },
-              { 'text-indigo-700': !dark },
+              { 'text-gray-500': !dark },
               'text-sm pl-2',
             )}
           >
@@ -130,7 +130,7 @@ function Credits({ dark }: { dark?: boolean }) {
             className={cn(
               'inline-block h-5',
               { 'text-indigo-200': dark },
-              { 'text-indigo-700': !dark },
+              { 'text-gray-500': !dark },
             )}
           />
           <a
@@ -138,7 +138,7 @@ function Credits({ dark }: { dark?: boolean }) {
             className={cn(
               'text-sm pl-2',
               { 'text-indigo-200': dark },
-              { 'text-indigo-700': !dark },
+              { 'text-gray-500': !dark },
             )}
           >
             aliparlakci@sabanciuniv.edu
@@ -168,7 +168,7 @@ function UserInfo({ dark }: { dark?: boolean }) {
                 className={cn(
                   'text-sm font-medium',
                   { 'text-white': dark },
-                  { 'text-blue-700': !dark },
+                  { 'text-black': !dark },
                 )}
               >
                 {user.displayName}
@@ -177,7 +177,7 @@ function UserInfo({ dark }: { dark?: boolean }) {
                 className={cn(
                   'text-xs font-medium',
                   { 'text-indigo-200': dark },
-                  { 'text-blue-700': !dark },
+                  { 'text-black': !dark },
                 )}
               >
                 {user.email}
@@ -188,9 +188,9 @@ function UserInfo({ dark }: { dark?: boolean }) {
         <Link
           to={CONSTANTS.ROUTES.LOGOUT}
           className={cn(
-            'transition w-full flex justify-center items-center text-sm h-8 rounded-full border-2  hover:border-red-500  hover:text-red-500',
+            'transition w-full flex justify-center items-center text-sm h-8 rounded-full border-2  hover:border-red-500 font-bold hover:text-red-500',
             { 'text-white border-white': dark },
-            { 'text-blue-700 border-blue-700': !dark },
+            { 'text-black border-black': !dark },
           )}
         >
           Sign out

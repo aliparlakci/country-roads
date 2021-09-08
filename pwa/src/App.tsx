@@ -44,6 +44,7 @@ export default function App() {
             {!user && <Redirect to={CONSTANTS.ROUTES.RIDES.MAIN} />}
             <ProfileView />
           </Route>
+          <Redirect to={CONSTANTS.ROUTES.RIDES.MAIN} />
         </Switch>
       </Layout>
     </Switch>

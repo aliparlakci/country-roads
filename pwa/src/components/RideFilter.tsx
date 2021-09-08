@@ -48,7 +48,7 @@ export default function RideFilter() {
         </select>
         <label
           htmlFor="direction_filter"
-          className="text-base md:text-sm text-right"
+          className="text-base sm:text-sm text-right"
         >
           Direction
         </label>
@@ -85,14 +85,14 @@ export default function RideFilter() {
       >
         <label
           htmlFor="start_date_filter"
-          className="text-base md:text-sm text-right"
+          className="text-base sm:text-sm text-right"
         >
           Start date
         </label>
         <input
           type="date"
           id="start_date_filter"
-          className="block text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+          className="block text-base sm:text-sm border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md"
           onChange={(event) =>
             setStartDate(
               (new Date(event.target.value).getTime() / 1000).toString(),
@@ -101,14 +101,14 @@ export default function RideFilter() {
         />
         <label
           htmlFor="end_date_filter"
-          className="text-base md:text-sm text-right"
+          className="text-base sm:text-sm text-right"
         >
           End date
         </label>
         <input
           type="date"
           id="end_date_filter"
-          className="block text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+          className="block text-base sm:text-sm border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md"
           onChange={(event) =>
             setEndDate(
               (new Date(event.target.value).getTime() / 1000).toString(),

@@ -26,7 +26,7 @@ export default function MainView() {
           className="flex flex-row items-center gap-1 text-left text-2xl font-semibold text-gray-900"
         >
           {({ open }) => (
-            <div className="flex items-center gap-1 ml-2 text-blue-900">  
+            <div className="flex items-center gap-1 ml-2 text-black">  
               Filters
               {!open && <ArrowDownIcon className="h-4" />}
               {open && <ArrowUpIcon className="h-4" />}
