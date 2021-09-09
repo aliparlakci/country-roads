@@ -10,6 +10,6 @@ COPY . .
 
 RUN go build -o server
 
-EXPOSE 5000
+EXPOSE 4769
 
 CMD [ "./server" ]

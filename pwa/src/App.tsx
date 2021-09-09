@@ -34,7 +34,8 @@ export default function App() {
       <Layout>
         <Switch>
           <Route exact path={CONSTANTS.ROUTES.RIDES.NEW}>
-            <CreateRideView />
+            {!user && <Redirect to="/" />}
+            {user && <CreateRideView />}
           </Route>
           <Route path={CONSTANTS.ROUTES.RIDES.DETAILS}>
             <RideDetailsView />

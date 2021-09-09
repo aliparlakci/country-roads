@@ -67,6 +67,10 @@ export default function LoginForm({ email: defaultEmail }: { email: string }) {
             </div>
           </div>
 
+          <span className="text-center text-xs text-gray-400">
+            Use your @sabanciuniv.edu email address
+          </span>
+
           {!loading && (
             <div>
               <button

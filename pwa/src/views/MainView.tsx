@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 import { PlusSmIcon } from '@heroicons/react/outline'
 
 import RideList from '../components/RideList'
+import useAuth from '../hooks/useAuth'
 import useQuery from '../hooks/useQuery'
 import { IRideQuery } from '../hooks/useRides'
 import RideFilter from '../components/RideFilter'
@@ -12,6 +13,7 @@ import CONSTANTS from '../constants'
 
 export default function MainView() {
   const params = useQuery()
+  const { user } = useAuth()
   const query: IRideQuery = {
     type: params.get('type'),
     direction: params.get('direction'),
@@ -27,14 +29,7 @@ export default function MainView() {
       </div>
 
       <Disclosure>
-        <div className="w-full flex flex-row justify-between">
-          <Link
-            to={CONSTANTS.ROUTES.RIDES.NEW}
-            className="shadow bg-indigo-600 border-2 border-indigo-600 rounded-full px-3 py-1 ml-1 text-base sm:text-sm text-white flex justify-center items-center gap-1 hover:bg-indigo-700 hover:border-indigo-700 transition"
-          >
-            <PlusSmIcon className="h-6 sm:h-5" />
-            New Post
-          </Link>
+        <div className="w-full flex flex-row-reverse justify-between">
           <Disclosure.Button as="button">
             {({ open }) => (
               <div
@@ -47,6 +42,15 @@ export default function MainView() {
               </div>
             )}
           </Disclosure.Button>
+          {user && (
+            <Link
+              to={CONSTANTS.ROUTES.RIDES.NEW}
+              className="shadow bg-indigo-600 border-2 border-indigo-600 rounded-full px-3 py-1 ml-1 text-base sm:text-sm text-white flex justify-center items-center gap-1 hover:bg-indigo-700 hover:border-indigo-700 transition"
+            >
+              <PlusSmIcon className="h-6 sm:h-5" />
+              New Post
+            </Link>
+          )}
         </div>
         <Disclosure.Panel>
           <RideFilter />

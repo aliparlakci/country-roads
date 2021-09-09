@@ -8,15 +8,6 @@ services:
       - database
     env_file: .env
 
-  database:
-    image: 'mongo'
-    restart: always
-    env_file: .env
-    volumes:
-      - ./volumes/mongo:/data/db
-    ports:
-      - '27017:27017'
-
   pwa:
     build:
       context: pwa
