@@ -3,8 +3,6 @@ services:
   server:
     image: ghcr.io/aliparlakci/country-roads/server:latest
     restart: always
-    depends_on:
-      - database
     env_file: .env
 
   pwa:
