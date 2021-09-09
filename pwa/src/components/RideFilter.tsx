@@ -4,8 +4,8 @@ import LocationsDropdown from './LocationsDropdown'
 
 export default function RideFilter() {
   const [type, setType] = useState('')
-  const [direction, setDirection] = useState('')
-  const [destination, setDestination] = useState('')
+  const [from, setFrom] = useState('')
+  const [to, setTo] = useState('')
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
 
@@ -15,13 +15,13 @@ export default function RideFilter() {
   useEffect(() => {
     const params = new URLSearchParams()
     if (type) params.set('type', type)
-    if (destination) params.set('destination', destination)
-    if (direction) params.set('direction', direction)
+    if (from) params.set('from', from)
+    if (to) params.set('to', to)
     if (startDate) params.set('start_date', startDate)
     if (endDate) params.set('end_date', endDate)
 
     history.push(`${pathname}?${params.toString()}`)
-  }, [type, destination, direction, startDate, endDate, history, pathname])
+  }, [type, from, to, startDate, endDate, history, pathname])
   return (
     <div>
       <div
@@ -47,31 +47,25 @@ export default function RideFilter() {
           <option value="taxi">Share a taxi</option>
         </select>
         <label
-          htmlFor="direction_filter"
+          htmlFor="from_filter"
           className="text-base sm:text-sm text-right"
         >
-          Direction
-        </label>
-        <select
-          id="direction_filter"
-          className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-          onChange={(event) => setDirection(event.target.value)}
-
-        >
-          <option value="">All</option>
-          <option value="to_campus">To campus</option>
-          <option value="from_campus">From campus</option>
-        </select>
-        <label
-          htmlFor="destination_filter"
-          className="text-base sm:text-sm text-right"
-        >
-          Destination
+          From
         </label>
         <LocationsDropdown
-          id="destination_filter"
+          id="from_filter"
           className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-          onChange={(event) => setDestination(event.target.value)}
+          onChange={(event) => setFrom(event.target.value)}
+        >
+          <option value="">All</option>
+        </LocationsDropdown>
+        <label htmlFor="to_filter" className="text-base sm:text-sm text-right">
+          To
+        </label>
+        <LocationsDropdown
+          id="to_filter"
+          className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+          onChange={(event) => setTo(event.target.value)}
         >
           <option value="">All</option>
         </LocationsDropdown>

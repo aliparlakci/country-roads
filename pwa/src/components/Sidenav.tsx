@@ -1,8 +1,10 @@
 import React from 'react'
 import {
   AdjustmentsIcon,
+  LoginIcon,
   MailIcon,
   NewspaperIcon,
+  PlusIcon,
   UserIcon,
 } from '@heroicons/react/outline'
 import { Link } from 'react-router-dom'
@@ -39,6 +41,24 @@ function Navigation({ dark }: { dark?: boolean }) {
 
   return (
     <nav className="px-2 space-y-1">
+      {!user && (
+        <MenuItem
+          href={CONSTANTS.ROUTES.LOGIN}
+          current={false}
+          Icon={LoginIcon}
+          label="Sign in"
+          dark={true}
+        />
+      )}
+      {user && (
+        <MenuItem
+          href={CONSTANTS.ROUTES.RIDES.NEW}
+          current={false}
+          Icon={PlusIcon}
+          label="New post"
+          dark={true}
+        />
+      )}
       <MenuItem
         href={CONSTANTS.ROUTES.RIDES.MAIN}
         current={false}
@@ -53,13 +73,6 @@ function Navigation({ dark }: { dark?: boolean }) {
             current={false}
             Icon={UserIcon}
             label="Profile"
-            dark={dark}
-          />
-          <MenuItem
-            href="?"
-            current={false}
-            Icon={AdjustmentsIcon}
-            label="Settings"
             dark={dark}
           />
         </>
@@ -188,7 +201,7 @@ function UserInfo({ dark }: { dark?: boolean }) {
         <Link
           to={CONSTANTS.ROUTES.LOGOUT}
           className={cn(
-            'transition w-full flex justify-center items-center text-sm h-8 rounded-full border-2  hover:border-red-500 font-bold hover:text-red-500',
+            'transition w-full flex justify-center items-center text-sm h-8 rounded-full border-2  hover:border-red-500 font-medium hover:text-red-500',
             { 'text-white border-white': dark },
             { 'text-black border-black': !dark },
           )}

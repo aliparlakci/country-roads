@@ -3,6 +3,7 @@ export interface IUser {
   email: string
   displayName: string
   phone: string
+  contactWithPhone: boolean
 }
 
 export interface IForeignUser {

@@ -5,16 +5,24 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2184203d-af06-4b3d-8c06-bb8cd61e9c5c" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../pwa/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../pwa/src/App.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../pwa/src/components/LoginForm.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../pwa/src/components/LoginForm.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../pwa/src/components/LoginForm_.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../pwa/src/components/LoginForm_.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../pwa/src/components/OTPForm.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../pwa/src/components/OTPForm.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../pwa/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/../pwa/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../pwa/src/components/Layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../pwa/src/components/Layout.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../pwa/src/components/RegisterForm.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../pwa/src/components/RegisterForm.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../pwa/src/constants/routes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../pwa/src/constants/routes.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../pwa/src/views/LoginView.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../pwa/src/views/LoginView.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../pwa/src/components/RideItem.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../pwa/src/components/RideItem.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../pwa/src/components/RideList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../pwa/src/components/RideList.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../pwa/src/components/Sidenav.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../pwa/src/components/Sidenav.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../pwa/src/constants/api.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../pwa/src/constants/api.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../pwa/src/types/user.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../pwa/src/types/user.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../pwa/src/views/MainView.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../pwa/src/views/MainView.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../pwa/src/views/RegisterView.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../pwa/src/views/RegisterView.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../pwa/src/views/ProfileView.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../pwa/src/views/ProfileView.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/aggregations/aggregations.go" beforeDir="false" afterPath="$PROJECT_DIR$/aggregations/aggregations.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/utils.go" beforeDir="false" afterPath="$PROJECT_DIR$/common/utils.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controllers/ride_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/ride_controller.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controllers/user_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/user_controller.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/ride_model.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/ride_model.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/user_model.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/user_model.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -24,6 +32,14 @@
   <component name="GOROOT" url="file://$PROJECT_DIR$/../../../../../Program Files/Go" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
   </component>
   <component name="GoLibraries">
     <option name="indexEntireGoPath" value="false" />

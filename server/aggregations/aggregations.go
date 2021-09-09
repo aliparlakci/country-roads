@@ -13,11 +13,11 @@ func FilterRides(queries models.SearchRideQueries) []bson.D {
 	if queries.Type != "" {
 		keys = append(keys, primitive.E{Key: "type", Value: queries.Type})
 	}
-	if queries.Direction != "" {
-		keys = append(keys, primitive.E{Key: "direction", Value: queries.Direction})
+	if queries.From != "" {
+		keys = append(keys, primitive.E{Key: "from", Value: queries.From})
 	}
-	if queries.Destination != "" {
-		keys = append(keys, primitive.E{Key: "destination", Value: queries.Destination})
+	if queries.To != "" {
+		keys = append(keys, primitive.E{Key: "to", Value: queries.To})
 	}
 	if queries.StartDate.Unix() != common.MinDate || queries.EndDate.Unix() != common.MinDate {
 		dateRange := bson.D{}
@@ -43,9 +43,20 @@ var RideResponseAggregation = []bson.D{
 			Key: "$lookup",
 			Value: bson.D{
 				primitive.E{Key: "from", Value: "locations"},
-				primitive.E{Key: "localField", Value: "destination"},
+				primitive.E{Key: "localField", Value: "from"},
 				primitive.E{Key: "foreignField", Value: "key"},
-				primitive.E{Key: "as", Value: "destination"},
+				primitive.E{Key: "as", Value: "from"},
+			},
+		},
+	},
+	bson.D{
+		primitive.E{
+			Key: "$lookup",
+			Value: bson.D{
+				primitive.E{Key: "from", Value: "locations"},
+				primitive.E{Key: "localField", Value: "to"},
+				primitive.E{Key: "foreignField", Value: "key"},
+				primitive.E{Key: "as", Value: "to"},
 			},
 		},
 	},
@@ -73,7 +84,15 @@ var RideResponseAggregation = []bson.D{
 		primitive.E{
 			Key: "$unwind",
 			Value: bson.D{
-				primitive.E{Key: "path", Value: "$destination"},
+				primitive.E{Key: "path", Value: "$from"},
+				primitive.E{Key: "preserveNullAndEmptyArrays", Value: false},
+			},
+		},
+	}, bson.D{
+		primitive.E{
+			Key: "$unwind",
+			Value: bson.D{
+				primitive.E{Key: "path", Value: "$to"},
 				primitive.E{Key: "preserveNullAndEmptyArrays", Value: false},
 			},
 		},

@@ -97,22 +97,31 @@ func PostRides(rideInserter repositories.RideInserter, locationFinder repositori
 			return
 		}
 
-		if _, err := locationFinder.FindOne(c.Copy(), bson.M{"key": rideDto.Destination}); err == mongo.ErrNoDocuments {
-			logger.WithField("destination", rideDto.Destination).Debug("no location with the destination key exists")
-			c.JSON(http.StatusBadRequest, gin.H{"error": "destination does not exist"})
+		if _, err := locationFinder.FindOne(c.Copy(), bson.M{"key": rideDto.From}); err == mongo.ErrNoDocuments {
+			logger.WithField("from", rideDto.From).Debug("no location with the from key exists")
+			c.JSON(http.StatusBadRequest, gin.H{"error": "from does not exist"})
 		} else if err != nil {
-			logger.Errorf("locaitionFinder.FindOne raised an error while querying for destination: %v", err)
+			logger.Errorf("locaitionFinder.FindOne raised an error while querying for from: %v", err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "cannot validate the destination"})
+			return
+		}
+
+		if _, err := locationFinder.FindOne(c.Copy(), bson.M{"key": rideDto.To}); err == mongo.ErrNoDocuments {
+			logger.WithField("to", rideDto.To).Debug("no location with the to key exists")
+			c.JSON(http.StatusBadRequest, gin.H{"error": "to does not exist"})
+		} else if err != nil {
+			logger.Errorf("locaitionFinder.FindOne raised an error while querying for to: %v", err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "cannot validate the destination"})
 			return
 		}
 
 		newRide := models.RideSchema{
-			Type:        rideDto.Type,
-			Date:        rideDto.Date,
-			Destination: rideDto.Destination,
-			Direction:   rideDto.Direction,
-			CreatedAt:   time.Now(),
-			Owner:       user.ID,
+			Type:      rideDto.Type,
+			Date:      rideDto.Date,
+			From:      rideDto.From,
+			To:        rideDto.To,
+			CreatedAt: time.Now(),
+			Owner:     user.ID,
 		}
 		id, err := rideInserter.InsertOne(c.Copy(), newRide)
 		if err != nil {
@@ -158,7 +167,7 @@ func DeleteRides(repository repositories.RideRepository) gin.HandlerFunc {
 		if ride.Owner != user.ID {
 			logger.WithFields(logrus.Fields{
 				"requester": user.ID.Hex(),
-				"owner": ride.Owner.Hex(),
+				"owner":     ride.Owner.Hex(),
 			}).Debug("requester cannot delete ride of owner")
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "you cannot delete someone else's post"})
 			return

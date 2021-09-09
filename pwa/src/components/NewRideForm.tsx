@@ -1,20 +1,24 @@
 import React, { useState } from 'react'
-import styled from 'styled-components'
+import cn from 'classnames'
+import { faCircleNotch } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import CONSTANTS from '../constants'
 import mutateWithQueries from '../utils/mutateWithQueries'
-import LocationsDropdown from './LocationsDropdown'
 import { useHistory } from 'react-router-dom'
+import { SportsCar, Student, Taxi } from './icons'
+import LocationsDropdown from './LocationsDropdown'
 
 export interface INewRideFormProps {}
 
 export default function NewRideForm(props: INewRideFormProps) {
-  const [disabled, setDisabled] = useState(true)
+  const [loading, setLoading] = useState(false)
+  const [selectedType, setSelectedType] = useState('taxi')
   const history = useHistory()
 
   const handleSubmit = async (event: any) => {
     event.preventDefault()
-    setDisabled(true)
+    setLoading(true)
 
     const formData = new FormData(event.currentTarget)
     const date = formData.get('date')?.toString()
@@ -32,126 +36,129 @@ export default function NewRideForm(props: INewRideFormProps) {
     mutateWithQueries(CONSTANTS.API.RIDES)
 
     event.target.reset()
-    setDisabled(false)
+    setLoading(false)
 
     history.push(CONSTANTS.ROUTES.RIDES.MAIN)
   }
 
   return (
-    <StyledForm onSubmit={handleSubmit}>
-      <FormItem>
-        <span>Ride type:</span>
-        <StyledUl>
-          <li>
-            <input
-              type="radio"
-              name="type"
-              id="type_request"
-              value="request"
-              required
-              disabled={disabled}
-            />
-            <label htmlFor="type_request">Request a ride</label>
-          </li>
-          <li>
-            <input
-              type="radio"
-              name="type"
-              id="type_offer"
-              value="offer"
-              required
-              disabled={disabled}
-            />
-            <label htmlFor="type_offer">Offer a ride</label>
-          </li>
-          <li>
-            <input
-              type="radio"
-              name="type"
-              id="type_taxi"
-              value="taxi"
-              required
-              disabled={disabled}
-            />
-            <label htmlFor="type_taxi">Share a taxi</label>
-          </li>
-        </StyledUl>
-      </FormItem>
-
-      <FormItem>
+    <form
+      onSubmit={handleSubmit}
+      className="mt-8 sm:mx-auto sm:w-full sm:max-w-md"
+    >
+      <div className="flex flex-row rounded-t-lg shadow bg-white border-b border-gray-100">
+        <button
+          onClick={(e) => {
+            e.preventDefault()
+            setSelectedType('offer')
+          }}
+          className={cn(
+            'border-b-2 hover:border-indigo-600 border-transparent rounded-tl-lg flex flex-col justify-center items-center px-2 py-2 w-full',
+            { 'border-indigo-600': selectedType === 'offer' },
+          )}
+        >
+          <SportsCar className="text-5xl" />
+          <span className="text-base sm:text-sm text-center">Offer a lift</span>
+        </button>
+        <button
+          onClick={(e) => {
+            e.preventDefault()
+            setSelectedType('taxi')
+          }}
+          className={cn(
+            'border-b-2 hover:border-indigo-600 border-transparent flex flex-col justify-center items-center px-2 py-2 w-full',
+            { 'border-indigo-600': selectedType === 'taxi' },
+          )}
+        >
+          <Taxi className="text-5xl" />
+          <span className="text-base sm:text-sm text-center">Share a taxi</span>
+        </button>
+        <button
+          onClick={(e) => {
+            e.preventDefault()
+            setSelectedType('request')
+          }}
+          className={cn(
+            'border-b-2 hover:border-indigo-600 border-transparent rounded-tr-lg flex flex-col justify-center items-center px-2 py-2 w-full',
+            { 'border-indigo-600': selectedType === 'request' },
+          )}
+        >
+          <Student className="text-5xl" />
+          <span className="text-base sm:text-sm text-center">
+            Request a lift
+          </span>
+        </button>
+        <input type="hidden" name="type" value={selectedType} />
+      </div>
+      <div className="flex flex-col gap-3 bg-white py-4 px-4 shadow rounded-b-lg sm:px-10">
         <div>
-          <input
-            type="radio"
-            name="direction"
-            id="direction_to"
-            value="to_campus"
-            required
-            disabled={disabled}
-          />
-          <label htmlFor="direction_to">To campus</label>
+          <label
+            htmlFor="from"
+            className="block text-base sm:text-sm font-medium text-gray-700"
+          >
+            From
+          </label>
+          <div className="mt-1">
+            <LocationsDropdown
+              id="from"
+              name="from"
+              className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+            />
+          </div>
         </div>
         <div>
-          <input
-            type="radio"
-            name="direction"
-            id="direction_from"
-            value="from_campus"
-            required
-            disabled={disabled}
-          />
-          <label htmlFor="direction_from">From campus</label>
+          <label
+            htmlFor="to"
+            className="block text-base sm:text-sm font-medium text-gray-700"
+          >
+            To
+          </label>
+          <div className="mt-1">
+            <LocationsDropdown
+              id="to"
+              name="to"
+              className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+            />
+          </div>
         </div>
-      </FormItem>
 
-      <FormItem>
-        <label htmlFor="destination">Destination:</label>
-        <LocationsDropdown
-          id="destination"
-          name="destination"
-          required
-          disabled={disabled}
-          onData={() => setDisabled(false)}
-        />
-      </FormItem>
+        <div>
+          <label
+            htmlFor="date"
+            className="block text-base sm:text-sm font-medium text-gray-700"
+          >
+            When
+          </label>
+          <div className="mt-1">
+            <input
+              type="date"
+              id="date"
+              name="date"
+              required
+              className="mt-1 block w-full pl-3 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+            />
+          </div>
+        </div>
 
-      <FormItem>
-        <label htmlFor="name">When:</label>
-        <input
-          type="date"
-          id="name"
-          name="date"
-          min={new Date().toISOString().substring(0, 10)} // Today's date string
-          required
-          disabled={disabled}
-        />
-      </FormItem>
-
-      <input type="submit" value="Post" disabled={disabled} />
-    </StyledForm>
+        {!loading && (
+          <div>
+            <button
+              type="submit"
+              className="w-full flex items-center gap-2 justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-base sm:text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+              Create
+            </button>
+          </div>
+        )}
+        {loading && (
+          <div className="flex justify-center w-full">
+            <FontAwesomeIcon
+              className="animate-spin text-lg text-indigo-600"
+              icon={faCircleNotch}
+            />
+          </div>
+        )}
+      </div>
+    </form>
   )
 }
-
-const StyledForm = styled.form`
-  width: 16rem;
-
-  display: flex;
-  flex-direction: column;
-  padding: 1rem;
-  gap: 1rem;
-
-  border-radius: 1rem;
-  border: 1px solid lightgrey;
-`
-
-const StyledUl = styled.ul`
-  padding: 0;
-  margin: 0;
-  list-style: none;
-`
-
-const FormItem = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-`

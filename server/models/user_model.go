@@ -11,12 +11,13 @@ import (
 )
 
 type User struct {
-	ID          primitive.ObjectID `bson:"_id" json:"id"`
-	DisplayName string             `bson:"displayName" json:"displayName"`
-	Email       string             `bson:"email" json:"email"`
-	Phone       string             `bson:"phone" json:"phone"`
-	Verified    bool               `bson:"verified" json:"verified"`
-	SignedUpAt  time.Time          `bson:"signedUpAt" json:"signedUpAt" time_format:"unix"`
+	ID               primitive.ObjectID `bson:"_id" json:"id"`
+	DisplayName      string             `bson:"displayName" json:"displayName"`
+	Email            string             `bson:"email" json:"email"`
+	Phone            string             `bson:"phone" json:"phone"`
+	Verified         bool               `bson:"verified" json:"verified"`
+	SignedUpAt       time.Time          `bson:"signedUpAt" json:"signedUpAt" time_format:"unix"`
+	ContactWithPhone bool               `bson:"contactWithPhone" json:"contactWithPhone"`
 }
 
 type UserResponse struct {
@@ -24,19 +25,26 @@ type UserResponse struct {
 	DisplayName string             `bson:"displayName" json:"displayName"`
 }
 
+type ContactResponse struct {
+	Phone string `json:"phone,omitempty"`
+	Email string `json:"email,omitempty"`
+}
+
 type UserSchema struct {
-	ID          primitive.ObjectID `bson:"_id,omitempty" json:"id"`
-	DisplayName string             `bson:"displayName" json:"displayName"`
-	Email       string             `bson:"email" json:"email"`
-	Phone       string             `bson:"phone" json:"phone"`
-	Verified    bool               `bson:"verified" json:"verified"`
-	SignedUpAt  time.Time          `bson:"signedUpAt" json:"signedUpAt" time_format:"unix"`
+	ID               primitive.ObjectID `bson:"_id,omitempty" json:"id"`
+	DisplayName      string             `bson:"displayName" json:"displayName"`
+	Email            string             `bson:"email" json:"email"`
+	Phone            string             `bson:"phone" json:"phone"`
+	Verified         bool               `bson:"verified" json:"verified"`
+	SignedUpAt       time.Time          `bson:"signedUpAt" json:"signedUpAt" time_format:"unix"`
+	ContactWithPhone bool               `bson:"contactWithPhone" json:"contactWithPhone"`
 }
 
 type NewUserForm struct {
-	DisplayName string `form:"displayName" json:"displayName" binding:"required"`
-	Email       string `form:"email" json:"email" binding:"required"`
-	Phone       string `form:"phone" json:"phone" binding:"required"`
+	DisplayName      string `form:"displayName" json:"displayName" binding:"required"`
+	Email            string `form:"email" json:"email" binding:"required"`
+	Phone            string `form:"phone" json:"phone" binding:"required"`
+	ContactWithPhone bool   `form:"contact_with_phone" json:"contact_with_phone"`
 }
 
 type LoginRequestForm struct {

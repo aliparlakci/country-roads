@@ -7,7 +7,7 @@
     "build": "craco build",
     "test": "craco test"
   },
-  "proxy": "http://localhost:5000",
+  "proxy": "http://localhost:4769",
   "eslintConfig": {
     "extends": [
       "react-app",

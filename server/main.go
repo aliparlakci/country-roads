@@ -20,7 +20,7 @@ import (
 func main() {
 	godotenv.Load()
 
-	logrus.SetLevel(logrus.InfoLevel)
+	logrus.SetLevel(logrus.DebugLevel)
 	logrus.SetReportCaller(true)
 	logrus.SetFormatter(&logrus.TextFormatter{PadLevelText: true})
 	//logrus.SetFormatter(&logrus.JSONFormatter{PrettyPrint: true})
@@ -71,5 +71,5 @@ func main() {
 		controllers.RegisterAuthController(api, env)
 	}
 
-	router.Run(":5000")
+	router.Run(":4769")
 }

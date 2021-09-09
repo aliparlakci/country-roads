@@ -2,7 +2,10 @@ export const API = {
   RIDE: (id: string) => `/api/rides/${id}`,
   RIDES: '/api/rides',
   LOCATIONS: '/api/locations',
-  USERS: '/api/users',
+  USERS: {
+    MAIN: '/api/users',
+    CONTACT: '/api/users/contact',
+  },
   AUTH: {
     LOGIN: '/api/auth/login',
     VERIFY: '/api/auth/verify',

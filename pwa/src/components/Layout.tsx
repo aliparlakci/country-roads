@@ -77,7 +77,7 @@ export default function Layout({ children }: any) {
 
       {/* Static sidebar for desktop */}
       <div className="flex flex-col w-screen flex-1">
-        <div className="relative z-10 flex-shrink-0 flex items-center h-16 bg-white shadow">
+        <div className="relative z-10 flex-shrink-0 flex lg:hidden items-center h-16 bg-white shadow">
           <button
             type="button"
             className="px-4 border-r border-gray-200 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 lg:hidden"
@@ -97,19 +97,11 @@ export default function Layout({ children }: any) {
                   Sign in
                 </Link>
               )}
-              {user && (
-                <Link
-                  to={CONSTANTS.ROUTES.RIDES.NEW}
-                  className="flex border-2 border-indigo-600 hover:bg-indigo-600 text-indigo-600 hover:text-white transition group items-center px-4 py-2 text-base font-medium rounded-full shadow max-h-12 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 border-transparent"
-                >
-                  New Post
-                </Link>
-              )}
             </div>
           </div>
         </div>
         <div className="flex flex-row justify-center items-start h-full w-full">
-          <main className="my-6 px-4 w-full sm:px-6 md:px-8 max-w-4xl">
+          <main className="py-6 px-4 w-full h-full sm:px-6 md:px-8 max-w-4xl">
             {children}
           </main>
         </div>

@@ -104,8 +104,8 @@ func (r RideSchemaMatcher) Matches(x interface{}) bool {
 	result = result && r.Expected.ID == actual.ID
 	result = result && r.Expected.Type == actual.Type
 	result = result && r.Expected.Date == actual.Date
-	result = result && r.Expected.Destination == actual.Destination
-	result = result && r.Expected.Direction == actual.Direction
+	result = result && r.Expected.From == actual.From
+	result = result && r.Expected.To == actual.To
 	result = result && r.Expected.CreatedAt.Unix() != MinDate
 	return result
 }

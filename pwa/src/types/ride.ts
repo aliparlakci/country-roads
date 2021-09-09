@@ -6,8 +6,8 @@ export default interface IRide {
   id: string
   type: RideType
   date: number
-  destination: ILocation
-  direction: string
+  from: ILocation
+  to: ILocation
   createdAt: number
   owner: IForeignUser
 }
