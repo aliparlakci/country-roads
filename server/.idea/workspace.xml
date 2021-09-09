@@ -5,12 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2184203d-af06-4b3d-8c06-bb8cd61e9c5c" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../proxy/nginx.conf" beforeDir="false" afterPath="$PROJECT_DIR$/../proxy/nginx.conf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../pwa/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../pwa/src/App.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../pwa/src/components/LoginForm.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../pwa/src/components/LoginForm.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../pwa/src/views/MainView.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../pwa/src/views/MainView.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
