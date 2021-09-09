@@ -5,24 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2184203d-af06-4b3d-8c06-bb8cd61e9c5c" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../pwa/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/../pwa/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../pwa/src/components/Layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../pwa/src/components/Layout.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../pwa/src/components/RegisterForm.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../pwa/src/components/RegisterForm.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../pwa/src/components/RideItem.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../pwa/src/components/RideItem.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../pwa/src/components/RideList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../pwa/src/components/RideList.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../pwa/src/components/Sidenav.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../pwa/src/components/Sidenav.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../pwa/src/constants/api.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../pwa/src/constants/api.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../pwa/src/types/user.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../pwa/src/types/user.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../pwa/src/views/MainView.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../pwa/src/views/MainView.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../pwa/src/views/ProfileView.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../pwa/src/views/ProfileView.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/aggregations/aggregations.go" beforeDir="false" afterPath="$PROJECT_DIR$/aggregations/aggregations.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/utils.go" beforeDir="false" afterPath="$PROJECT_DIR$/common/utils.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/controllers/ride_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/ride_controller.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/controllers/user_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/user_controller.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/ride_model.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/ride_model.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/user_model.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/user_model.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

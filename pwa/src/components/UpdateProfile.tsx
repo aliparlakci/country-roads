@@ -5,10 +5,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import useAuth from '../hooks/useAuth'
 import CONSTANTS from '../constants'
 import { mutate } from 'swr'
+import useModal from '../hooks/useModal'
 
 export default function UpdateProfile({ email }: { email?: string }) {
   const [loading, setLoading] = React.useState(false)
   const { user } = useAuth()
+  const { alert, error } = useModal()
 
   const handleSubmit = async (event: any) => {
     event.preventDefault()
@@ -29,11 +31,13 @@ export default function UpdateProfile({ email }: { email?: string }) {
     if (!result || result.status !== 200) {
       console.log(result?.status)
       setLoading(false)
+      error({ header: 'Error', body: 'Profile cannot get updated' })
       return
     }
 
     await mutate(CONSTANTS.API.USERS.MAIN)
 
+    alert({ header: 'Succesful', body: 'Profile is updated' })
     event.target.reset()
     setLoading(false)
   }

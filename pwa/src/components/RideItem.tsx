@@ -6,23 +6,32 @@ import useAuth from '../hooks/useAuth'
 import IRide from '../types/ride'
 import mutateWithQueries from '../utils/mutateWithQueries'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCircleNotch } from '@fortawesome/free-solid-svg-icons'
+import {
+  faCircleNotch,
+  faPhone,
+  faEnvelope,
+} from '@fortawesome/free-solid-svg-icons'
+import IContactInfo from '../types/contact'
 
 export interface IRideItemProps {
   ride: IRide
 }
 
-const getContact = async (id: string) => {
-  try {
-    await fetch(`${CONSTANTS.API.USERS.CONTACT}/${id}`)
-  } catch (e) {
-    console.log(e)
-  }
-}
-
 export default function RideItem({ ride }: IRideItemProps) {
   const [deleteLoading, setDeleteLoading] = React.useState(false)
+  const [contact, setContact] = React.useState<IContactInfo | null>(null)
   const { user } = useAuth()
+
+  const getContact = async (id: string) => {
+    let response
+    try {
+      response = await fetch(`${CONSTANTS.API.USERS.CONTACT}/${id}`)
+    } catch (e) {
+      console.log(e)
+    }
+
+    setContact(await response?.json())
+  }
 
   const doDelete = async () => {
     setDeleteLoading(true)
@@ -111,12 +120,76 @@ export default function RideItem({ ride }: IRideItemProps) {
         </div>
         <div className="flex flex-row justify-between items-center">
           {user && (
-            <button
-              className="flex items-center justify-center text-base sm:text-sm rounded-full border-2 border-transparent px-2 transition hover:bg-indigo-600 text-indigo-600 hover:text-white w-min m-0"
-              onClick={() => getContact(ride.owner.id)}
-            >
-              Contact
-            </button>
+            <div className="flex flex-row gap-1 justify-between">
+              {!contact && (
+                <button
+                  className={cn(
+                    'flex items-center justify-center text-base sm:text-sm rounded-full border-2 border-transparent px-2 mb-1 transition hover:text-white w-min m-0',
+                    {
+                      'text-yellow-500 hover:bg-yellow-600':
+                        ride.type === 'taxi',
+                    },
+                    {
+                      'text-green-600 hover:bg-green-600':
+                        ride.type === 'offer',
+                    },
+                    {
+                      'text-blue-500 hover:bg-blue-600':
+                        ride.type === 'request',
+                    },
+                  )}
+                  onClick={() => getContact(ride.owner.id)}
+                >
+                  Contact
+                </button>
+              )}
+              {contact !== null && (
+                <div className="ml-2 flex flex-row gap-6 text-lg text-indigo-600">
+                  <a href={`mailto:${contact.email}`}>
+                    <FontAwesomeIcon
+                      icon={faEnvelope}
+                      className={cn(
+                        'transition',
+                        {
+                          'text-yellow-400 hover:text-yellow-600':
+                            ride.type === 'taxi',
+                        },
+                        {
+                          'text-green-400 hover:text-green-600':
+                            ride.type === 'offer',
+                        },
+                        {
+                          'text-blue-400 hover:text-blue-600':
+                            ride.type === 'request',
+                        },
+                      )}
+                    />
+                  </a>
+                  {contact.phone && (
+                    <a href={`tel:${contact.phone}`}>
+                      <FontAwesomeIcon
+                        icon={faPhone}
+                        className={cn(
+                          'transition',
+                          {
+                            'text-yellow-400 hover:text-yellow-600':
+                              ride.type === 'taxi',
+                          },
+                          {
+                            'text-green-400 hover:text-green-600':
+                              ride.type === 'offer',
+                          },
+                          {
+                            'text-blue-400 hover:text-blue-600':
+                              ride.type === 'request',
+                          },
+                        )}
+                      />
+                    </a>
+                  )}
+                </div>
+              )}
+            </div>
           )}
           {!user && (
             <div className="text-xs text-gray-400 font-extralight italic text-right w-full">
@@ -127,7 +200,7 @@ export default function RideItem({ ride }: IRideItemProps) {
             <>
               {!deleteLoading && (
                 <button
-                  className="flex items-center justify-center text-base sm:text-sm rounded-full border-2 border-transparent px-2 transition hover:bg-red-600 text-red-600 hover:text-white w-min m-0"
+                  className="flex items-center justify-center text-base sm:text-sm rounded-full border-2 border-transparent px-2 mb-1 transition hover:bg-red-600 text-red-600 hover:text-white w-min m-0"
                   onClick={doDelete}
                 >
                   Delete

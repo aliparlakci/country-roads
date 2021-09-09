@@ -2,12 +2,12 @@ import React from 'react'
 import { Disclosure } from '@headlessui/react'
 import cn from 'classnames'
 import { Link } from 'react-router-dom'
+import { PlusSmIcon } from '@heroicons/react/outline'
 
 import RideList from '../components/RideList'
 import useQuery from '../hooks/useQuery'
 import { IRideQuery } from '../hooks/useRides'
 import RideFilter from '../components/RideFilter'
-import { PlusCircleIcon, PlusIcon, PlusSmIcon } from '@heroicons/react/outline'
 import CONSTANTS from '../constants'
 
 export default function MainView() {

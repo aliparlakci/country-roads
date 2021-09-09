@@ -8,6 +8,7 @@ import mutateWithQueries from '../utils/mutateWithQueries'
 import { useHistory } from 'react-router-dom'
 import { SportsCar, Student, Taxi } from './icons'
 import LocationsDropdown from './LocationsDropdown'
+import useModal from '../hooks/useModal'
 
 export interface INewRideFormProps {}
 
@@ -15,6 +16,7 @@ export default function NewRideForm(props: INewRideFormProps) {
   const [loading, setLoading] = useState(false)
   const [selectedType, setSelectedType] = useState('taxi')
   const history = useHistory()
+  const { alert, error } = useModal()
 
   const handleSubmit = async (event: any) => {
     event.preventDefault()
@@ -23,6 +25,12 @@ export default function NewRideForm(props: INewRideFormProps) {
     const formData = new FormData(event.currentTarget)
     const date = formData.get('date')?.toString()
     if (date) formData.set('date', (new Date(date).getTime() / 1000).toString())
+
+    if (formData.get('from') === formData.get('to')) {
+      setLoading(false)
+      error({header: "Request is invalid", body: "Departure and destination cannot be the same"})
+      return
+    }
 
     try {
       await fetch(CONSTANTS.API.RIDES, {
@@ -96,7 +104,7 @@ export default function NewRideForm(props: INewRideFormProps) {
             htmlFor="from"
             className="block text-base sm:text-sm font-medium text-gray-700"
           >
-            From
+            Departure
           </label>
           <div className="mt-1">
             <LocationsDropdown
@@ -111,7 +119,7 @@ export default function NewRideForm(props: INewRideFormProps) {
             htmlFor="to"
             className="block text-base sm:text-sm font-medium text-gray-700"
           >
-            To
+            Destination
           </label>
           <div className="mt-1">
             <LocationsDropdown

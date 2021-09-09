@@ -7,12 +7,15 @@ import { AuthProvider } from './hooks/useAuth'
 import * as serviceWorkerRegistration from './serviceWorkerRegistration'
 import reportWebVitals from './reportWebVitals'
 import './index.css'
+import { ModalProvider } from './hooks/useModal'
 
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>
       <AuthProvider>
-        <App />
+        <ModalProvider>
+          <App />
+        </ModalProvider>
       </AuthProvider>
     </BrowserRouter>
   </React.StrictMode>,
