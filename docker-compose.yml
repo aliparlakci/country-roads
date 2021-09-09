@@ -1,16 +1,14 @@
 version: '3.4'
 services:
   server:
-    build: 
-      context: server
+    image: ghcr.io/aliparlakci/country-roads/server:latest
     restart: always
     depends_on:
       - database
     env_file: .env
 
   pwa:
-    build:
-      context: pwa
+    image: ghcr.io/aliparlakci/country-roads/pwa:latest
     restart: always
 
   redis:
@@ -19,8 +17,6 @@ services:
     env_file: .env
     ports:
       - "6379:6379"
-    volumes:
-      - ./volumes/redis:/data
 
   proxy:
     build: 
