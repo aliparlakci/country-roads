@@ -1,9 +1,9 @@
 FROM node:14-alpine as build
 WORKDIR /root
 COPY ./package.json ./package.json
-RUN yarn
+RUN npm ci
 COPY . . 
-RUN yarn build -o app
+RUN npm run build -o app
 
 # multistage build...
 # this runs a lil nginx instance to serve the app
