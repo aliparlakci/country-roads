@@ -15,28 +15,29 @@ type OTPStore struct {
 }
 
 type OTPService interface {
-	CreateOTP(owner string) error
+	CreateOTP(owner string) (string, error)
 	RevokeOTP(owner string) error
 	VerifyOTP(owner, otp string) (bool, error)
 }
 
-func (a *OTPStore) CreateOTP(owner string) error {
-	if err := a.Store.Get(owner).Err(); err == nil {
-		return nil
+func (a *OTPStore) CreateOTP(owner string) (string, error) {
+	if existingOtp, err := a.Store.Get(owner).Result(); err == nil {
+		return existingOtp, nil
 	}
 
 	bytes := make([]byte, 3)
 	rand.Read(bytes)
 
-	otp := uint32(0)
+	randomNumber := uint32(0)
 	for i, b := range bytes {
-		otp += uint32(b) * uint32(math.Pow(10.0, float64(i*3)))
+		randomNumber += uint32(b) * uint32(math.Pow(10.0, float64(i*3)))
 	}
+	randomNumber = randomNumber%999999
 
-	otp = otp % 999999
+	otp := fmt.Sprintf("%06d", randomNumber)
 
 	// TODO: Set expiration
-	return a.Store.Set(owner, fmt.Sprintf("%06d",otp), 0).Err()
+	return otp, a.Store.Set(owner, otp, 0).Err()
 }
 
 func (a *OTPStore) VerifyOTP(owner, givenOTP string) (bool, error) {

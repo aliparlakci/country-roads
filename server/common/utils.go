@@ -132,7 +132,6 @@ func (r UserSchemaMatcher) Matches(x interface{}) bool {
 	result = result && r.Expected.ID == actual.ID
 	result = result && r.Expected.DisplayName == actual.DisplayName
 	result = result && r.Expected.Email == actual.Email
-	result = result && r.Expected.Phone == actual.Phone
 	result = result && r.Expected.Verified == actual.Verified
 	result = result && r.Expected.SignedUpAt.Unix() != MinDate
 	return result

@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"github.com/aliparlakci/country-roads/common"
+	"github.com/aliparlakci/country-roads/middlewares"
 	"github.com/aliparlakci/country-roads/models"
 	"github.com/aliparlakci/country-roads/repositories"
 	"github.com/aliparlakci/country-roads/services"
@@ -13,13 +14,13 @@ import (
 	"os"
 )
 
-func Login(otpService services.OTPService, finder repositories.UserFinder) gin.HandlerFunc {
+func SignIn(mailSender services.MailSender, otpService services.OTPService, userService services.UserService) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		logger := common.LoggerWithRequestId(c.Copy())
 
-		var creds models.LoginRequestForm
+		var creds models.SignInRequestForm
 		if err := c.Bind(&creds); err != nil {
-			logger.Debugf("cannot bind request body to models.LoginRequestForm: %v", err.Error())
+			logger.Debugf("cannot bind request body to models.SignInRequestForm: %v", err.Error())
 			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
 			return
 		}
@@ -30,24 +31,49 @@ func Login(otpService services.OTPService, finder repositories.UserFinder) gin.H
 			return
 		}
 
-		user, err := finder.FindOne(c.Copy(), bson.M{"email": creds.Email})
+		userExists, err := userService.Exists(c.Copy(), creds.Email)
 		if err != nil {
-			logger.WithField("email", creds.Email).Debug("no user with email exists")
-			c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Errorf("no user with the email exists: [email=%v]", creds.Email)})
+			logger.WithField("email", creds.Email).Errorf("UserService.Exists raised an error while querying for email: %v", err.Error())
+			c.JSON(http.StatusInternalServerError, gin.H{})
 			return
 		}
 
-		if err := otpService.CreateOTP(user.ID.Hex()); err != nil {
+		if !userExists {
+			if _, err := userService.CreateUser(c.Copy(), creds.Email); err != nil {
+				logger.WithField("email", creds.Email).Errorf("UserService.CreateUSer raised an error while creating user with email: %v", err.Error())
+				c.JSON(http.StatusInternalServerError, gin.H{})
+				return
+			}
+		}
+
+		user, err := userService.FindUser(c.Copy(), creds.Email)
+		if err != nil {
+			logger.WithField("email", creds.Email).Debug("no user with email exists")
+			c.JSON(http.StatusBadRequest, gin.H{})
+			return
+		}
+
+		otp, err := otpService.CreateOTP(user.ID.Hex())
+		if err != nil {
 			logger.WithField("user_id", user.ID.Hex()).Errorf("while creating OTP for user with user_id, otpService.CreateOTP raised an error: %v", err.Error())
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 			return
 		}
 
+		if err := mailSender.SendMail(c.Copy(), "Your code to sign in to tuzlapool", otp, creds.Email); err != nil {
+			logger.WithField("receiver", creds.Email).Errorf("MailSender.SendMail raised an error while sending a mail: %v", err)
+		}
+
 		logger.WithFields(logrus.Fields{
 			"user_id": user.ID.Hex(),
 			"email":   user.Email,
-		}).Debug("login flow is started for user with user_id and email")
-		c.JSON(http.StatusOK, gin.H{})
+		}).Debug("sign in flow is started for user with user_id and email")
+
+		if userExists {
+			c.JSON(http.StatusOK, gin.H{})
+		} else {
+			c.JSON(http.StatusCreated, gin.H{})
+		}
 	}
 }
 
@@ -183,16 +209,17 @@ func Logout(sessions services.SessionService) gin.HandlerFunc {
 }
 
 func RegisterAuthController(router *gin.RouterGroup, env *common.Env) {
-	router.POST("/auth/login", Login(
+	router.POST("/auth/signin", SignIn(
+		env.Services.MailingService,
 		env.Services.OTPService,
-		env.Repositories.UserRepository,
+		env.Services.UserService,
 	))
 	router.POST("/auth/verify", Verify(
 		env.Services.OTPService,
 		env.Services.SessionService,
 		env.Repositories.UserRepository,
 	))
-	router.GET("/auth/user", User())
+	router.GET("/auth/user", middlewares.Protected(User()))
 	router.POST("/auth/logout", Logout(
 		env.Services.SessionService,
 	))

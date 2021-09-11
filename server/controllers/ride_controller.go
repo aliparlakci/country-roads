@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"github.com/aliparlakci/country-roads/middlewares"
 	"github.com/aliparlakci/country-roads/repositories"
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -194,9 +195,9 @@ func DeleteRides(repository repositories.RideRepository) gin.HandlerFunc {
 func RegisterRideController(router *gin.RouterGroup, env *common.Env) {
 	router.GET("/rides/:id", GetRide(env.Repositories.RideRepository))
 	router.GET("/rides", SearchRides(env.Repositories.RideRepository))
-	router.POST("/rides", PostRides(
+	router.POST("/rides", middlewares.Protected(PostRides(
 		env.Repositories.RideRepository,
 		env.Repositories.LocationRepository,
-	))
-	router.DELETE("/rides/:id", DeleteRides(env.Repositories.RideRepository))
+	)))
+	router.DELETE("/rides/:id", middlewares.Protected(DeleteRides(env.Repositories.RideRepository)))
 }

@@ -12,6 +12,7 @@ import {
   faEnvelope,
 } from '@fortawesome/free-solid-svg-icons'
 import IContactInfo from '../types/contact'
+import { faWhatsapp } from '@fortawesome/free-brands-svg-icons'
 
 export interface IRideItemProps {
   ride: IRide
@@ -25,7 +26,7 @@ export default function RideItem({ ride }: IRideItemProps) {
   const getContact = async (id: string) => {
     let response
     try {
-      response = await fetch(`${CONSTANTS.API.USERS.CONTACT}/${id}`)
+      response = await fetch(CONSTANTS.API.CONTACT(id))
     } catch (e) {
       console.log(e)
     }
@@ -62,7 +63,7 @@ export default function RideItem({ ride }: IRideItemProps) {
           { 'border-blue-400': ride.type === 'request' },
         )}
       >
-        <div className="border-b border-gray-200 text-2xl sm:text-xl font-light px-4 py-1">
+        <div className="border-b border-gray-200 text-xl sm:text-lg font-light px-4 py-1 text-right">
           {(() => {
             switch (ride.type) {
               case 'offer':
@@ -115,7 +116,7 @@ export default function RideItem({ ride }: IRideItemProps) {
             Author
           </span>
           <span className="text-base sm:text-sm font-light">
-            {ride.owner.displayName}
+            {ride.owner.displayName !== "" ? ride.owner.displayName : "-"}
           </span>
         </div>
         <div className="flex flex-row justify-between items-center">
@@ -144,48 +145,26 @@ export default function RideItem({ ride }: IRideItemProps) {
                 </button>
               )}
               {contact !== null && (
-                <div className="ml-2 flex flex-row gap-6 text-lg text-indigo-600">
-                  <a href={`mailto:${contact.email}`}>
-                    <FontAwesomeIcon
-                      icon={faEnvelope}
-                      className={cn(
-                        'transition',
-                        {
-                          'text-yellow-400 hover:text-yellow-600':
-                            ride.type === 'taxi',
-                        },
-                        {
-                          'text-green-400 hover:text-green-600':
-                            ride.type === 'offer',
-                        },
-                        {
-                          'text-blue-400 hover:text-blue-600':
-                            ride.type === 'request',
-                        },
-                      )}
-                    />
-                  </a>
+                <div className="ml-2 flex flex-row gap-4 text-lg text-indigo-600">
+                  <ContactItem
+                    type={ride.type}
+                    link={`mailto:${contact.email}`}
+                    icon={faEnvelope}
+                  />
                   {contact.phone && (
-                    <a href={`tel:${contact.phone}`}>
-                      <FontAwesomeIcon
-                        icon={faPhone}
-                        className={cn(
-                          'transition',
-                          {
-                            'text-yellow-400 hover:text-yellow-600':
-                              ride.type === 'taxi',
-                          },
-                          {
-                            'text-green-400 hover:text-green-600':
-                              ride.type === 'offer',
-                          },
-                          {
-                            'text-blue-400 hover:text-blue-600':
-                              ride.type === 'request',
-                          },
-                        )}
-                      />
-                    </a>
+                    <ContactItem
+                      type={ride.type}
+                      link={`tel:${contact.phone}`}
+                      icon={faPhone}
+                    />
+                  )}
+                  {contact.whatsapp && (
+                    <ContactItem
+                      type={ride.type}
+                      link={`https://wa.me/${contact.whatsapp}`}
+                      icon={faWhatsapp}
+                      className="text-2xl"
+                    />
                   )}
                 </div>
               )}
@@ -217,5 +196,43 @@ export default function RideItem({ ride }: IRideItemProps) {
         </div>
       </div>
     </div>
+  )
+}
+
+function ContactItem({
+  type,
+  link,
+  icon,
+  className,
+}: {
+  type: string
+  link: string
+  icon: any
+  className?: string
+}) {
+  return (
+    <a
+      href={link}
+      target="_blank"
+      rel="noreferrer"
+      className="flex justify-center items-center"
+    >
+      <FontAwesomeIcon
+        icon={icon}
+        className={cn(
+          className,
+          'transition',
+          {
+            'text-yellow-400 hover:text-yellow-600': type === 'taxi',
+          },
+          {
+            'text-green-400 hover:text-green-600': type === 'offer',
+          },
+          {
+            'text-blue-400 hover:text-blue-600': type === 'request',
+          },
+        )}
+      />
+    </a>
   )
 }

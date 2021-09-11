@@ -11,13 +11,13 @@ interface IModalData {
 }
 
 export interface IModalInterface {
-  alert: CallableFunction
-  error: CallableFunction
+  alert: (args: IModalData) => void
+  error: (args: IModalData) => void
 }
 
 const modalContext = createContext<IModalInterface>({
-  alert: (args: IModalData) => null,
-  error: (args: IModalData) => null,
+  alert: (args: IModalData) => undefined,
+  error: (args: IModalData) => undefined,
 })
 
 export function ModalProvider(props: any) {

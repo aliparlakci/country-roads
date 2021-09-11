@@ -40,9 +40,9 @@ type UserFindInserter interface {
 	UserInserter
 }
 
-func (u *UserCollection) FindOne(ctx context.Context, filter interface{}) (models.User, error) {
+func (c *UserCollection) FindOne(ctx context.Context, filter interface{}) (models.User, error) {
 	var user models.User
-	result := u.Collection.FindOne(ctx, filter)
+	result := c.Collection.FindOne(ctx, filter)
 	if err := result.Err(); err != nil {
 		return user, err
 	}
@@ -50,8 +50,8 @@ func (u *UserCollection) FindOne(ctx context.Context, filter interface{}) (model
 	return user, err
 }
 
-func (u *UserCollection) InsertOne(ctx context.Context, candidate models.UserSchema) (interface{}, error) {
-	result, err := u.Collection.InsertOne(ctx, candidate)
+func (c *UserCollection) InsertOne(ctx context.Context, candidate models.UserSchema) (interface{}, error) {
+	result, err := c.Collection.InsertOne(ctx, candidate)
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +59,7 @@ func (u *UserCollection) InsertOne(ctx context.Context, candidate models.UserSch
 	return result.InsertedID, nil
 }
 
-func (u *UserCollection) UpdateOne(ctx context.Context, filter interface{}, changes interface{}) error {
-	_, err := u.Collection.UpdateOne(ctx, filter, changes)
+func (c *UserCollection) UpdateOne(ctx context.Context, filter interface{}, changes interface{}) error {
+	_, err := c.Collection.UpdateOne(ctx, filter, changes)
 	return err
 }

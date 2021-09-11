@@ -2,7 +2,8 @@ import React from 'react'
 import { Disclosure } from '@headlessui/react'
 import cn from 'classnames'
 import { Link } from 'react-router-dom'
-import { PlusSmIcon } from '@heroicons/react/outline'
+import { FilterIcon as FilterIconOutline, PlusSmIcon } from '@heroicons/react/outline'
+import { FilterIcon as FilterIconSolid } from '@heroicons/react/solid'
 
 import RideList from '../components/RideList'
 import useAuth from '../hooks/useAuth'
@@ -34,11 +35,11 @@ export default function MainView() {
             {({ open }) => (
               <div
                 className={cn(
-                  'transition px-3 py-1 flex justify-end items-center gap-1 mr-2 text-base sm:text-sm rounded-full border-2 border-transparent text-indigo-600',
-                  { 'border-indigo-600': open },
+                  'transition mx-3 py-1 flex justify-end items-center gap-1 text-base sm:text-sm rounded-full border-transparent text-indigo-600',
                 )}
               >
-                Show filters
+                {!open && <FilterIconOutline className="h-6" />}
+                {open && <FilterIconSolid className="h-6" />}
               </div>
             )}
           </Disclosure.Button>

@@ -124,7 +124,7 @@ func TestSignUp(t *testing.T) {
 
 			recorder := httptest.NewRecorder()
 			_, r := gin.CreateTestContext(recorder)
-			r.POST("/users", PostUser(mockUserFindInserter, validator))
+			r.POST("/users", CreateUser(mockUserFindInserter, validator))
 
 			request, err := http.NewRequest(http.MethodPost, "/users", nil)
 			request.MultipartForm = &tt.Body

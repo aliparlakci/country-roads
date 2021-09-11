@@ -1,12 +1,13 @@
 import React from 'react'
 import {
-  AdjustmentsIcon,
+  CogIcon,
+  CollectionIcon,
   LoginIcon,
   MailIcon,
   NewspaperIcon,
   PlusIcon,
-  UserIcon,
 } from '@heroicons/react/outline'
+import { UserIcon } from '@heroicons/react/solid'
 import { Link } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faGithub } from '@fortawesome/free-brands-svg-icons'
@@ -43,7 +44,7 @@ function Navigation({ dark }: { dark?: boolean }) {
     <nav className="px-2 space-y-1">
       {!user && (
         <MenuItem
-          href={CONSTANTS.ROUTES.LOGIN}
+          href={CONSTANTS.ROUTES.SIGNIN}
           current={false}
           Icon={LoginIcon}
           label="Sign in"
@@ -71,8 +72,19 @@ function Navigation({ dark }: { dark?: boolean }) {
           <MenuItem
             href={CONSTANTS.ROUTES.ME}
             current={false}
-            Icon={UserIcon}
-            label="Profile"
+            Icon={CollectionIcon}
+            label="Your Posts"
+            dark={dark}
+          />
+        </>
+      )}
+      {user && (
+        <>
+          <MenuItem
+            href={CONSTANTS.ROUTES.SETTINGS}
+            current={false}
+            Icon={CogIcon}
+            label="Settings"
             dark={dark}
           />
         </>
@@ -108,16 +120,26 @@ function MenuItem({ label, Icon, href, current, dark }: IMenuItemProps) {
 function Credits({ dark }: { dark?: boolean }) {
   return (
     <div className="mx-5 space-y-6">
-      <div
-        className={cn(
-          { 'text-indigo-200': dark },
-          { 'text-gray-500': !dark },
-          'text-sm text-left select-none',
-        )}
-      >
-        {/* This project is developed by <b>Ali Parlakçı</b> */}
-      </div>
       <div className="gap-2 justify-center flex flex-col">
+        <div className="flex items-center">
+          <UserIcon
+            className={cn(
+              'h-5',
+              { 'text-indigo-200': dark },
+              { 'text-gray-500': !dark },
+            )}
+          />
+          <a
+            href="https://github.com/aliparlakci"
+            className={cn(
+              { 'text-indigo-200': dark },
+              { 'text-gray-500': !dark },
+              'text-sm pl-2',
+            )}
+          >
+            Developed by Ali Parlakçı
+          </a>
+        </div>
         <div className="flex items-center">
           <FontAwesomeIcon
             icon={faGithub}
@@ -138,7 +160,7 @@ function Credits({ dark }: { dark?: boolean }) {
             github.com/aliparlakci
           </a>
         </div>
-        <div className="flex items-start">
+        <div className="flex items-center">
           <MailIcon
             className={cn(
               'inline-block h-5',
@@ -154,7 +176,7 @@ function Credits({ dark }: { dark?: boolean }) {
               { 'text-gray-500': !dark },
             )}
           >
-            aliparlakci@sabanciuniv.edu
+            parlakciali@gmail.com
           </a>
         </div>
       </div>

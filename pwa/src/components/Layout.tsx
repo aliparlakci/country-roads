@@ -91,7 +91,7 @@ export default function Layout({ children }: any) {
             <div className="flex items-center">
               {!user && (
                 <Link
-                  to={CONSTANTS.ROUTES.LOGIN}
+                  to={CONSTANTS.ROUTES.SIGNIN}
                   className="bg-indigo-600 hover:bg-indigo-800 text-white group flex items-center px-4 py-2 text-base font-medium rounded-full shadow max-h-12 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 border border-transparent"
                 >
                   Sign in
@@ -101,7 +101,7 @@ export default function Layout({ children }: any) {
           </div>
         </div>
         <div className="flex flex-row justify-center items-start h-full w-full">
-          <main className="py-6 px-4 w-full h-full sm:px-6 md:px-8 max-w-4xl">
+          <main className="py-6 px-4 w-full h-full sm:px-6 md:px-24">
             {children}
           </main>
         </div>

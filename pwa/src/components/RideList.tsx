@@ -14,7 +14,7 @@ export default function RideList(props: IRideListProps) {
   if (data && data.error) return <div>Error</div>
 
   return (
-    <div className="grid gap-2 grid-cols-1 sm:grid-cols-3">
+    <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
       {data &&
         data.results &&
         data.results.map((ride, i) => <RideItem key={i} ride={ride} />)}

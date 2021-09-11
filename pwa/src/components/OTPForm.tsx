@@ -4,9 +4,17 @@ import React, { useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import { mutate } from 'swr'
 import CONSTANTS from '../constants'
+import useModal from '../hooks/useModal'
 
-export default function OTPForm({ email }: { email: string }) {
+interface IOTPFormProps {
+  email: string
+  redirect: string
+}
+
+export default function OTPForm({ email, redirect }: IOTPFormProps) {
   const [loading, setLoading] = useState(false)
+
+  const { alert, error } = useModal()
   const history = useHistory()
 
   const handleLogin = async (event: any) => {
@@ -25,14 +33,20 @@ export default function OTPForm({ email }: { email: string }) {
       console.error(e)
     }
 
-    if (!result || result.status !== 200) {
+    if (!result) {
       setLoading(false)
-      console.log({ error: await result?.body?.getReader().read() })
+      error({ "header": "Something happened", body: "Unexpected confition occured" })
+      return
+    }
+
+    if (result.status === 400) {
+      setLoading(false)
+      error({ "header": "Incorrect code", body: "One time password did not match" })
       return
     }
 
     mutate(CONSTANTS.API.AUTH.USER)
-    history.push(CONSTANTS.ROUTES.RIDES.MAIN)
+    history.push(redirect)
   }
 
   return (

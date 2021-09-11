@@ -1,5 +1,5 @@
 export const ROUTES = {
-  LOGIN: '/login',
+  SIGNIN: '/signin',
   REGISTER: '/register',
   LOGOUT: '/logout',
   OTP: '/verify',
@@ -9,6 +9,7 @@ export const ROUTES = {
     DETAILS: '/rides/:id',
   },
   ME: '/me',
+  SETTINGS: '/settings',
   LOCATIONS: {
     NEW: '/locations/new',
   },

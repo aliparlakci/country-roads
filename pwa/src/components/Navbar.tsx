@@ -22,7 +22,7 @@ export default function Navbar() {
       {!user && (
         <StyledNavRow>
           <StyledNavItem>
-            <Link to={CONSTANTS.ROUTES.LOGIN}>Login</Link>
+            <Link to={CONSTANTS.ROUTES.SIGNIN}>Login</Link>
           </StyledNavItem>
           <StyledNavItem>
             <Link to={CONSTANTS.ROUTES.REGISTER}>Register</Link>

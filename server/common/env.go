@@ -11,12 +11,15 @@ type Env struct {
 }
 
 type RepositoryContainer struct {
+	repositories.ContactRepository
 	repositories.RideRepository
 	repositories.LocationRepository
 	repositories.UserRepository
 }
 
 type ServiceContainer struct {
-	services.SessionService
+	services.MailingService
 	services.OTPService
+	services.SessionService
+	services.UserService
 }

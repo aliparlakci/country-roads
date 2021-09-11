@@ -4,10 +4,10 @@ import { faCircleNotch } from '@fortawesome/free-solid-svg-icons'
 import CONSTANTS from '../constants'
 import { useHistory } from 'react-router-dom'
 
-export default function LoginForm({ email: defaultEmail }: { email: string }) {
+export default function LoginForm() {
   const history = useHistory()
   const [loading, setLoading] = useState(false)
-  const [email, setEmail] = useState(defaultEmail)
+  const [email, setEmail] = useState("")
 
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (
     event,
@@ -29,14 +29,15 @@ export default function LoginForm({ email: defaultEmail }: { email: string }) {
     }
 
     if (response.status === 200) {
-      history.push(`${CONSTANTS.ROUTES.OTP}?email=${email}`)
+      history.push(`${CONSTANTS.ROUTES.OTP}?email=${email}&redirect=${CONSTANTS.ROUTES.RIDES.MAIN}`)
       return
     }
 
-    if (response.status === 400) {
-      history.push(`${CONSTANTS.ROUTES.REGISTER}?email=${email}`)
+    if (response.status === 201) {
+      history.push(`${CONSTANTS.ROUTES.OTP}?email=${email}&redirect=${CONSTANTS.ROUTES.SETTINGS}`)
       return
     }
+
     setLoading(false)
   }
 
@@ -58,7 +59,6 @@ export default function LoginForm({ email: defaultEmail }: { email: string }) {
                 type="email"
                 autoComplete="email"
                 pattern="^.+@sabanciuniv\.edu$"
-                defaultValue={defaultEmail}
                 required
                 autoFocus
                 onChange={(event) => setEmail(event.target.value)}

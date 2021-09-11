@@ -88,7 +88,7 @@ func (n NewRideForm) validate() (bool, error) {
 }
 
 func (n *NewRideForm) Bind(c *gin.Context) error {
-	if err := c.Bind(n); err != nil {
+	if err := c.ShouldBind(n); err != nil {
 		return fmt.Errorf(err.Error())
 	}
 
