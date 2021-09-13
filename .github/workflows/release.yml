@@ -42,6 +42,6 @@ jobs:
           
       - name: Build and publish pwa
         run: |
-          cd ./server
+          cd ./pwa
           docker build -t ghcr.io/aliparlakci/country-roads/pwa:latest -t ghcr.io/aliparlakci/country-roads/pwa:${{ steps.tag_name.outputs.SOURCE_TAG }} .
           docker image push --all-tags ghcr.io/aliparlakci/country-roads/pwa
