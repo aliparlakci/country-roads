@@ -28,7 +28,10 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Set tag name
         id: tag_name
-        run: echo ::set-output name=SOURCE_TAG::${GITHUB_REF#refs/tags/}
+        run: |
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+          echo ::set-output name=SOURCE_TAG::$VERSION
       - name: Publish server
         uses: docker/build-push-action@v2
         with:
