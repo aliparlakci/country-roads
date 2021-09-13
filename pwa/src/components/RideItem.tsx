@@ -49,7 +49,8 @@ export default function RideItem({ ride }: IRideItemProps) {
       // TODO: Bring up an alert
       return
     }
-
+    
+    setDeleteLoading(false)
     await mutateWithQueries(CONSTANTS.API.RIDES)
   }
 

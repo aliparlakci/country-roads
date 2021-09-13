@@ -1,4 +1,6 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
+import cn from 'classnames'
 import {
   CogIcon,
   CollectionIcon,
@@ -8,10 +10,9 @@ import {
   PlusIcon,
 } from '@heroicons/react/outline'
 import { UserIcon } from '@heroicons/react/solid'
-import { Link } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faGithub } from '@fortawesome/free-brands-svg-icons'
-import cn from 'classnames'
+
 import useAuth from '../hooks/useAuth'
 import CONSTANTS from '../constants'
 
@@ -69,13 +70,13 @@ function Navigation({ dark }: { dark?: boolean }) {
       />
       {user && (
         <>
-          <MenuItem
+          {/* <MenuItem
             href={CONSTANTS.ROUTES.ME}
             current={false}
             Icon={CollectionIcon}
             label="Your Posts"
             dark={dark}
-          />
+          /> */}
         </>
       )}
       {user && (

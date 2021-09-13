@@ -22,6 +22,7 @@ export default function RideFilter() {
 
     history.push(`${pathname}?${params.toString()}`)
   }, [type, from, to, startDate, endDate, history, pathname])
+  
   return (
     <div>
       <div
